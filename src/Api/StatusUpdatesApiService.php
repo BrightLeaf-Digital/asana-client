@@ -95,6 +95,56 @@ class StatusUpdatesApiService
     }
 
     /**
+     * Delete a status update
+     *
+     * DELETE /status_updates/{status_update_gid}
+     *
+     * Deletes the specified status update. This action is permanent and cannot be undone.
+     *
+     * API Documentation: https://developers.asana.com/reference/deletestatusupdate
+     *
+     * @param string $statusUpdateGid The unique global ID of the status update to delete.
+     *                                Example: "12345"
+     * @param int $responseType The type of response to return:
+     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response
+     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * @return array The response data based on the specified response type:
+     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
+     *               - status: HTTP status code
+     *               - reason: Response status message
+     *               - headers: Response headers
+     *               - body: Decoded response body (empty data object)
+     *               - raw_body: Raw response body
+     *               - request: Original request details
+     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     *               - Complete decoded JSON response including empty data object
+     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     *               - Just the data object (empty JSON object {}) indicating successful deletion
+     *
+     * @throws AsanaApiException If the API request fails due to:
+     *                          - Invalid status update GID
+     *                          - Status update not found
+     *                          - Insufficient permissions to delete the status update
+     *                          - Network connectivity issues
+     *                          - Rate limiting
+     */
+    public function deleteStatusUpdate(
+        string $statusUpdateGid,
+        int $responseType = AsanaApiClient::RESPONSE_DATA
+    ): array {
+        $this->validateGid($statusUpdateGid, 'Status Update GID');
+
+        return $this->client->request(
+            'DELETE',
+            "status_updates/$statusUpdateGid",
+            [],
+            $responseType
+        );
+    }
+
+    /**
      * Get status updates for an object
      *
      * GET /status_updates
@@ -222,56 +272,6 @@ class StatusUpdatesApiService
             'POST',
             'status_updates',
             ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
-    }
-
-    /**
-     * Delete a status update
-     *
-     * DELETE /status_updates/{status_update_gid}
-     *
-     * Deletes the specified status update. This action is permanent and cannot be undone.
-     *
-     * API Documentation: https://developers.asana.com/reference/deletestatusupdate
-     *
-     * @param string $statusUpdateGid The unique global ID of the status update to delete.
-     *                                Example: "12345"
-     * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
-     *
-     * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body (empty data object)
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including empty data object
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data object (empty JSON object {}) indicating successful deletion
-     *
-     * @throws AsanaApiException If the API request fails due to:
-     *                          - Invalid status update GID
-     *                          - Status update not found
-     *                          - Insufficient permissions to delete the status update
-     *                          - Network connectivity issues
-     *                          - Rate limiting
-     */
-    public function deleteStatusUpdate(
-        string $statusUpdateGid,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
-    ): array {
-        $this->validateGid($statusUpdateGid, 'Status Update GID');
-
-        return $this->client->request(
-            'DELETE',
-            "status_updates/$statusUpdateGid",
-            [],
             $responseType
         );
     }

@@ -123,6 +123,75 @@ class StatusUpdatesApiServiceTest extends TestCase
         $this->service->getStatusUpdate('abc');
     }
 
+    // ── deleteStatusUpdate ──────────────────────────────────────────────
+
+    /**
+     * Test deleteStatusUpdate calls client with correct parameters.
+     */
+    public function testDeleteStatusUpdate(): void
+    {
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'DELETE',
+                'status_updates/12345',
+                [],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $result = $this->service->deleteStatusUpdate('12345');
+
+        $this->assertSame([], $result);
+    }
+
+    /**
+     * Test deleteStatusUpdate with custom response type.
+     */
+    public function testDeleteStatusUpdateWithCustomResponseType(): void
+    {
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'DELETE',
+                'status_updates/12345',
+                [],
+                AsanaApiClient::RESPONSE_FULL
+            )
+            ->willReturn([]);
+
+        $this->service->deleteStatusUpdate(
+            '12345',
+            AsanaApiClient::RESPONSE_FULL
+        );
+    }
+
+    /**
+     * Test deleteStatusUpdate throws exception for empty GID.
+     */
+    public function testDeleteStatusUpdateThrowsExceptionForEmptyGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Status Update GID must be a non-empty string.'
+        );
+
+        $this->service->deleteStatusUpdate('');
+    }
+
+    /**
+     * Test deleteStatusUpdate throws exception for non-numeric GID.
+     */
+    public function testDeleteStatusUpdateThrowsExceptionForNonNumericGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Status Update GID must be a numeric string.'
+        );
+
+        $this->service->deleteStatusUpdate('abc');
+    }
+
     // ── getStatusUpdatesForObject ───────────────────────────────────────
 
     /**
@@ -416,74 +485,5 @@ class StatusUpdatesApiServiceTest extends TestCase
         );
 
         $this->service->createStatusUpdate([]);
-    }
-
-    // ── deleteStatusUpdate ──────────────────────────────────────────────
-
-    /**
-     * Test deleteStatusUpdate calls client with correct parameters.
-     */
-    public function testDeleteStatusUpdate(): void
-    {
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with(
-                'DELETE',
-                'status_updates/12345',
-                [],
-                AsanaApiClient::RESPONSE_DATA
-            )
-            ->willReturn([]);
-
-        $result = $this->service->deleteStatusUpdate('12345');
-
-        $this->assertSame([], $result);
-    }
-
-    /**
-     * Test deleteStatusUpdate with custom response type.
-     */
-    public function testDeleteStatusUpdateWithCustomResponseType(): void
-    {
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with(
-                'DELETE',
-                'status_updates/12345',
-                [],
-                AsanaApiClient::RESPONSE_FULL
-            )
-            ->willReturn([]);
-
-        $this->service->deleteStatusUpdate(
-            '12345',
-            AsanaApiClient::RESPONSE_FULL
-        );
-    }
-
-    /**
-     * Test deleteStatusUpdate throws exception for empty GID.
-     */
-    public function testDeleteStatusUpdateThrowsExceptionForEmptyGid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Status Update GID must be a non-empty string.'
-        );
-
-        $this->service->deleteStatusUpdate('');
-    }
-
-    /**
-     * Test deleteStatusUpdate throws exception for non-numeric GID.
-     */
-    public function testDeleteStatusUpdateThrowsExceptionForNonNumericGid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Status Update GID must be a numeric string.'
-        );
-
-        $this->service->deleteStatusUpdate('abc');
     }
 }
