@@ -35,64 +35,6 @@ class TimeTrackingEntriesApiService
     }
 
     /**
-     * Get a time tracking entry
-     *
-     * GET /time_tracking_entries/{time_tracking_entry_gid}
-     *
-     * Returns the full record for a single time tracking entry.
-     *
-     * API Documentation: https://developers.asana.com/reference/gettimetrackingentry
-     *
-     * @param string $timeTrackingEntryGid The unique global ID of the time tracking entry.
-     *                                     Example: "12345"
-     * @param array $options Optional parameters to customize the request:
-     *                      - opt_fields (string): A comma-separated list of fields to include
-     *                        (e.g., "created_by,duration_minutes,entered_on,task")
-     *                      - opt_pretty (bool): Returns formatted JSON if true
-     * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
-     *
-     * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body containing time tracking entry data
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including data object and other metadata
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data object containing the entry details including:
-     *                 - gid: Unique identifier of the time tracking entry
-     *                 - resource_type: Always "time_tracking_entry"
-     *                 - duration_minutes: Duration in minutes
-     *                 - entered_on: Date the time was entered for
-     *                 - created_by: Object containing the creator details
-     *                 - task: Object containing the associated task details
-     *                 Additional fields as specified in opt_fields
-     *
-     * @throws AsanaApiException If invalid GID provided, insufficient permissions,
-     *                          network issues, or rate limiting occurs
-     */
-    public function getTimeTrackingEntry(
-        string $timeTrackingEntryGid,
-        array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
-    ): array {
-        $this->validateGid($timeTrackingEntryGid, 'Time Tracking Entry GID');
-
-        return $this->client->request(
-            'GET',
-            "time_tracking_entries/$timeTrackingEntryGid",
-            ['query' => $options],
-            $responseType
-        );
-    }
-
-    /**
      * Get time tracking entries for a task
      *
      * GET /tasks/{task_gid}/time_tracking_entries
@@ -216,6 +158,64 @@ class TimeTrackingEntriesApiService
     }
 
     /**
+     * Get a time tracking entry
+     *
+     * GET /time_tracking_entries/{time_tracking_entry_gid}
+     *
+     * Returns the full record for a single time tracking entry.
+     *
+     * API Documentation: https://developers.asana.com/reference/gettimetrackingentry
+     *
+     * @param string $timeTrackingEntryGid The unique global ID of the time tracking entry.
+     *                                     Example: "12345"
+     * @param array $options Optional parameters to customize the request:
+     *                      - opt_fields (string): A comma-separated list of fields to include
+     *                        (e.g., "created_by,duration_minutes,entered_on,task")
+     *                      - opt_pretty (bool): Returns formatted JSON if true
+     * @param int $responseType The type of response to return:
+     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response
+     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * @return array The response data based on the specified response type:
+     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
+     *               - status: HTTP status code
+     *               - reason: Response status message
+     *               - headers: Response headers
+     *               - body: Decoded response body containing time tracking entry data
+     *               - raw_body: Raw response body
+     *               - request: Original request details
+     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     *               - Complete decoded JSON response including data object and other metadata
+     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     *               - Just the data object containing the entry details including:
+     *                 - gid: Unique identifier of the time tracking entry
+     *                 - resource_type: Always "time_tracking_entry"
+     *                 - duration_minutes: Duration in minutes
+     *                 - entered_on: Date the time was entered for
+     *                 - created_by: Object containing the creator details
+     *                 - task: Object containing the associated task details
+     *                 Additional fields as specified in opt_fields
+     *
+     * @throws AsanaApiException If invalid GID provided, insufficient permissions,
+     *                          network issues, or rate limiting occurs
+     */
+    public function getTimeTrackingEntry(
+        string $timeTrackingEntryGid,
+        array $options = [],
+        int $responseType = AsanaApiClient::RESPONSE_DATA
+    ): array {
+        $this->validateGid($timeTrackingEntryGid, 'Time Tracking Entry GID');
+
+        return $this->client->request(
+            'GET',
+            "time_tracking_entries/$timeTrackingEntryGid",
+            ['query' => $options],
+            $responseType
+        );
+    }
+
+    /**
      * Update a time tracking entry
      *
      * PUT /time_tracking_entries/{time_tracking_entry_gid}
@@ -317,6 +317,59 @@ class TimeTrackingEntriesApiService
             'DELETE',
             "time_tracking_entries/$timeTrackingEntryGid",
             [],
+            $responseType
+        );
+    }
+
+    /**
+     * Get multiple time tracking entries
+     *
+     * GET /time_tracking_entries
+     *
+     * Returns time tracking entry records filtered by the given criteria.
+     *
+     * API Documentation: https://developers.asana.com/reference/gettimetrackingentries
+     *
+     * @param array $options Optional parameters to customize the request:
+     *                      Filtering parameters:
+     *                      - workspace (string): GID of the workspace to filter entries from
+     *                      - start_date (string): Start date in YYYY-MM-DD format to filter entries
+     *                      - end_date (string): End date in YYYY-MM-DD format to filter entries
+     *                      Pagination parameters:
+     *                      - limit (int): Maximum number of entries to return. Default is 20, max is 100
+     *                      - offset (string): Offset token for pagination
+     *                      Display parameters:
+     *                      - opt_fields (string): A comma-separated list of fields to include
+     *                        (e.g., "created_by,duration_minutes,entered_on,task")
+     *                      - opt_pretty (bool): Returns formatted JSON if true
+     * @param int $responseType The type of response to return:
+     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response
+     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * @return array The response data based on the specified response type:
+     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
+     *               - status: HTTP status code
+     *               - reason: Response status message
+     *               - headers: Response headers
+     *               - body: Decoded response body containing time tracking entry data
+     *               - raw_body: Raw response body
+     *               - request: Original request details
+     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     *               - Complete decoded JSON response including data array and pagination info
+     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     *               - Just the data array containing the list of time tracking entries
+     *
+     * @throws AsanaApiException If insufficient permissions, network issues, or rate limiting occurs
+     */
+    public function getTimeTrackingEntries(
+        array $options = [],
+        int $responseType = AsanaApiClient::RESPONSE_DATA
+    ): array {
+        return $this->client->request(
+            'GET',
+            'time_tracking_entries',
+            ['query' => $options],
             $responseType
         );
     }
