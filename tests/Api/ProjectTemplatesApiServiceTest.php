@@ -121,6 +121,75 @@ class ProjectTemplatesApiServiceTest extends TestCase
         $this->service->getProjectTemplate('abc');
     }
 
+    // ── deleteProjectTemplate ───────────────────────────────────────────
+
+    /**
+     * Test deleteProjectTemplate calls client with correct parameters.
+     */
+    public function testDeleteProjectTemplate(): void
+    {
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'DELETE',
+                'project_templates/12345',
+                [],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $result = $this->service->deleteProjectTemplate('12345');
+
+        $this->assertSame([], $result);
+    }
+
+    /**
+     * Test deleteProjectTemplate with custom response type.
+     */
+    public function testDeleteProjectTemplateWithCustomResponseType(): void
+    {
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'DELETE',
+                'project_templates/12345',
+                [],
+                AsanaApiClient::RESPONSE_FULL
+            )
+            ->willReturn([]);
+
+        $this->service->deleteProjectTemplate(
+            '12345',
+            AsanaApiClient::RESPONSE_FULL
+        );
+    }
+
+    /**
+     * Test deleteProjectTemplate throws exception for empty GID.
+     */
+    public function testDeleteProjectTemplateThrowsExceptionForEmptyGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Project Template GID must be a non-empty string.'
+        );
+
+        $this->service->deleteProjectTemplate('');
+    }
+
+    /**
+     * Test deleteProjectTemplate throws exception for non-numeric GID.
+     */
+    public function testDeleteProjectTemplateThrowsExceptionForNonNumericGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Project Template GID must be a numeric string.'
+        );
+
+        $this->service->deleteProjectTemplate('abc');
+    }
+
     // ── getProjectTemplates ─────────────────────────────────────────────
 
     /**
@@ -483,74 +552,5 @@ class ProjectTemplatesApiServiceTest extends TestCase
             '12345',
             ['team' => '67890', 'public' => true]
         );
-    }
-
-    // ── deleteProjectTemplate ───────────────────────────────────────────
-
-    /**
-     * Test deleteProjectTemplate calls client with correct parameters.
-     */
-    public function testDeleteProjectTemplate(): void
-    {
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with(
-                'DELETE',
-                'project_templates/12345',
-                [],
-                AsanaApiClient::RESPONSE_DATA
-            )
-            ->willReturn([]);
-
-        $result = $this->service->deleteProjectTemplate('12345');
-
-        $this->assertSame([], $result);
-    }
-
-    /**
-     * Test deleteProjectTemplate with custom response type.
-     */
-    public function testDeleteProjectTemplateWithCustomResponseType(): void
-    {
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with(
-                'DELETE',
-                'project_templates/12345',
-                [],
-                AsanaApiClient::RESPONSE_FULL
-            )
-            ->willReturn([]);
-
-        $this->service->deleteProjectTemplate(
-            '12345',
-            AsanaApiClient::RESPONSE_FULL
-        );
-    }
-
-    /**
-     * Test deleteProjectTemplate throws exception for empty GID.
-     */
-    public function testDeleteProjectTemplateThrowsExceptionForEmptyGid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Project Template GID must be a non-empty string.'
-        );
-
-        $this->service->deleteProjectTemplate('');
-    }
-
-    /**
-     * Test deleteProjectTemplate throws exception for non-numeric GID.
-     */
-    public function testDeleteProjectTemplateThrowsExceptionForNonNumericGid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Project Template GID must be a numeric string.'
-        );
-
-        $this->service->deleteProjectTemplate('abc');
     }
 }

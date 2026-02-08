@@ -94,6 +94,57 @@ class ProjectTemplatesApiService
     }
 
     /**
+     * Delete a project template
+     *
+     * DELETE /project_templates/{project_template_gid}
+     *
+     * Deletes the specified project template. This action is permanent
+     * and cannot be undone.
+     *
+     * API Documentation: https://developers.asana.com/reference/deleteprojecttemplate
+     *
+     * @param string $projectTemplateGid The unique global ID of the project template.
+     *                                   Example: "12345"
+     * @param int $responseType The type of response to return:
+     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response
+     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * @return array The response data based on the specified response type:
+     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
+     *               - status: HTTP status code
+     *               - reason: Response status message
+     *               - headers: Response headers
+     *               - body: Decoded response body (empty data object)
+     *               - raw_body: Raw response body
+     *               - request: Original request details
+     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     *               - Complete decoded JSON response including empty data object
+     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     *               - Just the data object (empty JSON object {}) indicating successful deletion
+     *
+     * @throws AsanaApiException If the API request fails due to:
+     *                          - Invalid project template GID
+     *                          - Template not found
+     *                          - Insufficient permissions to delete the template
+     *                          - Network connectivity issues
+     *                          - Rate limiting
+     */
+    public function deleteProjectTemplate(
+        string $projectTemplateGid,
+        int $responseType = AsanaApiClient::RESPONSE_DATA
+    ): array {
+        $this->validateGid($projectTemplateGid, 'Project Template GID');
+
+        return $this->client->request(
+            'DELETE',
+            "project_templates/$projectTemplateGid",
+            [],
+            $responseType
+        );
+    }
+
+    /**
      * Get multiple project templates
      *
      * GET /project_templates
@@ -265,57 +316,6 @@ class ProjectTemplatesApiService
             'POST',
             "project_templates/$projectTemplateGid/instantiateProject",
             ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
-    }
-
-    /**
-     * Delete a project template
-     *
-     * DELETE /project_templates/{project_template_gid}
-     *
-     * Deletes the specified project template. This action is permanent
-     * and cannot be undone.
-     *
-     * API Documentation: https://developers.asana.com/reference/deleteprojecttemplate
-     *
-     * @param string $projectTemplateGid The unique global ID of the project template.
-     *                                   Example: "12345"
-     * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
-     *
-     * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body (empty data object)
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including empty data object
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data object (empty JSON object {}) indicating successful deletion
-     *
-     * @throws AsanaApiException If the API request fails due to:
-     *                          - Invalid project template GID
-     *                          - Template not found
-     *                          - Insufficient permissions to delete the template
-     *                          - Network connectivity issues
-     *                          - Rate limiting
-     */
-    public function deleteProjectTemplate(
-        string $projectTemplateGid,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
-    ): array {
-        $this->validateGid($projectTemplateGid, 'Project Template GID');
-
-        return $this->client->request(
-            'DELETE',
-            "project_templates/$projectTemplateGid",
-            [],
             $responseType
         );
     }
