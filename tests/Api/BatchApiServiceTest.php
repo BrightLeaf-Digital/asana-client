@@ -25,10 +25,10 @@ class BatchApiServiceTest extends TestCase
         $this->service = new BatchApiService($this->mockClient);
     }
 
-    // ── submitBatchRequest ──────────────────────────────────────────────
+    // ── createBatchRequest ──────────────────────────────────────────────
 
     /**
-     * Test submitBatchRequest calls client with correct parameters.
+     * Test createBatchRequest calls client with correct parameters.
      */
     public function testSubmitBatchRequest(): void
     {
@@ -60,13 +60,13 @@ class BatchApiServiceTest extends TestCase
             )
             ->willReturn($expectedResponse);
 
-        $result = $this->service->submitBatchRequest($actions);
+        $result = $this->service->createBatchRequest($actions);
 
         $this->assertSame($expectedResponse, $result);
     }
 
     /**
-     * Test submitBatchRequest with multiple actions.
+     * Test createBatchRequest with multiple actions.
      */
     public function testSubmitBatchRequestWithMultipleActions(): void
     {
@@ -100,11 +100,11 @@ class BatchApiServiceTest extends TestCase
             )
             ->willReturn([]);
 
-        $this->service->submitBatchRequest($actions);
+        $this->service->createBatchRequest($actions);
     }
 
     /**
-     * Test submitBatchRequest with options.
+     * Test createBatchRequest with options.
      */
     public function testSubmitBatchRequestWithOptions(): void
     {
@@ -129,11 +129,11 @@ class BatchApiServiceTest extends TestCase
             )
             ->willReturn([]);
 
-        $this->service->submitBatchRequest($actions, $options);
+        $this->service->createBatchRequest($actions, $options);
     }
 
     /**
-     * Test submitBatchRequest with custom response type.
+     * Test createBatchRequest with custom response type.
      */
     public function testSubmitBatchRequestWithCustomResponseType(): void
     {
@@ -157,7 +157,7 @@ class BatchApiServiceTest extends TestCase
             )
             ->willReturn([]);
 
-        $this->service->submitBatchRequest(
+        $this->service->createBatchRequest(
             $actions,
             [],
             AsanaApiClient::RESPONSE_FULL
@@ -165,7 +165,7 @@ class BatchApiServiceTest extends TestCase
     }
 
     /**
-     * Test submitBatchRequest with action containing options.
+     * Test createBatchRequest with action containing options.
      */
     public function testSubmitBatchRequestWithActionOptions(): void
     {
@@ -192,11 +192,11 @@ class BatchApiServiceTest extends TestCase
             )
             ->willReturn([]);
 
-        $this->service->submitBatchRequest($actions);
+        $this->service->createBatchRequest($actions);
     }
 
     /**
-     * Test submitBatchRequest with delete action.
+     * Test createBatchRequest with delete action.
      */
     public function testSubmitBatchRequestWithDeleteAction(): void
     {
@@ -220,13 +220,13 @@ class BatchApiServiceTest extends TestCase
             )
             ->willReturn([]);
 
-        $this->service->submitBatchRequest($actions);
+        $this->service->createBatchRequest($actions);
     }
 
     // ── Validation ──────────────────────────────────────────────────────
 
     /**
-     * Test submitBatchRequest throws exception for empty actions array.
+     * Test createBatchRequest throws exception for empty actions array.
      */
     public function testSubmitBatchRequestThrowsExceptionForEmptyActions(): void
     {
@@ -235,7 +235,7 @@ class BatchApiServiceTest extends TestCase
             'Actions array must not be empty for batch request.'
         );
 
-        $this->service->submitBatchRequest([]);
+        $this->service->createBatchRequest([]);
     }
 
     /**
@@ -248,7 +248,7 @@ class BatchApiServiceTest extends TestCase
             'Action at index 0 is missing required field(s): relative_path'
         );
 
-        $this->service->submitBatchRequest([
+        $this->service->createBatchRequest([
             ['method' => 'get'],
         ]);
     }
@@ -263,7 +263,7 @@ class BatchApiServiceTest extends TestCase
             'Action at index 0 is missing required field(s): method'
         );
 
-        $this->service->submitBatchRequest([
+        $this->service->createBatchRequest([
             ['relative_path' => '/tasks/12345'],
         ]);
     }
@@ -279,7 +279,7 @@ class BatchApiServiceTest extends TestCase
             . 'relative_path, method'
         );
 
-        $this->service->submitBatchRequest([
+        $this->service->createBatchRequest([
             ['data' => ['name' => 'test']],
         ]);
     }
@@ -294,7 +294,7 @@ class BatchApiServiceTest extends TestCase
             'Action at index 1 is missing required field(s): method'
         );
 
-        $this->service->submitBatchRequest([
+        $this->service->createBatchRequest([
             ['relative_path' => '/tasks/12345', 'method' => 'get'],
             ['relative_path' => '/tasks/67890'],
         ]);
@@ -310,7 +310,7 @@ class BatchApiServiceTest extends TestCase
             'Each action must be an array, invalid action at index 0.'
         );
 
-        $this->service->submitBatchRequest(['not-an-array']);
+        $this->service->createBatchRequest(['not-an-array']);
     }
 
     /**
@@ -323,7 +323,7 @@ class BatchApiServiceTest extends TestCase
             'Action at index 0 is missing required field(s): relative_path'
         );
 
-        $this->service->submitBatchRequest([
+        $this->service->createBatchRequest([
             ['relative_path' => '', 'method' => 'get'],
         ]);
     }
@@ -338,7 +338,7 @@ class BatchApiServiceTest extends TestCase
             'Action at index 0 is missing required field(s): method'
         );
 
-        $this->service->submitBatchRequest([
+        $this->service->createBatchRequest([
             ['relative_path' => '/tasks/12345', 'method' => ''],
         ]);
     }
@@ -353,7 +353,7 @@ class BatchApiServiceTest extends TestCase
             'Action at index 0 is missing required field(s): relative_path'
         );
 
-        $this->service->submitBatchRequest([
+        $this->service->createBatchRequest([
             ['relative_path' => '   ', 'method' => 'get'],
         ]);
     }
@@ -368,7 +368,7 @@ class BatchApiServiceTest extends TestCase
             'Action at index 0 is missing required field(s): method'
         );
 
-        $this->service->submitBatchRequest([
+        $this->service->createBatchRequest([
             ['relative_path' => '/tasks/12345', 'method' => '   '],
         ]);
     }

@@ -98,7 +98,7 @@ class BatchApiService
      *                                  required fields (relative_path, method)
      * @throws AsanaApiException If insufficient permissions, network issues, or rate limiting occurs
      */
-    public function submitBatchRequest(
+    public function createBatchRequest(
         array $actions,
         array $options = [],
         int $responseType = AsanaApiClient::RESPONSE_DATA
