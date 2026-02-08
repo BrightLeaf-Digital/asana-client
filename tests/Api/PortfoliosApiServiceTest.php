@@ -134,75 +134,6 @@ class PortfoliosApiServiceTest extends TestCase
         $this->service->getPortfolios('12345', 'abc');
     }
 
-    // ── getPortfolio ─────────────────────────────────────────────────
-
-    /**
-     * Test getPortfolio calls client with correct parameters.
-     */
-    public function testGetPortfolio(): void
-    {
-        $expectedResponse = ['gid' => '12345', 'resource_type' => 'portfolio', 'name' => 'My Portfolio'];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with('GET', 'portfolios/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
-            ->willReturn($expectedResponse);
-
-        $result = $this->service->getPortfolio('12345');
-
-        $this->assertSame($expectedResponse, $result);
-    }
-
-    /**
-     * Test getPortfolio with options.
-     */
-    public function testGetPortfolioWithOptions(): void
-    {
-        $options = ['opt_fields' => 'name,owner,members'];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with('GET', 'portfolios/12345', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
-            ->willReturn([]);
-
-        $this->service->getPortfolio('12345', $options);
-    }
-
-    /**
-     * Test getPortfolio with custom response type.
-     */
-    public function testGetPortfolioWithCustomResponseType(): void
-    {
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with('GET', 'portfolios/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
-            ->willReturn([]);
-
-        $this->service->getPortfolio('12345', [], AsanaApiClient::RESPONSE_FULL);
-    }
-
-    /**
-     * Test getPortfolio throws exception for empty GID.
-     */
-    public function testGetPortfolioThrowsExceptionForEmptyGid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
-
-        $this->service->getPortfolio('');
-    }
-
-    /**
-     * Test getPortfolio throws exception for non-numeric GID.
-     */
-    public function testGetPortfolioThrowsExceptionForNonNumericGid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
-
-        $this->service->getPortfolio('abc');
-    }
-
     // ── createPortfolio ──────────────────────────────────────────────
 
     /**
@@ -305,6 +236,75 @@ class PortfoliosApiServiceTest extends TestCase
         $this->expectExceptionMessage('Missing required field(s) for portfolio creation: name, workspace');
 
         $this->service->createPortfolio([]);
+    }
+
+    // ── getPortfolio ─────────────────────────────────────────────────
+
+    /**
+     * Test getPortfolio calls client with correct parameters.
+     */
+    public function testGetPortfolio(): void
+    {
+        $expectedResponse = ['gid' => '12345', 'resource_type' => 'portfolio', 'name' => 'My Portfolio'];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with('GET', 'portfolios/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->getPortfolio('12345');
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test getPortfolio with options.
+     */
+    public function testGetPortfolioWithOptions(): void
+    {
+        $options = ['opt_fields' => 'name,owner,members'];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with('GET', 'portfolios/12345', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->willReturn([]);
+
+        $this->service->getPortfolio('12345', $options);
+    }
+
+    /**
+     * Test getPortfolio with custom response type.
+     */
+    public function testGetPortfolioWithCustomResponseType(): void
+    {
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with('GET', 'portfolios/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->willReturn([]);
+
+        $this->service->getPortfolio('12345', [], AsanaApiClient::RESPONSE_FULL);
+    }
+
+    /**
+     * Test getPortfolio throws exception for empty GID.
+     */
+    public function testGetPortfolioThrowsExceptionForEmptyGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
+
+        $this->service->getPortfolio('');
+    }
+
+    /**
+     * Test getPortfolio throws exception for non-numeric GID.
+     */
+    public function testGetPortfolioThrowsExceptionForNonNumericGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
+
+        $this->service->getPortfolio('abc');
     }
 
     // ── updatePortfolio ──────────────────────────────────────────────
@@ -633,6 +633,143 @@ class PortfoliosApiServiceTest extends TestCase
         $this->expectExceptionMessage('Missing required field(s) for removing item from portfolio: item');
 
         $this->service->removeItemFromPortfolio('12345', []);
+    }
+
+    // ── addCustomFieldSettingForPortfolio ──────────────────────────
+
+    /**
+     * Test addCustomFieldSettingForPortfolio calls client with correct parameters.
+     */
+    public function testAddCustomFieldSettingForPortfolio(): void
+    {
+        $data = ['custom_field' => '67890', 'is_important' => true];
+        $expectedResponse = [
+            'gid' => '99999',
+            'resource_type' => 'custom_field_setting',
+            'custom_field' => ['gid' => '67890'],
+        ];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'portfolios/12345/addCustomFieldSetting',
+                ['json' => ['data' => $data]],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->addCustomFieldSettingForPortfolio('12345', $data);
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test addCustomFieldSettingForPortfolio with custom response type.
+     */
+    public function testAddCustomFieldSettingForPortfolioWithCustomResponseType(): void
+    {
+        $data = ['custom_field' => '67890'];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'portfolios/12345/addCustomFieldSetting',
+                ['json' => ['data' => $data]],
+                AsanaApiClient::RESPONSE_FULL
+            )
+            ->willReturn([]);
+
+        $this->service->addCustomFieldSettingForPortfolio('12345', $data, AsanaApiClient::RESPONSE_FULL);
+    }
+
+    /**
+     * Test addCustomFieldSettingForPortfolio throws exception for empty GID.
+     */
+    public function testAddCustomFieldSettingForPortfolioThrowsExceptionForEmptyGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
+
+        $this->service->addCustomFieldSettingForPortfolio('', ['custom_field' => '67890']);
+    }
+
+    /**
+     * Test addCustomFieldSettingForPortfolio throws exception for non-numeric GID.
+     */
+    public function testAddCustomFieldSettingForPortfolioThrowsExceptionForNonNumericGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
+
+        $this->service->addCustomFieldSettingForPortfolio('abc', ['custom_field' => '67890']);
+    }
+
+    // ── removeCustomFieldSettingForPortfolio ────────────────────────
+
+    /**
+     * Test removeCustomFieldSettingForPortfolio calls client with correct parameters.
+     */
+    public function testRemoveCustomFieldSettingForPortfolio(): void
+    {
+        $data = ['custom_field' => '67890'];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'portfolios/12345/removeCustomFieldSetting',
+                ['json' => ['data' => $data]],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $result = $this->service->removeCustomFieldSettingForPortfolio('12345', $data);
+
+        $this->assertSame([], $result);
+    }
+
+    /**
+     * Test removeCustomFieldSettingForPortfolio with custom response type.
+     */
+    public function testRemoveCustomFieldSettingForPortfolioWithCustomResponseType(): void
+    {
+        $data = ['custom_field' => '67890'];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'portfolios/12345/removeCustomFieldSetting',
+                ['json' => ['data' => $data]],
+                AsanaApiClient::RESPONSE_FULL
+            )
+            ->willReturn([]);
+
+        $this->service->removeCustomFieldSettingForPortfolio('12345', $data, AsanaApiClient::RESPONSE_FULL);
+    }
+
+    /**
+     * Test removeCustomFieldSettingForPortfolio throws exception for empty GID.
+     */
+    public function testRemoveCustomFieldSettingForPortfolioThrowsExceptionForEmptyGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
+
+        $this->service->removeCustomFieldSettingForPortfolio('', ['custom_field' => '67890']);
+    }
+
+    /**
+     * Test removeCustomFieldSettingForPortfolio throws exception for non-numeric GID.
+     */
+    public function testRemoveCustomFieldSettingForPortfolioThrowsExceptionForNonNumericGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
+
+        $this->service->removeCustomFieldSettingForPortfolio('abc', ['custom_field' => '67890']);
     }
 
     // ── addMembersToPortfolio ────────────────────────────────────────

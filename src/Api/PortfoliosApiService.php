@@ -98,64 +98,6 @@ class PortfoliosApiService
     }
 
     /**
-     * Get a portfolio
-     *
-     * GET /portfolios/{portfolio_gid}
-     *
-     * Returns the full record for a single portfolio.
-     *
-     * API Documentation: https://developers.asana.com/reference/getportfolio
-     *
-     * @param string $portfolioGid The unique global ID of the portfolio to retrieve.
-     *                             Example: "12345"
-     * @param array $options Optional parameters to customize the request:
-     *                      - opt_fields (string): A comma-separated list of fields to include in the response
-     *                        (e.g., "name,owner,workspace,members,color,created_at,due_on,start_on")
-     *                      - opt_pretty (bool): Returns formatted JSON if true
-     * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
-     *
-     * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body containing portfolio data
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including data object and other metadata
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data object containing the portfolio details including:
-     *                 - gid: Unique identifier of the portfolio
-     *                 - resource_type: Always "portfolio"
-     *                 - name: Name of the portfolio
-     *                 - owner: Object containing the owner details
-     *                 - workspace: Object containing the workspace details
-     *                 - members: Array of member objects
-     *                 - color: Color of the portfolio
-     *                 - created_at: Creation timestamp
-     *                 - due_on: Due date
-     *                 - start_on: Start date
-     *                 - permalink_url: URL to the portfolio in Asana
-     *                 Additional fields as specified in opt_fields
-     *
-     * @throws AsanaApiException If invalid portfolio GID provided, insufficient permissions,
-     *                          network issues, or rate limiting occurs
-     */
-    public function getPortfolio(
-        string $portfolioGid,
-        array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
-    ): array {
-        $this->validateGid($portfolioGid, 'Portfolio GID');
-
-        return $this->client->request('GET', "portfolios/$portfolioGid", ['query' => $options], $responseType);
-    }
-
-    /**
      * Create a portfolio
      *
      * POST /portfolios
@@ -215,6 +157,64 @@ class PortfoliosApiService
             ['json' => ['data' => $data], 'query' => $options],
             $responseType
         );
+    }
+
+    /**
+     * Get a portfolio
+     *
+     * GET /portfolios/{portfolio_gid}
+     *
+     * Returns the full record for a single portfolio.
+     *
+     * API Documentation: https://developers.asana.com/reference/getportfolio
+     *
+     * @param string $portfolioGid The unique global ID of the portfolio to retrieve.
+     *                             Example: "12345"
+     * @param array $options Optional parameters to customize the request:
+     *                      - opt_fields (string): A comma-separated list of fields to include in the response
+     *                        (e.g., "name,owner,workspace,members,color,created_at,due_on,start_on")
+     *                      - opt_pretty (bool): Returns formatted JSON if true
+     * @param int $responseType The type of response to return:
+     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
+     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * @return array The response data based on the specified response type:
+     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
+     *               - status: HTTP status code
+     *               - reason: Response status message
+     *               - headers: Response headers
+     *               - body: Decoded response body containing portfolio data
+     *               - raw_body: Raw response body
+     *               - request: Original request details
+     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     *               - Complete decoded JSON response including data object and other metadata
+     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     *               - Just the data object containing the portfolio details including:
+     *                 - gid: Unique identifier of the portfolio
+     *                 - resource_type: Always "portfolio"
+     *                 - name: Name of the portfolio
+     *                 - owner: Object containing the owner details
+     *                 - workspace: Object containing the workspace details
+     *                 - members: Array of member objects
+     *                 - color: Color of the portfolio
+     *                 - created_at: Creation timestamp
+     *                 - due_on: Due date
+     *                 - start_on: Start date
+     *                 - permalink_url: URL to the portfolio in Asana
+     *                 Additional fields as specified in opt_fields
+     *
+     * @throws AsanaApiException If invalid portfolio GID provided, insufficient permissions,
+     *                          network issues, or rate limiting occurs
+     */
+    public function getPortfolio(
+        string $portfolioGid,
+        array $options = [],
+        int $responseType = AsanaApiClient::RESPONSE_DATA
+    ): array {
+        $this->validateGid($portfolioGid, 'Portfolio GID');
+
+        return $this->client->request('GET', "portfolios/$portfolioGid", ['query' => $options], $responseType);
     }
 
     /**
@@ -490,6 +490,119 @@ class PortfoliosApiService
             'POST',
             "portfolios/$portfolioGid/removeItem",
             ['json' => ['data' => $data], 'query' => $options],
+            $responseType
+        );
+    }
+
+    /**
+     * Add a custom field setting to a portfolio
+     *
+     * POST /portfolios/{portfolio_gid}/addCustomFieldSetting
+     *
+     * Adds a custom field to the specified portfolio. Custom fields are defined per-workspace
+     * and must exist before they can be added to a portfolio.
+     *
+     * API Documentation: https://developers.asana.com/reference/addcustomfieldsettingforportfolio
+     *
+     * @param string $portfolioGid The unique global ID of the portfolio to add the custom field to.
+     *                             Example: "12345"
+     * @param array $data Data for adding the custom field setting. Supported fields include:
+     *                    - custom_field (string): The GID of the custom field to add to the portfolio.
+     *                      Example: "67890"
+     *                    - is_important (boolean): Whether this custom field is considered important
+     *                      for the portfolio. Important custom fields are displayed prominently.
+     *                    - insert_before (string): GID of the custom field setting to insert this
+     *                      new setting before.
+     *                    - insert_after (string): GID of the custom field setting to insert this
+     *                      new setting after.
+     *                    Example: ["custom_field" => "67890", "is_important" => true]
+     * @param int $responseType The type of response to return:
+     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
+     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * @return array The response data based on the specified response type:
+     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
+     *               - status: HTTP status code
+     *               - reason: Response status message
+     *               - headers: Response headers
+     *               - body: Decoded response body containing custom field setting data
+     *               - raw_body: Raw response body
+     *               - request: Original request details
+     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     *               - Complete decoded JSON response including data object and other metadata
+     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     *               - Just the data object containing the custom field setting details including:
+     *                 - gid: Unique identifier of the custom field setting
+     *                 - resource_type: Always "custom_field_setting"
+     *                 - custom_field: Object containing custom field details
+     *                 - is_important: Boolean indicating if the custom field is important
+     *
+     * @throws AsanaApiException If invalid portfolio GID provided, invalid custom field GID,
+     *                          insufficient permissions, or network issues occur
+     */
+    public function addCustomFieldSettingForPortfolio(
+        string $portfolioGid,
+        array $data,
+        int $responseType = AsanaApiClient::RESPONSE_DATA
+    ): array {
+        $this->validateGid($portfolioGid, 'Portfolio GID');
+
+        return $this->client->request(
+            'POST',
+            "portfolios/$portfolioGid/addCustomFieldSetting",
+            ['json' => ['data' => $data]],
+            $responseType
+        );
+    }
+
+    /**
+     * Remove a custom field setting from a portfolio
+     *
+     * POST /portfolios/{portfolio_gid}/removeCustomFieldSetting
+     *
+     * Removes a custom field from the specified portfolio.
+     *
+     * API Documentation: https://developers.asana.com/reference/removecustomfieldsettingforportfolio
+     *
+     * @param string $portfolioGid The unique global ID of the portfolio to remove the custom field from.
+     *                             Example: "12345"
+     * @param array $data Data for removing the custom field setting. Supported fields include:
+     *                    - custom_field (string): The GID of the custom field to remove from the portfolio.
+     *                      Example: "67890"
+     *                    Example: ["custom_field" => "67890"]
+     * @param int $responseType The type of response to return:
+     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
+     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * @return array The response data based on the specified response type:
+     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
+     *               - status: HTTP status code
+     *               - reason: Response status message
+     *               - headers: Response headers
+     *               - body: Decoded response body (empty data object)
+     *               - raw_body: Raw response body
+     *               - request: Original request details
+     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     *               - Complete decoded JSON response including empty data object
+     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     *               - Just the data object (empty JSON object {}) indicating successful removal
+     *
+     * @throws AsanaApiException If invalid portfolio GID provided, invalid custom field GID,
+     *                          insufficient permissions, or network issues occur
+     */
+    public function removeCustomFieldSettingForPortfolio(
+        string $portfolioGid,
+        array $data,
+        int $responseType = AsanaApiClient::RESPONSE_DATA
+    ): array {
+        $this->validateGid($portfolioGid, 'Portfolio GID');
+
+        return $this->client->request(
+            'POST',
+            "portfolios/$portfolioGid/removeCustomFieldSetting",
+            ['json' => ['data' => $data]],
             $responseType
         );
     }
