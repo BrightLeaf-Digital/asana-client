@@ -25,103 +25,6 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
         $this->service = new TimeTrackingEntriesApiService($this->mockClient);
     }
 
-    // ── getTimeTrackingEntry ────────────────────────────────────────────
-
-    /**
-     * Test getTimeTrackingEntry calls client with correct parameters.
-     */
-    public function testGetTimeTrackingEntry(): void
-    {
-        $expectedResponse = [
-            'gid' => '12345',
-            'resource_type' => 'time_tracking_entry',
-            'duration_minutes' => 60,
-            'entered_on' => '2026-02-05',
-        ];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with(
-                'GET',
-                'time_tracking_entries/12345',
-                ['query' => []],
-                AsanaApiClient::RESPONSE_DATA
-            )
-            ->willReturn($expectedResponse);
-
-        $result = $this->service->getTimeTrackingEntry('12345');
-
-        $this->assertSame($expectedResponse, $result);
-    }
-
-    /**
-     * Test getTimeTrackingEntry with options.
-     */
-    public function testGetTimeTrackingEntryWithOptions(): void
-    {
-        $options = ['opt_fields' => 'duration_minutes,entered_on,created_by'];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with(
-                'GET',
-                'time_tracking_entries/12345',
-                ['query' => $options],
-                AsanaApiClient::RESPONSE_DATA
-            )
-            ->willReturn([]);
-
-        $this->service->getTimeTrackingEntry('12345', $options);
-    }
-
-    /**
-     * Test getTimeTrackingEntry with custom response type.
-     */
-    public function testGetTimeTrackingEntryWithCustomResponseType(): void
-    {
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with(
-                'GET',
-                'time_tracking_entries/12345',
-                ['query' => []],
-                AsanaApiClient::RESPONSE_FULL
-            )
-            ->willReturn([]);
-
-        $this->service->getTimeTrackingEntry(
-            '12345',
-            [],
-            AsanaApiClient::RESPONSE_FULL
-        );
-    }
-
-    /**
-     * Test getTimeTrackingEntry throws exception for empty GID.
-     */
-    public function testGetTimeTrackingEntryThrowsExceptionForEmptyGid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Time Tracking Entry GID must be a non-empty string.'
-        );
-
-        $this->service->getTimeTrackingEntry('');
-    }
-
-    /**
-     * Test getTimeTrackingEntry throws exception for non-numeric GID.
-     */
-    public function testGetTimeTrackingEntryThrowsExceptionForNonNumericGid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Time Tracking Entry GID must be a numeric string.'
-        );
-
-        $this->service->getTimeTrackingEntry('abc');
-    }
-
     // ── getTimeTrackingEntriesForTask ───────────────────────────────────
 
     /**
@@ -398,6 +301,103 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
         $this->service->createTimeTrackingEntry('12345', []);
     }
 
+    // ── getTimeTrackingEntry ────────────────────────────────────────────
+
+    /**
+     * Test getTimeTrackingEntry calls client with correct parameters.
+     */
+    public function testGetTimeTrackingEntry(): void
+    {
+        $expectedResponse = [
+            'gid' => '12345',
+            'resource_type' => 'time_tracking_entry',
+            'duration_minutes' => 60,
+            'entered_on' => '2026-02-05',
+        ];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'time_tracking_entries/12345',
+                ['query' => []],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->getTimeTrackingEntry('12345');
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test getTimeTrackingEntry with options.
+     */
+    public function testGetTimeTrackingEntryWithOptions(): void
+    {
+        $options = ['opt_fields' => 'duration_minutes,entered_on,created_by'];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'time_tracking_entries/12345',
+                ['query' => $options],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $this->service->getTimeTrackingEntry('12345', $options);
+    }
+
+    /**
+     * Test getTimeTrackingEntry with custom response type.
+     */
+    public function testGetTimeTrackingEntryWithCustomResponseType(): void
+    {
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'time_tracking_entries/12345',
+                ['query' => []],
+                AsanaApiClient::RESPONSE_FULL
+            )
+            ->willReturn([]);
+
+        $this->service->getTimeTrackingEntry(
+            '12345',
+            [],
+            AsanaApiClient::RESPONSE_FULL
+        );
+    }
+
+    /**
+     * Test getTimeTrackingEntry throws exception for empty GID.
+     */
+    public function testGetTimeTrackingEntryThrowsExceptionForEmptyGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Time Tracking Entry GID must be a non-empty string.'
+        );
+
+        $this->service->getTimeTrackingEntry('');
+    }
+
+    /**
+     * Test getTimeTrackingEntry throws exception for non-numeric GID.
+     */
+    public function testGetTimeTrackingEntryThrowsExceptionForNonNumericGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Time Tracking Entry GID must be a numeric string.'
+        );
+
+        $this->service->getTimeTrackingEntry('abc');
+    }
+
     // ── updateTimeTrackingEntry ─────────────────────────────────────────
 
     /**
@@ -571,5 +571,75 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
         );
 
         $this->service->deleteTimeTrackingEntry('abc');
+    }
+
+    // ── getTimeTrackingEntries ──────────────────────────────────────────
+
+    /**
+     * Test getTimeTrackingEntries calls client with correct parameters.
+     */
+    public function testGetTimeTrackingEntries(): void
+    {
+        $expectedResponse = [
+            ['gid' => '111', 'duration_minutes' => 30],
+            ['gid' => '222', 'duration_minutes' => 60],
+        ];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'time_tracking_entries',
+                ['query' => []],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->getTimeTrackingEntries();
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test getTimeTrackingEntries with filtering options.
+     */
+    public function testGetTimeTrackingEntriesWithOptions(): void
+    {
+        $options = [
+            'workspace' => '12345',
+            'start_date' => '2026-01-01',
+            'end_date' => '2026-02-01',
+            'opt_fields' => 'duration_minutes,entered_on,task',
+        ];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'time_tracking_entries',
+                ['query' => $options],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $this->service->getTimeTrackingEntries($options);
+    }
+
+    /**
+     * Test getTimeTrackingEntries with custom response type.
+     */
+    public function testGetTimeTrackingEntriesWithCustomResponseType(): void
+    {
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'time_tracking_entries',
+                ['query' => []],
+                AsanaApiClient::RESPONSE_FULL
+            )
+            ->willReturn([]);
+
+        $this->service->getTimeTrackingEntries([], AsanaApiClient::RESPONSE_FULL);
     }
 }
