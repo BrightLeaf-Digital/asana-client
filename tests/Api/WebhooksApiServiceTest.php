@@ -103,79 +103,6 @@ class WebhooksApiServiceTest extends TestCase
     }
 
     /**
-     * Test getWebhook calls client with correct parameters.
-     */
-    public function testGetWebhook(): void
-    {
-        $webhookGid = '12345';
-        $expectedResponse = [
-            'gid' => '12345',
-            'resource_type' => 'webhook',
-            'target' => 'https://example.com/webhooks',
-            'active' => true,
-        ];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with('GET', 'webhooks/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
-            ->willReturn($expectedResponse);
-
-        $result = $this->service->getWebhook($webhookGid);
-
-        $this->assertSame($expectedResponse, $result);
-    }
-
-    /**
-     * Test getWebhook with options.
-     */
-    public function testGetWebhookWithOptions(): void
-    {
-        $options = ['opt_fields' => 'resource,target,active,filters'];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with('GET', 'webhooks/12345', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
-            ->willReturn([]);
-
-        $this->service->getWebhook('12345', $options);
-    }
-
-    /**
-     * Test getWebhook with custom response type.
-     */
-    public function testGetWebhookWithCustomResponseType(): void
-    {
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with('GET', 'webhooks/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
-            ->willReturn([]);
-
-        $this->service->getWebhook('12345', [], AsanaApiClient::RESPONSE_FULL);
-    }
-
-    /**
-     * Test getWebhook throws exception for empty GID.
-     */
-    public function testGetWebhookThrowsExceptionForEmptyGid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Webhook GID must be a non-empty string.');
-
-        $this->service->getWebhook('');
-    }
-
-    /**
-     * Test getWebhook throws exception for non-numeric GID.
-     */
-    public function testGetWebhookThrowsExceptionForNonNumericGid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Webhook GID must be a numeric string.');
-
-        $this->service->getWebhook('abc');
-    }
-
-    /**
      * Test createWebhook calls client with correct parameters.
      */
     public function testCreateWebhook(): void
@@ -282,6 +209,79 @@ class WebhooksApiServiceTest extends TestCase
         $this->expectExceptionMessage('Missing required field(s) for webhook creation: resource, target');
 
         $this->service->createWebhook([]);
+    }
+
+    /**
+     * Test getWebhook calls client with correct parameters.
+     */
+    public function testGetWebhook(): void
+    {
+        $webhookGid = '12345';
+        $expectedResponse = [
+            'gid' => '12345',
+            'resource_type' => 'webhook',
+            'target' => 'https://example.com/webhooks',
+            'active' => true,
+        ];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with('GET', 'webhooks/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->getWebhook($webhookGid);
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test getWebhook with options.
+     */
+    public function testGetWebhookWithOptions(): void
+    {
+        $options = ['opt_fields' => 'resource,target,active,filters'];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with('GET', 'webhooks/12345', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->willReturn([]);
+
+        $this->service->getWebhook('12345', $options);
+    }
+
+    /**
+     * Test getWebhook with custom response type.
+     */
+    public function testGetWebhookWithCustomResponseType(): void
+    {
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with('GET', 'webhooks/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->willReturn([]);
+
+        $this->service->getWebhook('12345', [], AsanaApiClient::RESPONSE_FULL);
+    }
+
+    /**
+     * Test getWebhook throws exception for empty GID.
+     */
+    public function testGetWebhookThrowsExceptionForEmptyGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Webhook GID must be a non-empty string.');
+
+        $this->service->getWebhook('');
+    }
+
+    /**
+     * Test getWebhook throws exception for non-numeric GID.
+     */
+    public function testGetWebhookThrowsExceptionForNonNumericGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Webhook GID must be a numeric string.');
+
+        $this->service->getWebhook('abc');
     }
 
     /**

@@ -104,65 +104,6 @@ class WebhooksApiService
     }
 
     /**
-     * Get a webhook
-     *
-     * GET /webhooks/{webhook_gid}
-     *
-     * Returns the full record for the given webhook.
-     *
-     * API Documentation: https://developers.asana.com/reference/getwebhook
-     *
-     * @param string $webhookGid The unique global ID of the webhook to retrieve.
-     *                           This identifier is returned when creating a webhook or
-     *                           from the getWebhooks endpoint.
-     *                           Example: "12345"
-     * @param array $options Optional parameters to customize the request:
-     *                      - opt_fields (string): A comma-separated list of fields to include in the response
-     *                        (e.g., "resource,target,active,filters")
-     *                      - opt_pretty (bool): Returns formatted JSON if true
-     * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
-     *
-     * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body containing webhook data
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including data object and other metadata
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data object containing the webhook details including:
-     *                 - gid: Unique identifier of the webhook
-     *                 - resource_type: Always "webhook"
-     *                 - resource: Object containing the resource being watched
-     *                 - target: The URL to receive webhook events
-     *                 - active: Whether the webhook is active
-     *                 - filters: Array of event filter objects
-     *                 - created_at: Creation timestamp
-     *                 - last_failure_at: Timestamp of last delivery failure
-     *                 - last_failure_content: Content of last delivery failure
-     *                 - last_success_at: Timestamp of last successful delivery
-     *                 Additional fields as specified in opt_fields
-     *
-     * @throws AsanaApiException If invalid webhook GID provided, insufficient permissions,
-     *                          network issues, or rate limiting occurs
-     */
-    public function getWebhook(
-        string $webhookGid,
-        array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
-    ): array {
-        $this->validateGid($webhookGid, 'Webhook GID');
-
-        return $this->client->request('GET', "webhooks/$webhookGid", ['query' => $options], $responseType);
-    }
-
-    /**
      * Create a webhook
      *
      * POST /webhooks
@@ -238,6 +179,65 @@ class WebhooksApiService
             ['json' => ['data' => $data], 'query' => $options],
             $responseType
         );
+    }
+
+    /**
+     * Get a webhook
+     *
+     * GET /webhooks/{webhook_gid}
+     *
+     * Returns the full record for the given webhook.
+     *
+     * API Documentation: https://developers.asana.com/reference/getwebhook
+     *
+     * @param string $webhookGid The unique global ID of the webhook to retrieve.
+     *                           This identifier is returned when creating a webhook or
+     *                           from the getWebhooks endpoint.
+     *                           Example: "12345"
+     * @param array $options Optional parameters to customize the request:
+     *                      - opt_fields (string): A comma-separated list of fields to include in the response
+     *                        (e.g., "resource,target,active,filters")
+     *                      - opt_pretty (bool): Returns formatted JSON if true
+     * @param int $responseType The type of response to return:
+     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
+     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * @return array The response data based on the specified response type:
+     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
+     *               - status: HTTP status code
+     *               - reason: Response status message
+     *               - headers: Response headers
+     *               - body: Decoded response body containing webhook data
+     *               - raw_body: Raw response body
+     *               - request: Original request details
+     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     *               - Complete decoded JSON response including data object and other metadata
+     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     *               - Just the data object containing the webhook details including:
+     *                 - gid: Unique identifier of the webhook
+     *                 - resource_type: Always "webhook"
+     *                 - resource: Object containing the resource being watched
+     *                 - target: The URL to receive webhook events
+     *                 - active: Whether the webhook is active
+     *                 - filters: Array of event filter objects
+     *                 - created_at: Creation timestamp
+     *                 - last_failure_at: Timestamp of last delivery failure
+     *                 - last_failure_content: Content of last delivery failure
+     *                 - last_success_at: Timestamp of last successful delivery
+     *                 Additional fields as specified in opt_fields
+     *
+     * @throws AsanaApiException If invalid webhook GID provided, insufficient permissions,
+     *                          network issues, or rate limiting occurs
+     */
+    public function getWebhook(
+        string $webhookGid,
+        array $options = [],
+        int $responseType = AsanaApiClient::RESPONSE_DATA
+    ): array {
+        $this->validateGid($webhookGid, 'Webhook GID');
+
+        return $this->client->request('GET', "webhooks/$webhookGid", ['query' => $options], $responseType);
     }
 
     /**
