@@ -39,14 +39,16 @@ class EventsApiService
      *
      * GET /events
      *
-     * Returns the set of events that have occurred since the last request. The Events API
-     * uses a sync token-based mechanism to provide incremental updates. On the first call,
-     * provide only the resource GID; the response will include the initial set of events
-     * and a sync token. On subsequent calls, include the sync token to receive only new
-     * events since the last request.
+     * Returns the set of events that have occurred since the last sync token was generated.
+     * The Events API uses a sync token-based mechanism to provide incremental updates.
      *
-     * If the sync token is too old (expired), the API will return an error with a new
-     * sync token that can be used to get future events.
+     * On the first call, provide only the resource GID; the response will include a sync token
+     * but no events. Subsequent requests should always provide the sync token from the
+     * immediately preceding call to receive events that occurred since that token was generated.
+     *
+     * A new sync token will always be included in every response. If the sync token is too old
+     * (expired), the API will return an error (412 Precondition Failed) but will still include
+     * a new sync token to use for future requests.
      *
      * API Documentation: https://developers.asana.com/reference/getevents
      *
@@ -64,8 +66,10 @@ class EventsApiService
      *                      - opt_pretty (bool): Returns formatted JSON if true
      * @param int $responseType The type of response to return:
      *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body (default)
+     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset
+     *                              Note: The default response type is RESPONSE_NORMAL (not RESPONSE_DATA) to ensure
+     *                              the sync token is included in the response for subsequent requests.
      *
      * @return array The response data based on the specified response type:
      *               If $responseType is AsanaApiClient::RESPONSE_FULL:
@@ -99,7 +103,7 @@ class EventsApiService
         string $resourceGid,
         ?string $syncToken = null,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = AsanaApiClient::RESPONSE_NORMAL
     ): array {
         $this->validateGid($resourceGid, 'Resource GID');
 

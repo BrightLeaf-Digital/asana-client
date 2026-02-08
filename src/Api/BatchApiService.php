@@ -51,7 +51,9 @@ class BatchApiService
      *                       - relative_path (string): The API endpoint path (e.g., "/tasks/12345").
      *                       - method (string): The HTTP method (get, post, put, delete).
      *                       Optional:
-     *                       - data (array): The request body for post/put requests.
+     *                       - data (array): The request body for post/put requests, or query
+     *                         parameters for get requests (aside from options and pagination
+     *                         which go in the options array).
      *                       - options (array): Query parameters for the request.
      *                         - fields (array): Array of fields to include in the response.
      *                         - limit (int): Maximum number of items to return.
