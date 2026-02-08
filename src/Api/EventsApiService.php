@@ -84,7 +84,7 @@ class EventsApiService
      *                 - data: Array of event objects
      *                 - sync: The new sync token to use for the next request
      *                 - has_more: Whether there are more events to fetch
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     *               If $responseType is AsanaApiClient::RESPONSE_DATA:
      *               - Just the data array containing the list of events with fields including:
      *                 - user: The user who triggered the event
      *                 - resource: The resource that was affected
