@@ -25,6 +25,112 @@ class TeamsApiServiceTest extends TestCase
         $this->service = new TeamsApiService($this->mockClient);
     }
 
+    // ── createTeam ──────────────────────────────────────────────────────
+
+    /**
+     * Test createTeam calls client with correct parameters.
+     */
+    public function testCreateTeam(): void
+    {
+        $data = ['name' => 'Engineering', 'organization' => '12345'];
+        $expectedResponse = ['gid' => '99999', 'resource_type' => 'team', 'name' => 'Engineering'];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'teams',
+                ['json' => ['data' => $data], 'query' => []],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->createTeam($data);
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test createTeam with options.
+     */
+    public function testCreateTeamWithOptions(): void
+    {
+        $data = ['name' => 'Engineering', 'organization' => '12345'];
+        $options = ['opt_fields' => 'name,description,organization'];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'teams',
+                ['json' => ['data' => $data], 'query' => $options],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $this->service->createTeam($data, $options);
+    }
+
+    /**
+     * Test createTeam with optional description and visibility.
+     */
+    public function testCreateTeamWithOptionalFields(): void
+    {
+        $data = [
+            'name' => 'Engineering',
+            'organization' => '12345',
+            'description' => 'The engineering team',
+            'visibility' => 'secret',
+        ];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'teams',
+                ['json' => ['data' => $data], 'query' => []],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $this->service->createTeam($data);
+    }
+
+    /**
+     * Test createTeam throws exception when name is missing.
+     */
+    public function testCreateTeamThrowsExceptionForMissingName(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required field(s) for team creation: name');
+
+        $this->service->createTeam(['organization' => '12345']);
+    }
+
+    /**
+     * Test createTeam throws exception when organization is missing.
+     */
+    public function testCreateTeamThrowsExceptionForMissingOrganization(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required field(s) for team creation: organization');
+
+        $this->service->createTeam(['name' => 'Engineering']);
+    }
+
+    /**
+     * Test createTeam throws exception when both name and organization are missing.
+     */
+    public function testCreateTeamThrowsExceptionForMissingBothFields(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required field(s) for team creation: name, organization');
+
+        $this->service->createTeam([]);
+    }
+
+    // ── getTeam ─────────────────────────────────────────────────────────
+
     /**
      * Test getTeam calls client with correct parameters.
      */
@@ -91,6 +197,154 @@ class TeamsApiServiceTest extends TestCase
 
         $this->service->getTeam('abc');
     }
+
+    // ── updateTeam ──────────────────────────────────────────────────────
+
+    /**
+     * Test updateTeam calls client with correct parameters.
+     */
+    public function testUpdateTeam(): void
+    {
+        $data = ['name' => 'Updated Team', 'description' => 'New description'];
+        $expectedResponse = ['gid' => '12345', 'resource_type' => 'team', 'name' => 'Updated Team'];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'PUT',
+                'teams/12345',
+                ['json' => ['data' => $data], 'query' => []],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->updateTeam('12345', $data);
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test updateTeam with options.
+     */
+    public function testUpdateTeamWithOptions(): void
+    {
+        $data = ['name' => 'Updated Team'];
+        $options = ['opt_fields' => 'name,description'];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'PUT',
+                'teams/12345',
+                ['json' => ['data' => $data], 'query' => $options],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $this->service->updateTeam('12345', $data, $options);
+    }
+
+    /**
+     * Test updateTeam with custom response type.
+     */
+    public function testUpdateTeamWithCustomResponseType(): void
+    {
+        $data = ['name' => 'Updated Team'];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'PUT',
+                'teams/12345',
+                ['json' => ['data' => $data], 'query' => []],
+                AsanaApiClient::RESPONSE_FULL
+            )
+            ->willReturn([]);
+
+        $this->service->updateTeam('12345', $data, [], AsanaApiClient::RESPONSE_FULL);
+    }
+
+    /**
+     * Test updateTeam throws exception for empty GID.
+     */
+    public function testUpdateTeamThrowsExceptionForEmptyGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Team GID must be a non-empty string.');
+
+        $this->service->updateTeam('', ['name' => 'Test']);
+    }
+
+    /**
+     * Test updateTeam throws exception for non-numeric GID.
+     */
+    public function testUpdateTeamThrowsExceptionForNonNumericGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Team GID must be a numeric string.');
+
+        $this->service->updateTeam('abc', ['name' => 'Test']);
+    }
+
+    // ── getTeamsForWorkspace ────────────────────────────────────────────
+
+    /**
+     * Test getTeamsForWorkspace calls client with correct parameters.
+     */
+    public function testGetTeamsForWorkspace(): void
+    {
+        $expectedResponse = [
+            ['gid' => '111', 'name' => 'Engineering'],
+        ];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with('GET', 'workspaces/12345/teams', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->getTeamsForWorkspace('12345');
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test getTeamsForWorkspace with options.
+     */
+    public function testGetTeamsForWorkspaceWithOptions(): void
+    {
+        $options = ['opt_fields' => 'name,description', 'limit' => 50];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with('GET', 'workspaces/12345/teams', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->willReturn([]);
+
+        $this->service->getTeamsForWorkspace('12345', $options);
+    }
+
+    /**
+     * Test getTeamsForWorkspace throws exception for empty GID.
+     */
+    public function testGetTeamsForWorkspaceThrowsExceptionForEmptyGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Workspace GID must be a non-empty string.');
+
+        $this->service->getTeamsForWorkspace('');
+    }
+
+    /**
+     * Test getTeamsForWorkspace throws exception for non-numeric GID.
+     */
+    public function testGetTeamsForWorkspaceThrowsExceptionForNonNumericGid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Workspace GID must be a numeric string.');
+
+        $this->service->getTeamsForWorkspace('abc');
+    }
+
+    // ── getTeamsForUser ─────────────────────────────────────────────────
 
     /**
      * Test getTeamsForUser calls client with correct parameters.
@@ -199,249 +453,7 @@ class TeamsApiServiceTest extends TestCase
         $this->service->getTeamsForUser('12345', 'abc');
     }
 
-    /**
-     * Test getTeamsForWorkspace calls client with correct parameters.
-     */
-    public function testGetTeamsForWorkspace(): void
-    {
-        $expectedResponse = [
-            ['gid' => '111', 'name' => 'Engineering'],
-        ];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with('GET', 'workspaces/12345/teams', ['query' => []], AsanaApiClient::RESPONSE_DATA)
-            ->willReturn($expectedResponse);
-
-        $result = $this->service->getTeamsForWorkspace('12345');
-
-        $this->assertSame($expectedResponse, $result);
-    }
-
-    /**
-     * Test getTeamsForWorkspace with options.
-     */
-    public function testGetTeamsForWorkspaceWithOptions(): void
-    {
-        $options = ['opt_fields' => 'name,description', 'limit' => 50];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with('GET', 'workspaces/12345/teams', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
-            ->willReturn([]);
-
-        $this->service->getTeamsForWorkspace('12345', $options);
-    }
-
-    /**
-     * Test getTeamsForWorkspace throws exception for empty GID.
-     */
-    public function testGetTeamsForWorkspaceThrowsExceptionForEmptyGid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Workspace GID must be a non-empty string.');
-
-        $this->service->getTeamsForWorkspace('');
-    }
-
-    /**
-     * Test getTeamsForWorkspace throws exception for non-numeric GID.
-     */
-    public function testGetTeamsForWorkspaceThrowsExceptionForNonNumericGid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Workspace GID must be a numeric string.');
-
-        $this->service->getTeamsForWorkspace('abc');
-    }
-
-    /**
-     * Test createTeam calls client with correct parameters.
-     */
-    public function testCreateTeam(): void
-    {
-        $data = ['name' => 'Engineering', 'organization' => '12345'];
-        $expectedResponse = ['gid' => '99999', 'resource_type' => 'team', 'name' => 'Engineering'];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with(
-                'POST',
-                'teams',
-                ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
-            )
-            ->willReturn($expectedResponse);
-
-        $result = $this->service->createTeam($data);
-
-        $this->assertSame($expectedResponse, $result);
-    }
-
-    /**
-     * Test createTeam with options.
-     */
-    public function testCreateTeamWithOptions(): void
-    {
-        $data = ['name' => 'Engineering', 'organization' => '12345'];
-        $options = ['opt_fields' => 'name,description,organization'];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with(
-                'POST',
-                'teams',
-                ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
-            )
-            ->willReturn([]);
-
-        $this->service->createTeam($data, $options);
-    }
-
-    /**
-     * Test createTeam with optional description and visibility.
-     */
-    public function testCreateTeamWithOptionalFields(): void
-    {
-        $data = [
-            'name' => 'Engineering',
-            'organization' => '12345',
-            'description' => 'The engineering team',
-            'visibility' => 'secret',
-        ];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with(
-                'POST',
-                'teams',
-                ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
-            )
-            ->willReturn([]);
-
-        $this->service->createTeam($data);
-    }
-
-    /**
-     * Test createTeam throws exception when name is missing.
-     */
-    public function testCreateTeamThrowsExceptionForMissingName(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Missing required field(s) for team creation: name');
-
-        $this->service->createTeam(['organization' => '12345']);
-    }
-
-    /**
-     * Test createTeam throws exception when organization is missing.
-     */
-    public function testCreateTeamThrowsExceptionForMissingOrganization(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Missing required field(s) for team creation: organization');
-
-        $this->service->createTeam(['name' => 'Engineering']);
-    }
-
-    /**
-     * Test createTeam throws exception when both name and organization are missing.
-     */
-    public function testCreateTeamThrowsExceptionForMissingBothFields(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Missing required field(s) for team creation: name, organization');
-
-        $this->service->createTeam([]);
-    }
-
-    /**
-     * Test updateTeam calls client with correct parameters.
-     */
-    public function testUpdateTeam(): void
-    {
-        $data = ['name' => 'Updated Team', 'description' => 'New description'];
-        $expectedResponse = ['gid' => '12345', 'resource_type' => 'team', 'name' => 'Updated Team'];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with(
-                'PUT',
-                'teams/12345',
-                ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
-            )
-            ->willReturn($expectedResponse);
-
-        $result = $this->service->updateTeam('12345', $data);
-
-        $this->assertSame($expectedResponse, $result);
-    }
-
-    /**
-     * Test updateTeam with options.
-     */
-    public function testUpdateTeamWithOptions(): void
-    {
-        $data = ['name' => 'Updated Team'];
-        $options = ['opt_fields' => 'name,description'];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with(
-                'PUT',
-                'teams/12345',
-                ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
-            )
-            ->willReturn([]);
-
-        $this->service->updateTeam('12345', $data, $options);
-    }
-
-    /**
-     * Test updateTeam with custom response type.
-     */
-    public function testUpdateTeamWithCustomResponseType(): void
-    {
-        $data = ['name' => 'Updated Team'];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with(
-                'PUT',
-                'teams/12345',
-                ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_FULL
-            )
-            ->willReturn([]);
-
-        $this->service->updateTeam('12345', $data, [], AsanaApiClient::RESPONSE_FULL);
-    }
-
-    /**
-     * Test updateTeam throws exception for empty GID.
-     */
-    public function testUpdateTeamThrowsExceptionForEmptyGid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Team GID must be a non-empty string.');
-
-        $this->service->updateTeam('', ['name' => 'Test']);
-    }
-
-    /**
-     * Test updateTeam throws exception for non-numeric GID.
-     */
-    public function testUpdateTeamThrowsExceptionForNonNumericGid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Team GID must be a numeric string.');
-
-        $this->service->updateTeam('abc', ['name' => 'Test']);
-    }
+    // ── addUserToTeam ───────────────────────────────────────────────────
 
     /**
      * Test addUserToTeam calls client with correct parameters.
@@ -516,6 +528,8 @@ class TeamsApiServiceTest extends TestCase
 
         $this->service->addUserToTeam('12345', []);
     }
+
+    // ── removeUserFromTeam ──────────────────────────────────────────────
 
     /**
      * Test removeUserFromTeam calls client with correct parameters.
