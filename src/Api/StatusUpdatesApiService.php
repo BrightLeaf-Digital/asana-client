@@ -41,7 +41,7 @@ class StatusUpdatesApiService
      *
      * Returns the full record for a single status update.
      *
-     * API Documentation: https://developers.asana.com/reference/getstatusupdate
+     * API Documentation: https://developers.asana.com/reference/getstatus
      *
      * @param string $statusUpdateGid The unique global ID of the status update.
      *                                Example: "12345"
@@ -101,7 +101,7 @@ class StatusUpdatesApiService
      *
      * Deletes the specified status update. This action is permanent and cannot be undone.
      *
-     * API Documentation: https://developers.asana.com/reference/deletestatusupdate
+     * API Documentation: https://developers.asana.com/reference/deletestatus
      *
      * @param string $statusUpdateGid The unique global ID of the status update to delete.
      *                                Example: "12345"
@@ -152,7 +152,7 @@ class StatusUpdatesApiService
      * Returns the compact status update records for the given parent object
      * (project, portfolio, or goal). The parent parameter is required.
      *
-     * API Documentation: https://developers.asana.com/reference/getstatusupdatesforobject
+     * API Documentation: https://developers.asana.com/reference/getstatusesforobject
      *
      * @param string $parentGid The unique global ID of the parent resource
      *                          (project, portfolio, or goal).
@@ -215,7 +215,7 @@ class StatusUpdatesApiService
      * Creates a new status update on a parent object (project, portfolio, or goal).
      * Returns the full record of the newly created status update.
      *
-     * API Documentation: https://developers.asana.com/reference/createstatusupdate
+     * API Documentation: https://developers.asana.com/reference/createstatusforobject
      *
      * @param array $data Data for creating the status update. Supported fields include:
      *                    Required:
