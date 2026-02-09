@@ -421,14 +421,62 @@ class TeamsApiServiceTest extends TestCase
     }
 
     /**
-     * Test getTeamsForUser throws exception for non-numeric user GID.
+     * Test getTeamsForUser throws exception for invalid user GID.
      */
-    public function testGetTeamsForUserThrowsExceptionForNonNumericUserGid(): void
+    public function testGetTeamsForUserThrowsExceptionForInvalidUserGid(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('User GID must be a numeric string.');
+        $this->expectExceptionMessage('User GID must be a numeric string, "me", or a valid email address.');
 
         $this->service->getTeamsForUser('abc', '67890');
+    }
+
+    /**
+     * Test getTeamsForUser accepts "me" as user GID.
+     */
+    public function testGetTeamsForUserAcceptsMeAsUserGid(): void
+    {
+        $expectedResponse = [
+            ['gid' => '111', 'name' => 'Engineering'],
+        ];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'users/me/teams',
+                ['query' => ['organization' => '67890']],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->getTeamsForUser('me', '67890');
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test getTeamsForUser accepts an email address as user GID.
+     */
+    public function testGetTeamsForUserAcceptsEmailAsUserGid(): void
+    {
+        $expectedResponse = [
+            ['gid' => '111', 'name' => 'Engineering'],
+        ];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'users/user@example.com/teams',
+                ['query' => ['organization' => '67890']],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->getTeamsForUser('user@example.com', '67890');
+
+        $this->assertSame($expectedResponse, $result);
     }
 
     /**

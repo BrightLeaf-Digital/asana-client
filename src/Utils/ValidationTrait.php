@@ -41,6 +41,37 @@ trait ValidationTrait
     }
 
     /**
+     * Validate that a user GID parameter is a non-empty string that is either
+     * a numeric GID, the string "me", or an email address.
+     *
+     * The Asana API accepts "me" as a shorthand for the currently authenticated
+     * user in endpoints that take a user GID path parameter.
+     *
+     * @param string $userGid The user GID to validate.
+     *
+     * @throws InvalidArgumentException If the user GID is empty or not a valid identifier.
+     */
+    protected function validateUserGid(string $userGid): void
+    {
+        $trimmedGid = trim($userGid);
+
+        if ($trimmedGid === '') {
+            throw new InvalidArgumentException(
+                'User GID must be a non-empty string.'
+            );
+        }
+
+        // Allow "me", numeric GIDs, and email addresses
+        if ($trimmedGid === 'me' || ctype_digit($trimmedGid) || filter_var($trimmedGid, FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+
+        throw new InvalidArgumentException(
+            'User GID must be a numeric string, "me", or a valid email address.'
+        );
+    }
+
+    /**
      * Validate that required fields are present in the data array.
      *
      * @param array $data The data array to validate.

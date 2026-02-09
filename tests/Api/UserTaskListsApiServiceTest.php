@@ -209,16 +209,68 @@ class UserTaskListsApiServiceTest extends TestCase
     }
 
     /**
-     * Test getUserTaskListForUser throws exception for non-numeric user GID.
+     * Test getUserTaskListForUser throws exception for invalid user GID.
      */
-    public function testGetUserTaskListForUserThrowsExceptionForNonNumericUserGid(): void
+    public function testGetUserTaskListForUserThrowsExceptionForInvalidUserGid(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'User GID must be a numeric string.'
+            'User GID must be a numeric string, "me", or a valid email address.'
         );
 
         $this->service->getUserTaskListForUser('abc', '67890');
+    }
+
+    /**
+     * Test getUserTaskListForUser accepts "me" as user GID.
+     */
+    public function testGetUserTaskListForUserAcceptsMeAsUserGid(): void
+    {
+        $expectedResponse = [
+            'gid' => '99999',
+            'resource_type' => 'user_task_list',
+            'name' => 'My Tasks',
+        ];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'users/me/user_task_list',
+                ['query' => ['workspace' => '67890']],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->getUserTaskListForUser('me', '67890');
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test getUserTaskListForUser accepts an email address as user GID.
+     */
+    public function testGetUserTaskListForUserAcceptsEmailAsUserGid(): void
+    {
+        $expectedResponse = [
+            'gid' => '99999',
+            'resource_type' => 'user_task_list',
+            'name' => 'My Tasks',
+        ];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'users/user@example.com/user_task_list',
+                ['query' => ['workspace' => '67890']],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->getUserTaskListForUser('user@example.com', '67890');
+
+        $this->assertSame($expectedResponse, $result);
     }
 
     /**

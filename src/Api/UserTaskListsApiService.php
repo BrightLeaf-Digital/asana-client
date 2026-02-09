@@ -143,7 +143,7 @@ class UserTaskListsApiService
         array $options = [],
         int $responseType = AsanaApiClient::RESPONSE_DATA
     ): array {
-        $this->validateGid($userGid, 'User GID');
+        $this->validateUserGid($userGid);
         $this->validateGid($workspaceGid, 'Workspace GID');
 
         $options['workspace'] = $workspaceGid;
