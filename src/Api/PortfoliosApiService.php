@@ -89,7 +89,7 @@ class PortfoliosApiService
         int $responseType = AsanaApiClient::RESPONSE_DATA
     ): array {
         $this->validateGid($workspaceGid, 'Workspace GID');
-        $this->validateGid($ownerGid, 'Owner GID');
+        $this->validateUserGid($ownerGid);
 
         $options['workspace'] = $workspaceGid;
         $options['owner'] = $ownerGid;

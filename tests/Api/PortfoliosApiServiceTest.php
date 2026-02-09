@@ -118,20 +118,68 @@ class PortfoliosApiServiceTest extends TestCase
     public function testGetPortfoliosThrowsExceptionForEmptyOwnerGid(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Owner GID must be a non-empty string.');
+        $this->expectExceptionMessage('User GID must be a non-empty string.');
 
         $this->service->getPortfolios('12345', '');
     }
 
     /**
-     * Test getPortfolios throws exception for non-numeric owner GID.
+     * Test getPortfolios throws exception for invalid owner GID.
      */
-    public function testGetPortfoliosThrowsExceptionForNonNumericOwnerGid(): void
+    public function testGetPortfoliosThrowsExceptionForInvalidOwnerGid(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Owner GID must be a numeric string.');
+        $this->expectExceptionMessage('User GID must be a numeric string, "me", or a valid email address.');
 
         $this->service->getPortfolios('12345', 'abc');
+    }
+
+    /**
+     * Test getPortfolios accepts "me" as owner GID.
+     */
+    public function testGetPortfoliosAcceptsMeAsOwnerGid(): void
+    {
+        $expectedResponse = [
+            ['gid' => '111', 'name' => 'Portfolio A'],
+        ];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'portfolios',
+                ['query' => ['workspace' => '12345', 'owner' => 'me']],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->getPortfolios('12345', 'me');
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test getPortfolios accepts an email address as owner GID.
+     */
+    public function testGetPortfoliosAcceptsEmailAsOwnerGid(): void
+    {
+        $expectedResponse = [
+            ['gid' => '111', 'name' => 'Portfolio A'],
+        ];
+
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'portfolios',
+                ['query' => ['workspace' => '12345', 'owner' => 'user@example.com']],
+                AsanaApiClient::RESPONSE_DATA
+            )
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->getPortfolios('12345', 'user@example.com');
+
+        $this->assertSame($expectedResponse, $result);
     }
 
     // ── createPortfolio ──────────────────────────────────────────────
