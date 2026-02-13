@@ -60,7 +60,81 @@ storage up to date.
 
 ## API Coverage
 
-This library may not support all parts of the Asana API. I've focused primarily on the endpoints relevant to my own work, generally supporting all methods for those endpoints. Contributions to expand coverage to additional endpoints are welcome!
+This library provides comprehensive coverage of the Asana API, including:
+
+### Core Resources
+- **Tasks** - Create, read, update, delete tasks and manage task relationships
+- **Projects** - Manage projects, sections, and project memberships
+- **Users** - Get user information and manage user settings
+- **Workspaces** - Access workspace information and settings
+- **Tags** - Create and manage tags for organizing tasks
+- **Attachments** - Upload and manage file attachments
+- **Custom Fields** - Work with custom fields and their settings
+- **Sections** - Organize tasks within projects using sections
+- **Memberships** - Manage project and workspace memberships
+
+### Advanced Features
+- **Webhooks** - Set up real-time notifications for resource changes
+- **Events** - Poll for events and track changes to resources
+- **Teams** - Manage teams and team memberships
+- **Portfolios** - Create and manage project portfolios
+- **Goals** - Track organizational goals and objectives
+- **Time Tracking** - Record and manage time entries on tasks
+- **Project Templates** - Create projects from templates
+- **Batch API** - Execute multiple API requests in a single call
+- **Status Updates** - Post and retrieve project status updates
+- **User Task Lists** - Access "My Tasks" and personal task lists
+
+### Quick Examples
+
+```php
+// Webhooks - Real-time notifications
+$webhook = $client->webhooks()->createWebhook([
+    'resource' => $projectGid,
+    'target' => 'https://example.com/webhook'
+]);
+
+// Events - Poll for changes
+$events = $client->events()->getEvents($resourceGid);
+
+// Teams - Manage teams
+$teams = $client->teams()->getTeams($workspaceGid);
+$team = $client->teams()->createTeam(['name' => 'Engineering', 'workspace' => $workspaceGid]);
+
+// Portfolios - Organize projects
+$portfolios = $client->portfolios()->getPortfolios($workspaceGid);
+$portfolio = $client->portfolios()->createPortfolio(['name' => 'Q1 Projects', 'workspace' => $workspaceGid]);
+
+// Goals - Track objectives
+$goals = $client->goals()->getGoals(['workspace' => $workspaceGid]);
+$goal = $client->goals()->createGoal(['name' => 'Increase Revenue', 'workspace' => $workspaceGid]);
+
+// Time Tracking - Log time entries
+$entry = $client->timeTrackingEntries()->createTimeTrackingEntry([
+    'task' => $taskGid,
+    'duration_minutes' => 120
+]);
+
+// Project Templates - Standardize workflows
+$templates = $client->projectTemplates()->getProjectTemplates($workspaceGid);
+$project = $client->projectTemplates()->instantiateProject($templateGid, ['name' => 'New Project']);
+
+// Batch API - Optimize multiple requests
+$responses = $client->batch()->submitBatch([
+    ['method' => 'GET', 'relative_path' => '/tasks/12345'],
+    ['method' => 'GET', 'relative_path' => '/projects/67890']
+]);
+
+// Status Updates - Project communication
+$statusUpdate = $client->statusUpdates()->createStatusUpdate([
+    'parent' => $projectGid,
+    'text' => 'Project is on track',
+    'status_type' => 'on_track'
+]);
+
+// User Task Lists - Personal task management
+$myTasks = $client->userTaskLists()->getUserTaskList($userTaskListGid);
+```
 
 ## Design Decisions
 

@@ -2,7 +2,28 @@
 
 This document outlines feature enhancements needed for the Asana Client PHP library. Each item includes detailed explanations, code examples, and validation against API specifications.
 
-## 1. Add support for webhooks
+## ✅ 1. Add support for webhooks — COMPLETED
+
+Webhook support has been implemented via `WebhooksApiService`. The service provides methods for creating, retrieving, and deleting webhooks, along with signature verification for secure webhook handling.
+
+**Implementation:** See `src/Api/WebhooksApiService.php`
+
+## ✅ 6. Support full API coverage — COMPLETED
+
+Comprehensive API coverage has been achieved with the addition of 10 new API services:
+
+1. **WebhooksApiService** - Real-time notifications for resource changes
+2. **EventsApiService** - Poll for events and track changes
+3. **TeamsApiService** - Manage teams and team memberships
+4. **PortfoliosApiService** - Create and manage project portfolios
+5. **GoalsApiService** - Track organizational goals and objectives
+6. **TimeTrackingEntriesApiService** - Record and manage time entries
+7. **ProjectTemplatesApiService** - Create projects from templates
+8. **BatchApiService** - Execute multiple API requests in a single call
+9. **StatusUpdatesApiService** - Post and retrieve project status updates
+10. **UserTaskListsApiService** - Access "My Tasks" and personal task lists
+
+**Note:** The following items from the original feature list remain as future enhancements:
 
 ### Problem Statement
 The current library does not support Asana's webhook functionality, which allows applications to receive real-time notifications when resources change. Adding webhook support would enable applications to respond to changes in Asana without polling the API.
