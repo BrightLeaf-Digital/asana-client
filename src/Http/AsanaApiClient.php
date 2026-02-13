@@ -30,35 +30,30 @@ class AsanaApiClient
 
     /**
      * GuzzleHttp client instance configured for Asana API communication.
-     *
      * @var GuzzleClient
      */
     private GuzzleClient $httpClient;
 
     /**
      * PSR-3 compatible logger instance.
-     *
      * @var LoggerInterface
      */
     private LoggerInterface $logger;
 
     /**
      * Maximum number of retry attempts for rate-limited requests.
-     *
      * @var int
      */
     private int $maxRetries;
 
     /**
      * Initial backoff time in seconds for exponential backoff.
-     *
      * @var int
      */
     private int $initialBackoff;
 
     /**
      * Creates a new Asana API client instance.
-     *
      * @param string $accessToken OAuth2 access token for authentication
      * @param LoggerInterface|null $logger PSR-3 compatible logger instance
      * @param int $maxRetries Maximum number of retry attempts for rate-limited requests
@@ -84,19 +79,16 @@ class AsanaApiClient
 
     /**
      * Sends an HTTP request with the specified method, URI, and options.
-     *
      * This method includes automatic retry logic with exponential backoff for rate-limited
      * requests (HTTP 429). It will retry up to the configured maximum number of times,
      * respecting the Retry-After header if provided by the API.
-     *
      * @param string $method The HTTP method to use (e.g., 'GET', 'POST', etc.).
      * @param string $uri The URI to make the request to.
      * @param array $options Additional options for the request, such as headers, body, and query parameters.
      * @param int $responseType The type of response to return:
-     *                              - RESPONSE_FULL (1): Full response with status, headers, etc.
-     *                              - RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - RESPONSE_DATA (3): Only the data subset (default)
-     *
+     * - RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - RESPONSE_DATA (3): Only the data subset (default)
      * @return array The response data based on the specified response type.
      * @throws AsanaApiException If the response indicates an error or if the request fails.
      * @throws RateLimitException If rate limit is exceeded and all retries are exhausted.
@@ -112,13 +104,11 @@ class AsanaApiClient
 
     /**
      * Execute a request with retry logic for rate limiting.
-     *
      * @param string $method The HTTP method to use.
      * @param string $uri The URI to make the request to.
      * @param array $options Additional options for the request.
      * @param int $responseType The type of response to return.
      * @param int $retryCount Current retry attempt number.
-     *
      * @return array The response data based on the specified response type.
      * @throws AsanaApiException If the request fails.
      * @throws RateLimitException If rate limit is exceeded and all retries are exhausted.
@@ -185,14 +175,12 @@ class AsanaApiClient
 
     /**
      * Handle Guzzle exceptions with rate limit retry logic.
-     *
      * @param GuzzleException $e The caught exception.
      * @param string $method The HTTP method used.
      * @param string $uri The URI of the request.
      * @param array $options The request options.
      * @param int $responseType The response type requested.
      * @param int $retryCount Current retry attempt number.
-     *
      * @return array The response data if retry succeeds.
      * @throws AsanaApiException If the request fails for non-rate-limit reasons.
      * @throws RateLimitException If rate limit is exceeded and all retries are exhausted.
@@ -289,9 +277,7 @@ class AsanaApiClient
     /**
      * Get the number of seconds to wait before retrying based on the Retry-After header
      * or calculate using exponential backoff.
-     *
      * @param \Psr\Http\Message\ResponseInterface|null $response The HTTP response.
-     *
      * @return int The number of seconds to wait before retrying.
      */
     private function getRetryAfterSeconds($response): int
@@ -318,9 +304,7 @@ class AsanaApiClient
 
     /**
      * Sanitize request options for logging by removing sensitive information.
-     *
      * @param array $options The request options to sanitize.
-     *
      * @return array The sanitized options.
      */
     private function sanitizeOptions(array $options): array
@@ -337,7 +321,6 @@ class AsanaApiClient
 
     /**
      * Get the configured logger instance.
-     *
      * @return LoggerInterface The logger instance.
      */
     public function getLogger(): LoggerInterface
@@ -347,9 +330,7 @@ class AsanaApiClient
 
     /**
      * Set a new logger instance.
-     *
      * @param LoggerInterface $logger The new logger instance.
-     *
      * @return self
      */
     public function setLogger(LoggerInterface $logger): self
