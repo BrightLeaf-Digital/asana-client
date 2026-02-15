@@ -13,24 +13,19 @@ class WorkspaceApiService
 
     /**
      * The Asana API client instance
-     *
      * Handles HTTP requests to the Asana API endpoints with proper authentication
      * and request formatting. This client manages the API connection details and
      * provides methods for making authenticated requests.
-     *
      * @var AsanaApiClient An authenticated client for making Asana API requests
      */
     private AsanaApiClient $client;
 
     /**
      * Constructor
-     *
      * Initializes the instance with the provided Asana API client. The client is
      * used to make authenticated requests to the Asana API.
-     *
      * @param AsanaApiClient $client An instance of the AsanaApiClient responsible for
      *                               handling API requests and authentication.
-     *
      * @return void
      */
     public function __construct(AsanaApiClient $client)
@@ -40,41 +35,41 @@ class WorkspaceApiService
 
     /**
      * Get multiple workspaces
-     *
      * GET /workspaces
-     *
      * Returns the compact representation of all workspaces visible to the authorized user.
-     *
      * API Documentation: https://developers.asana.com/reference/getworkspaces
-     *
      * @param array $options Optional parameters to customize the request:
-     *                      - opt_fields (string): A comma-separated list of fields to include in the response
-     *                        (e.g., "name,email_domains,is_organization")
-     *                      - opt_pretty (bool): Returns formatted JSON if true
-     *                      - limit (int): Results to return per page (1-100)
-     *                      - offset (string): Pagination offset token
+     * - opt_fields (string): A comma-separated list of fields to include in the response
+     *   (e.g., "name,email_domains,is_organization")
+     * - opt_pretty (bool): Returns formatted JSON if true
+     * - limit (int): Results to return per page (1-100)
+     * - offset (string): Pagination offset token
      * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body containing workspace data
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including data array and pagination info
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data array containing the list of workspaces with fields including:
-     *                 - gid: Unique identifier of the workspace
-     *                 - resource_type: Always "workspace"
-     *                 - name: Name of the workspace
-     *                 - email_domains: Array of email domains associated with the workspace
-     *                 - is_organization: Boolean indicating if workspace is an organization
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * - status: HTTP status code
+     * - reason: Response status message
+     * - headers: Response headers
+     * - body: Decoded response body containing workspace data
+     * - raw_body: Raw response body
+     * - request: Original request details
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * - Complete decoded JSON response including data array and pagination info
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * - Just the data array containing the list of workspaces with fields including:
+     *   - gid: Unique identifier of the workspace
+     * - resource_type: Always "workspace"
+     * - name: Name of the workspace
+     * - email_domains: Array of email domains associated with the workspace
+     * - is_organization: Boolean indicating if workspace is an organization
      *                 Additional fields as specified in opt_fields
      *
      * @throws AsanaApiException If permission errors, network issues, or rate limiting occurs
@@ -86,43 +81,44 @@ class WorkspaceApiService
 
     /**
      * Get a workspace
-     *
      * GET /workspaces/{workspace_gid}
-     *
      * Returns the full workspace record for a single workspace.
-     *
      * API Documentation: https://developers.asana.com/reference/getworkspace
-     *
      * @param string $workspaceGid The unique global ID of the workspace to retrieve.
      *                           This identifier can be found in the workspace URL or returned from
      *                           workspace-related API endpoints.
      *                           Example: "12345"
      * @param array $options Optional parameters to customize the request:
-     *                      - opt_fields (string): A comma-separated list of fields to include in the response
-     *                        (e.g., "name,email_domains,is_organization")
-     *                      - opt_pretty (bool): Returns formatted JSON if true
+     * - opt_fields (string): A comma-separated list of fields to include in the response
+     *   (e.g., "name,email_domains,is_organization")
+     * - opt_pretty (bool): Returns formatted JSON if true
+     *
      * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body containing workspace data
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including data object and other metadata
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data object containing the workspace details including:
-     *                 - gid: Unique identifier of the workspace
-     *                 - resource_type: Always "workspace"
-     *                 - name: Name of the workspace
-     *                 - email_domains: Array of email domains associated with the workspace
-     *                 - is_organization: Boolean indicating if workspace is an organization
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * - status: HTTP status code
+     * - reason: Response status message
+     * - headers: Response headers
+     * - body: Decoded response body containing workspace data
+     * - raw_body: Raw response body
+     * - request: Original request details
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * - Complete decoded JSON response including data object and other metadata
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * - Just the data object containing the workspace details including:
+     *   - gid: Unique identifier of the workspace
+     * - resource_type: Always "workspace"
+     * - name: Name of the workspace
+     * - email_domains: Array of email domains associated with the workspace
+     * - is_organization: Boolean indicating if workspace is an organization
      *                 Additional fields as specified in opt_fields
      *
      * @throws AsanaApiException If invalid workspace GID provided, permission errors,
@@ -140,47 +136,48 @@ class WorkspaceApiService
 
     /**
      * Update a workspace
-     *
      * PUT /workspaces/{workspace_gid}
-     *
      * Updates the workspace with the provided data. Currently, only name can be updated.
-     *
      * API Documentation: https://developers.asana.com/reference/updateworkspace
-     *
      * @param string $workspaceGid The unique global ID of the workspace to update.
      *                           This identifier can be found in the workspace URL or returned from
      *                           workspace-related API endpoints.
      *                           Example: "12345"
      * @param array $data The properties of the workspace to update. Can include:
-     *                    - name (string): The name of the workspace.
-     *                      Example: "Updated Workspace Name"
+     * - name (string): The name of the workspace.
+     *   Example: "Updated Workspace Name"
      *                    Example: ["name" => "My Updated Workspace"]
      * @param array $options Optional parameters to customize the request:
-     *                      - opt_fields (string): A comma-separated list of fields to include in the response
-     *                        (e.g., "name,email_domains,is_organization")
-     *                      - opt_pretty (bool): Returns formatted JSON if true
+     * - opt_fields (string): A comma-separated list of fields to include in the response
+     *   (e.g., "name,email_domains,is_organization")
+     * - opt_pretty (bool): Returns formatted JSON if true
+     *
      * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body containing updated workspace data
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including data object and other metadata
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data object containing the updated workspace details including:
-     *                 - gid: Unique identifier of the workspace
-     *                 - resource_type: Always "workspace"
-     *                 - name: Updated name of the workspace
-     *                 - email_domains: Array of email domains associated with the workspace
-     *                 - is_organization: Boolean indicating if workspace is an organization
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * - status: HTTP status code
+     * - reason: Response status message
+     * - headers: Response headers
+     * - body: Decoded response body containing updated workspace data
+     * - raw_body: Raw response body
+     * - request: Original request details
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * - Complete decoded JSON response including data object and other metadata
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * - Just the data object containing the updated workspace details including:
+     *   - gid: Unique identifier of the workspace
+     * - resource_type: Always "workspace"
+     * - name: Updated name of the workspace
+     * - email_domains: Array of email domains associated with the workspace
+     * - is_organization: Boolean indicating if workspace is an organization
      *                 Additional fields as specified in opt_fields
      *
      * @throws AsanaApiException If invalid workspace GID provided, malformed data,
@@ -204,51 +201,52 @@ class WorkspaceApiService
 
     /**
      * Add a user to a workspace or organization
-     *
      * POST /workspaces/{workspace_gid}/addUser
-     *
      * Adds a user to a workspace or organization. The user can be referenced by their globally unique user ID or
      * their email address. Returns the full user record for the invited user.
-     *
      * API Documentation: https://developers.asana.com/reference/adduserforworkspace
-     *
      * @param string $workspaceGid The unique global ID of the workspace to add the user to.
      *                           This identifier can be found in the workspace URL or returned from
      *                           workspace-related API endpoints.
      *                           Example: "12345"
      * @param array $data Data for adding the user. Must include at least one of:
-     *                    - user (string): GID of the user to add to the workspace.
-     *                      Example: "67890"
-     *                    - email (string): Email address of the user to add to the workspace.
-     *                      Example: "user@example.com"
+     * - user (string): GID of the user to add to the workspace.
+     *   Example: "67890"
+     * - email (string): Email address of the user to add to the workspace.
+     *   Example: "user@example.com"
      *                    Example: ["user" => "67890"] or ["email" => "user@example.com"]
      * @param array $options Optional parameters to customize the request:
-     *                      - opt_fields (string): A comma-separated list of fields to include in the response
-     *                        (e.g., "name,email,photo")
-     *                      - opt_pretty (bool): Returns formatted JSON if true
+     * - opt_fields (string): A comma-separated list of fields to include in the response
+     *   (e.g., "name,email,photo")
+     * - opt_pretty (bool): Returns formatted JSON if true
+     *
      * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body containing user data
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including data object and other metadata
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data object containing the added user details including:
-     *                 - gid: Unique identifier of the user
-     *                 - resource_type: Always "user"
-     *                 - name: Full name of the user
-     *                 - email: Email address of the user
-     *                 - photo: Object containing user's profile photo details
-     *                 - workspaces: Array of workspace objects the user belongs to
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * - status: HTTP status code
+     * - reason: Response status message
+     * - headers: Response headers
+     * - body: Decoded response body containing user data
+     * - raw_body: Raw response body
+     * - request: Original request details
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * - Complete decoded JSON response including data object and other metadata
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * - Just the data object containing the added user details including:
+     *   - gid: Unique identifier of the user
+     * - resource_type: Always "user"
+     * - name: Full name of the user
+     * - email: Email address of the user
+     * - photo: Object containing user's profile photo details
+     * - workspaces: Array of workspace objects the user belongs to
      *                 Additional fields as specified in opt_fields
      *
      * @throws AsanaApiException If invalid workspace GID provided, invalid user data,
@@ -272,43 +270,42 @@ class WorkspaceApiService
 
     /**
      * Remove a user from a workspace or organization
-     *
      * POST /workspaces/{workspace_gid}/removeUser
-     *
      * Removes a user from a workspace or organization. The user making this call must be an admin
      * in the workspace. The user can be referenced by their globally unique user ID or their email address.
      * Returns an empty data block.
-     *
      * API Documentation: https://developers.asana.com/reference/removeuserforworkspace
-     *
      * @param string $workspaceGid The unique global ID of the workspace to remove the user from.
      *                           This identifier can be found in the workspace URL or returned from
      *                           workspace-related API endpoints.
      *                           Example: "12345"
      * @param array $data Data for removing the user. Must include at least one of:
-     *                    - user (string): GID of the user to remove from the workspace.
-     *                      Example: "67890"
-     *                    - email (string): Email address of the user to remove from the workspace.
-     *                      Example: "user@example.com"
+     * - user (string): GID of the user to remove from the workspace.
+     *   Example: "67890"
+     * - email (string): Email address of the user to remove from the workspace.
+     *   Example: "user@example.com"
      *                    Example: ["user" => "67890"] or ["email" => "user@example.com"]
      * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body (empty data object)
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including empty data object
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data object (empty JSON object {}) indicating successful removal
      *
+     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * - status: HTTP status code
+     * - reason: Response status message
+     * - headers: Response headers
+     * - body: Decoded response body (empty data object)
+     * - raw_body: Raw response body
+     * - request: Original request details
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * - Complete decoded JSON response including empty data object
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * - Just the data object (empty JSON object {}) indicating successful removal
      * @throws AsanaApiException If invalid workspace GID provided, invalid user data,
      *                          insufficient permissions, or network issues occur
      */
@@ -329,46 +326,46 @@ class WorkspaceApiService
 
     /**
      * Get users in a workspace or organization
-     *
      * GET /workspaces/{workspace_gid}/users
-     *
      * Returns the user records for all users in the specified workspace or organization.
-     *
      * API Documentation: https://developers.asana.com/reference/getusersforworkspace
-     *
      * @param string $workspaceGid The unique global ID of the workspace to get users from.
      *                           This identifier can be found in the workspace URL or returned from
      *                           workspace-related API endpoints.
      *                           Example: "12345"
      * @param array $options Optional parameters to customize the request:
-     *                      - opt_fields (string): A comma-separated list of fields to include in the response
-     *                        (e.g., "name,email,photo")
-     *                      - opt_pretty (bool): Returns formatted JSON if true
-     *                      - limit (int): Results to return per page (1-100)
-     *                      - offset (string): Pagination offset token
+     * - opt_fields (string): A comma-separated list of fields to include in the response
+     *   (e.g., "name,email,photo")
+     * - opt_pretty (bool): Returns formatted JSON if true
+     * - limit (int): Results to return per page (1-100)
+     * - offset (string): Pagination offset token
      * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body containing user data
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including data array and pagination info
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data array containing the list of users with fields including:
-     *                 - gid: Unique identifier of the user
-     *                 - resource_type: Always "user"
-     *                 - name: Full name of the user
-     *                 - email: Email address of the user
-     *                 - photo: Object containing user's profile photo details
-     *                 - workspaces: Array of workspace objects the user belongs to
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * - status: HTTP status code
+     * - reason: Response status message
+     * - headers: Response headers
+     * - body: Decoded response body containing user data
+     * - raw_body: Raw response body
+     * - request: Original request details
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * - Complete decoded JSON response including data array and pagination info
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * - Just the data array containing the list of users with fields including:
+     *   - gid: Unique identifier of the user
+     * - resource_type: Always "user"
+     * - name: Full name of the user
+     * - email: Email address of the user
+     * - photo: Object containing user's profile photo details
+     * - workspaces: Array of workspace objects the user belongs to
      *                 Additional fields as specified in opt_fields
      *
      * @throws AsanaApiException If invalid workspace GID provided, permission errors,
@@ -391,46 +388,46 @@ class WorkspaceApiService
 
     /**
      * Get teams in a workspace
-     *
      * GET /workspaces/{workspace_gid}/teams
-     *
      * Returns the compact records for all teams in the workspace visible to the authorized user.
-     *
      * API Documentation: https://developers.asana.com/reference/getteamsforworkspace
-     *
      * @param string $workspaceGid The unique global ID of the workspace to get teams from.
      *                           This identifier can be found in the workspace URL or returned from
      *                           workspace-related API endpoints.
      *                           Example: "12345"
      * @param array $options Optional parameters to customize the request:
-     *                      - opt_fields (string): A comma-separated list of fields to include in the response
-     *                        (e.g., "name,description,html_description")
-     *                      - opt_pretty (bool): Returns formatted JSON if true
-     *                      - limit (int): Results to return per page (1-100)
-     *                      - offset (string): Pagination offset token
+     * - opt_fields (string): A comma-separated list of fields to include in the response
+     *   (e.g., "name,description,html_description")
+     * - opt_pretty (bool): Returns formatted JSON if true
+     * - limit (int): Results to return per page (1-100)
+     * - offset (string): Pagination offset token
      * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body containing team data
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including data array and pagination info
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data array containing the list of teams with fields including:
-     *                 - gid: Unique identifier of the team
-     *                 - resource_type: Always "team"
-     *                 - name: Name of the team
-     *                 - description: Description of the team
-     *                 - html_description: HTML formatted description of the team
-     *                 - organization: Object containing organization details
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * - status: HTTP status code
+     * - reason: Response status message
+     * - headers: Response headers
+     * - body: Decoded response body containing team data
+     * - raw_body: Raw response body
+     * - request: Original request details
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * - Complete decoded JSON response including data array and pagination info
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * - Just the data array containing the list of teams with fields including:
+     *   - gid: Unique identifier of the team
+     * - resource_type: Always "team"
+     * - name: Name of the team
+     * - description: Description of the team
+     * - html_description: HTML formatted description of the team
+     * - organization: Object containing organization details
      *                 Additional fields as specified in opt_fields
      *
      * @throws AsanaApiException If invalid workspace GID provided, permission errors,
@@ -453,50 +450,50 @@ class WorkspaceApiService
 
     /**
      * Get all projects in a workspace
-     *
      * GET /workspaces/{workspace_gid}/projects
-     *
      * Returns the compact project records for all projects in the workspace.
      * Returns projects the authenticated user has access to.
-     *
      * API Documentation: https://developers.asana.com/reference/getprojectsforworkspace
-     *
      * @param string $workspaceGid The unique global ID of the workspace to get projects from.
      *                           This identifier can be found in the workspace URL or returned from
      *                           workspace-related API endpoints.
      *                           Example: "12345"
      * @param array $options Optional parameters to customize the request:
-     *                      - archived (boolean): Only return projects whose archived field matches this value
-     *                      - opt_fields (string): A comma-separated list of fields to include in the response
-     *                        (e.g., "name,owner.name,custom_field_settings")
-     *                      - opt_pretty (bool): Returns formatted JSON if true
-     *                      - limit (int): Results to return per page (1-100)
-     *                      - offset (string): Pagination offset token
+     * - archived (boolean): Only return projects whose archived field matches this value
+     * - opt_fields (string): A comma-separated list of fields to include in the response
+     *   (e.g., "name,owner.name,custom_field_settings")
+     * - opt_pretty (bool): Returns formatted JSON if true
+     * - limit (int): Results to return per page (1-100)
+     * - offset (string): Pagination offset token
      * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body containing project data
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including data array and pagination info
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data array containing the list of projects with fields including:
-     *                 - gid: Unique identifier of the project
-     *                 - resource_type: Always "project"
-     *                 - name: Name of the project
-     *                 - owner: Object containing project owner details
-     *                 - workspace: Object containing workspace details
-     *                 - team: Object containing team details (if applicable)
-     *                 - archived: Boolean indicating if project is archived
-     *                 - current_status: Object containing current project status
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * - status: HTTP status code
+     * - reason: Response status message
+     * - headers: Response headers
+     * - body: Decoded response body containing project data
+     * - raw_body: Raw response body
+     * - request: Original request details
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * - Complete decoded JSON response including data array and pagination info
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * - Just the data array containing the list of projects with fields including:
+     *   - gid: Unique identifier of the project
+     * - resource_type: Always "project"
+     * - name: Name of the project
+     * - owner: Object containing project owner details
+     * - workspace: Object containing workspace details
+     * - team: Object containing team details (if applicable)
+     * - archived: Boolean indicating if project is archived
+     * - current_status: Object containing current project status
      *                 Additional fields as specified in opt_fields
      *
      * @throws AsanaApiException If invalid workspace GID provided, permission errors,
@@ -519,20 +516,16 @@ class WorkspaceApiService
 
     /**
      * Search tasks in a workspace
-     *
      * GET /workspaces/{workspace_gid}/tasks/search
-     *
      * Search for tasks within a specific workspace. Results are returned based on the search criteria and
      * permissions of the user making the request.
-     *
      * API Documentation: https://developers.asana.com/reference/searchtasksforworkspace
-     *
      * @param string $workspaceGid The unique global ID of the workspace to search in.
      *                             This identifier can be found in the workspace URL or returned from
      *                             workspace-related API endpoints.
      *                             Example: "12345"
      * @param array $options Query parameters to filter and customize search results. Supported keys include:
-     *   - text (string): Full-text search query
+     * - text (string): Full-text search query
      *   - resource_subtype (string): Filter by task type (e.g., "default_task", "milestone", "section")
      *   - assignee.any (array): GIDs of users tasks could be assigned to
      *   - assignee.not (array): GIDs of users tasks should not be assigned to
@@ -553,33 +546,37 @@ class WorkspaceApiService
      *   - limit (int): Maximum number of results to return (1-100)
      *   - offset (string): Pagination offset token
      * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body containing task search results
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including data array and pagination info
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data array containing the list of matching tasks with fields including:
-     *                 - gid: Unique identifier of the task
-     *                 - resource_type: Always "task"
-     *                 - name: Name of the task
-     *                 - assignee: Object containing assignee details
-     *                 - completed: Boolean indicating if task is completed
-     *                 - due_on: Due date of the task
-     *                 - projects: Array of project objects this task belongs to
-     *                 - tags: Array of tag objects associated with the task
-     *                 - workspace: Object containing workspace details
-     *                 - created_at: Creation timestamp
-     *                 - modified_at: Last modification timestamp
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * - status: HTTP status code
+     * - reason: Response status message
+     * - headers: Response headers
+     * - body: Decoded response body containing task search results
+     * - raw_body: Raw response body
+     * - request: Original request details
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * - Complete decoded JSON response including data array and pagination info
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * - Just the data array containing the list of matching tasks with fields including:
+     *   - gid: Unique identifier of the task
+     * - resource_type: Always "task"
+     * - name: Name of the task
+     * - assignee: Object containing assignee details
+     * - completed: Boolean indicating if task is completed
+     * - due_on: Due date of the task
+     * - projects: Array of project objects this task belongs to
+     * - tags: Array of tag objects associated with the task
+     * - workspace: Object containing workspace details
+     * - created_at: Creation timestamp
+     * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
      * @throws AsanaApiException If invalid workspace GID provided, invalid search parameters,
@@ -602,53 +599,52 @@ class WorkspaceApiService
 
     /**
      * Get workspace events
-     *
      * GET /workspaces/{workspace_gid}/events
-     *
      * Returns events for a single workspace.
      * This endpoint supports retrieval of either all events in a workspace (for synchronization)
      * or a filtered subset of events from a resource in a workspace.
-     *
      * Important note: Currently, access to this API is exclusively available through a service account
      * in an Enterprise+ domain. To get started, see the workspace events guide.
-     *
      * API Documentation: https://developers.asana.com/reference/getworkspaceevents
-     *
      * @param string $workspaceGid The unique global ID of the workspace to get events from.
      *                             This identifier can be found in the workspace URL or returned from
      *                             workspace-related API endpoints.
      *                             Example: "12345"
      * @param array $options Optional parameters to customize the request:
-     *                      - sync (string): A sync token received from a previous call to this endpoint.
-     *                                       If provided, only events since the token will be returned.
-     *                      - opt_pretty (bool): Returns formatted JSON if true.
+     * - sync (string): A sync token received from a previous call to this endpoint.
+     *   If provided, only events since the token will be returned.
+     * - opt_pretty (bool): Returns formatted JSON if true.
+     *
      * @param int $responseType The type of response to return:
-     *                              - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     *                              - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     *                              - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
-     *               If $responseType is AsanaApiClient::RESPONSE_FULL:
-     *               - status: HTTP status code
-     *               - reason: Response status message
-     *               - headers: Response headers
-     *               - body: Decoded response body containing event data
-     *               - raw_body: Raw response body
-     *               - request: Original request details
-     *               If $responseType is AsanaApiClient::RESPONSE_NORMAL:
-     *               - Complete decoded JSON response including data array and sync token
-     *               If $responseType is AsanaApiClient::RESPONSE_DATA (default):
-     *               - Just the data array containing the list of events with fields including:
-     *                 - gid: Unique identifier of the event
-     *                 - resource_type: Always "event"
-     *                 - action: The action that triggered the event (e.g., "added", "removed", "changed")
-     *                 - resource: Object containing details of the resource that changed
-     *                 - parent: Object containing parent resource details (if applicable)
-     *                 - user: Object containing user who triggered the event
-     *                 - created_at: Timestamp when the event occurred
-     *                 - type: Type of event (e.g., "task", "project", "story")
-     *                 Additional sync token for subsequent requests
      *
+     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * - status: HTTP status code
+     * - reason: Response status message
+     * - headers: Response headers
+     * - body: Decoded response body containing event data
+     * - raw_body: Raw response body
+     * - request: Original request details
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * - Complete decoded JSON response including data array and sync token
+     *
+     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * - Just the data array containing the list of events with fields including:
+     *   - gid: Unique identifier of the event
+     * - resource_type: Always "event"
+     * - action: The action that triggered the event (e.g., "added", "removed", "changed")
+     * - resource: Object containing details of the resource that changed
+     * - parent: Object containing parent resource details (if applicable)
+     * - user: Object containing user who triggered the event
+     * - created_at: Timestamp when the event occurred
+     * - type: Type of event (e.g., "task", "project", "story")
+     *                 Additional sync token for subsequent requests
      * @throws AsanaApiException If invalid workspace GID provided, permission errors,
      *                          network issues, or rate limiting occurs
      */
