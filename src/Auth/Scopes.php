@@ -46,6 +46,12 @@ class Scopes
      */
     public const GOALS_READ = 'goals:read';
 
+    // 🔹 Jobs
+    /**
+     * GET /jobs/{job_gid}
+     */
+    public const JOBS_READ = 'jobs:read';
+
     // 🔹 Portfolios
     /**
      * - GET /portfolios/{portfolio_gid}/custom_field_settings
