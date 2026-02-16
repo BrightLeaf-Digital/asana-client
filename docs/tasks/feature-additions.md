@@ -2,28 +2,11 @@
 
 This document outlines feature enhancements needed for the Asana Client PHP library. Each item includes detailed explanations, code examples, and validation against API specifications.
 
-## ✅ 1. Add support for webhooks — COMPLETED
+## 1. Complete Webhook support
 
-Webhook support has been implemented via `WebhooksApiService`. The service provides methods for creating, retrieving, and deleting webhooks, along with signature verification for secure webhook handling.
+Webhook support has been partially implemented via `WebhooksApiService`. The service provides methods for creating, retrieving, and deleting webhooks. Security/HMAC verification and signature validation are still pending.
 
 **Implementation:** See `src/Api/WebhooksApiService.php`
-
-## ✅ 6. Support full API coverage — COMPLETED
-
-Comprehensive API coverage has been achieved with the addition of 10 new API services:
-
-1. **WebhooksApiService** - Real-time notifications for resource changes
-2. **EventsApiService** - Poll for events and track changes
-3. **TeamsApiService** - Manage teams and team memberships
-4. **PortfoliosApiService** - Create and manage project portfolios
-5. **GoalsApiService** - Track organizational goals and objectives
-6. **TimeTrackingEntriesApiService** - Record and manage time entries
-7. **ProjectTemplatesApiService** - Create projects from templates
-8. **BatchApiService** - Execute multiple API requests in a single call
-9. **StatusUpdatesApiService** - Post and retrieve project status updates
-10. **UserTaskListsApiService** - Access "My Tasks" and personal task lists
-
-**Note:** The following items from the original feature list remain as future enhancements:
 
 ### Problem Statement
 The current library does not support Asana's webhook functionality, which allows applications to receive real-time notifications when resources change. Adding webhook support would enable applications to respond to changes in Asana without polling the API.
@@ -1242,266 +1225,62 @@ Implement an EventApiService class that provides methods for retrieving events a
 
 ## 6. Support full API coverage
 
-### Problem Statement
-The current library covers only a subset of the Asana API endpoints. A comprehensive analysis of the API specification shows that many important endpoints are not yet implemented. Ensuring full API coverage would make the library more complete and useful for a wider range of applications.
+### 1. Missing API Services and Resources
 
-### Comprehensive API Coverage Analysis
+The following table lists the 23 Asana REST API resource groups that are **not currently implemented** in the library (no corresponding `*ApiService` class).
 
-Based on the Asana API specification (asana_oas.yaml) and the current implementation, the following endpoints are not yet supported:
+| #  | Resource Group                     | Path Prefix              | Tier         | Impact   |
+|:---|:-----------------------------------|:-------------------------|:-------------|:---------|
+| 1  | **Stories (Comments)**             | `/stories`               | All          | **High** |
+| 2  | **Memberships (Project)**          | `/project_memberships`   | All          | Medium   |
+| 3  | **Memberships (Team)**             | `/team_memberships`      | All          | Medium   |
+| 4  | **Memberships (Portfolio)**        | `/portfolio_memberships` | All          | Medium   |
+| 5  | **Memberships (Workspace)**        | `/workspace_memberships` | All          | Medium   |
+| 6  | **Project Statuses**               | `/project_statuses`      | All          | Medium   |
+| 7  | **Audit Log API**                  | `/audit_log_events`      | Enterprise   | Medium   |
+| 8  | **Rules**                          | `/rules`                 | Business/Ent | Medium   |
+| 9  | **Reactions**                      | `/reactions`             | All          | Low      |
+| 10 | **Allocations**                    | `/allocations`           | Business/Ent | Low      |
+| 11 | **Budgets**                        | `/budgets`               | Business/Ent | Low      |
+| 12 | **Task Templates**                 | `/task_templates`        | All          | Low      |
+| 13 | **Organization Exports**           | `/organization_exports`  | Enterprise   | Low      |
+| 14 | **Access Requests**                | `/access_requests`       | Enterprise   | Low      |
+| 15 | **Project Briefs**                 | `/project_briefs`        | All          | Low      |
+| 16 | **Goal Relationships**             | `/goal_relationships`    | All          | Low      |
+| 17 | **Custom Types**                   | `/custom_types`          | All          | Low      |
+| 18 | **Exports**                        | `/exports`               | All          | Low      |
+| 19 | **Jobs**                           | `/jobs`                  | All          | Low      |
+| 20 | **Rates**                          | `/rates`                 | Business/Ent | Low      |
+| 21 | **Time Periods**                   | `/time_periods`          | All          | Low      |
+| 22 | **Typeahead**                      | `/typeahead`             | All          | Low      |
+| 23 | **Custom Field Settings** (Global) | `/custom_field_settings` | All          | Low      |
 
-#### High Priority Endpoints
+---
 
-1. **Webhooks API**
-   - **HTTP Methods**: GET, POST, DELETE
-   - **Endpoints**: `/webhooks`, `/webhooks/{webhook_gid}`
-   - **Description**: Allows applications to receive real-time notifications when resources change
-   - **Use Cases**: Real-time updates, event-driven architecture, integrations with other systems
+### 🚀 Implementation Strategy
 
-2. **Events API**
-   - **HTTP Methods**: GET
-   - **Endpoints**: `/events`
-   - **Description**: Provides access to events that occur in Asana
-   - **Use Cases**: Activity tracking, audit logging, synchronization with external systems
+To achieve 100% compliance with the `asana_oas.yaml` specification, the following strategy is recommended:
 
-3. **Teams API**
-   - **HTTP Methods**: GET, POST, PUT
-   - **Endpoints**: `/teams`, `/teams/{team_gid}`, `/teams/{team_gid}/projects`
-   - **Description**: Manages teams within an organization
-   - **Use Cases**: Team management, project organization, user permissions
+1. **Prioritize High-Impact Gaps**: 
+    - Implement `StoriesApiService` (Comments) as it is essential for most task-based workflows.
+    - Implement membership services (`ProjectMemberships`, `TeamMemberships`, etc.) to support access control.
+2. **Enterprise Feature Support**:
+    - Add `AuditLogApiService` and `OrganizationExportApiService` for Enterprise-tier users.
+3. **Consistency Refactor**:
+    - Ensure all new services follow the established pattern of using the `ValidationTrait` and consistent `AsanaApiClient::RESPONSE_*` handling.
 
-4. **Portfolios API**
-   - **HTTP Methods**: GET, POST, PUT, DELETE
-   - **Endpoints**: `/portfolios`, `/portfolios/{portfolio_gid}`, `/portfolios/{portfolio_gid}/items`
-   - **Description**: Manages portfolios, which provide a high-level view of multiple projects
-   - **Use Cases**: Project grouping, status reporting, high-level progress tracking
+### Recommended Action
+1. **Phase 1**: Implement `StoriesApiService`.
+2. **Phase 2**: Implement all 4 membership services (`Project`, `Team`, `Portfolio`, `Workspace`).
+3. **Phase 4**: Implement the remaining niche services (Briefs, Rules, Rates, Budgets, etc.).
 
-#### Medium Priority Endpoints
 
-5. **Goals API**
-   - **HTTP Methods**: GET, POST, PUT, DELETE
-   - **Endpoints**: `/goals`, `/goals/{goal_gid}`
-   - **Description**: Manages goals and objectives
-   - **Use Cases**: OKR tracking, performance management, strategic planning
-
-6. **Time Tracking API**
-   - **HTTP Methods**: GET, POST, PUT, DELETE
-   - **Endpoints**: `/time_tracking_entries`, `/time_tracking_entries/{time_tracking_entry_gid}`
-   - **Description**: Manages time tracking entries for tasks
-   - **Use Cases**: Time tracking, billing, productivity analysis
-
-7. **Project Templates API**
-   - **HTTP Methods**: GET, POST
-   - **Endpoints**: `/project_templates`, `/project_templates/{project_template_gid}/instantiate_project`
-   - **Description**: Manages project templates and creates projects from templates
-   - **Use Cases**: Standardized project creation, workflow automation
-
-8. **Batch API**
-   - **HTTP Methods**: POST
-   - **Endpoints**: `/batch`
-   - **Description**: Allows multiple API requests to be made in a single HTTP request
-   - **Use Cases**: Performance optimization, reducing API calls, complex operations
-
-#### Lower Priority Endpoints
-
-9. **Status Updates API**
-   - **HTTP Methods**: GET, POST, DELETE
-   - **Endpoints**: `/status_updates`, `/status_updates/{status_update_gid}`
-   - **Description**: Manages status updates for projects and portfolios
-   - **Use Cases**: Project status reporting, team communication
-
-10. **User Task Lists API**
-    - **HTTP Methods**: GET
-    - **Endpoints**: `/user_task_lists`, `/user_task_lists/{user_task_list_gid}`
-    - **Description**: Accesses a user's "My Tasks" list
-    - **Use Cases**: Personal task management, task assignment
-
-11. **Workspace Memberships API**
-    - **HTTP Methods**: GET
-    - **Endpoints**: `/workspace_memberships`, `/workspace_memberships/{workspace_membership_gid}`
-    - **Description**: Manages user memberships in workspaces
-    - **Use Cases**: User access management, organization structure
-
-12. **Team Memberships API**
-    - **HTTP Methods**: GET, POST, DELETE
-    - **Endpoints**: `/team_memberships`, `/team_memberships/{team_membership_gid}`
-    - **Description**: Manages user memberships in teams
-    - **Use Cases**: Team composition, access control
-
-13. **Project Memberships API**
-    - **HTTP Methods**: GET, POST, DELETE
-    - **Endpoints**: `/project_memberships`, `/project_memberships/{project_membership_gid}`
-    - **Description**: Manages user memberships in projects
-    - **Use Cases**: Project access control, collaboration management
-
-14. **Portfolio Memberships API**
-    - **HTTP Methods**: GET, POST, DELETE
-    - **Endpoints**: `/portfolio_memberships`, `/portfolio_memberships/{portfolio_membership_gid}`
-    - **Description**: Manages user memberships in portfolios
-    - **Use Cases**: Portfolio access control, stakeholder management
-
-15. **Custom Types API**
-    - **HTTP Methods**: GET
-    - **Endpoints**: `/custom_types`, `/custom_types/{custom_type_gid}`
-    - **Description**: Manages custom types for objects
-    - **Use Cases**: Custom workflows, specialized object types
-
-16. **Typeahead API**
-    - **HTTP Methods**: GET
-    - **Endpoints**: `/typeahead`
-    - **Description**: Provides search functionality for Asana objects
-    - **Use Cases**: Auto-completion, search functionality
-
-17. **Audit Log API**
-    - **HTTP Methods**: GET
-    - **Endpoints**: `/workspaces/{workspace_gid}/audit_log_events`
-    - **Description**: Retrieves audit log events for a workspace
-    - **Use Cases**: Security monitoring, compliance, activity tracking
-
-18. **Organization Exports API**
-    - **HTTP Methods**: GET, POST
-    - **Endpoints**: `/organization_exports`, `/organization_exports/{organization_export_gid}`
-    - **Description**: Creates and manages organization data exports
-    - **Use Cases**: Data backup, migration, analysis
-
-19. **Project Briefs API**
-    - **HTTP Methods**: GET, PUT
-    - **Endpoints**: `/project_briefs/{project_brief_gid}`
-    - **Description**: Manages project briefs (rich text documents)
-    - **Use Cases**: Project documentation, requirements management
-
-20. **Rules API**
-    - **HTTP Methods**: GET, POST, PUT, DELETE
-    - **Endpoints**: `/rule_triggers/{rule_trigger_gid}/run`
-    - **Description**: Manages automation rules
-    - **Use Cases**: Workflow automation, process standardization
-
-### Code Examples
-
-#### Example Implementation for Webhooks API:
-
-```php
-// In src/Api/WebhookApiService.php
-class WebhookApiService
-{
-    private AsanaApiClient $client;
-
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
-    /**
-     * Create a webhook.
-     *
-     * @param string $resourceGid The resource to subscribe to
-     * @param string $target The target URL for webhook delivery
-     * @param array $options Additional options
-     * @param int $responseType Response type format
-     * 
-     * @return array The created webhook
-     */
-    public function createWebhook(
-        string $resourceGid,
-        string $target,
-        array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
-    ): array {
-        $data = [
-            'resource' => $resourceGid,
-            'target' => $target
-        ];
-
-        if (isset($options['filters'])) {
-            $data['filters'] = $options['filters'];
-        }
-
-        return $this->client->request('POST', 'webhooks', ['json' => ['data' => $data]], $responseType);
-    }
-
-    /**
-     * Get all webhooks for a workspace.
-     *
-     * @param string $workspaceGid The workspace GID
-     * @param array $options Additional options
-     * @param int $responseType Response type format
-     * 
-     * @return array List of webhooks
-     */
-    public function getWebhooks(
-        string $workspaceGid,
-        array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
-    ): array {
-        $queryParams = array_merge(['workspace' => $workspaceGid], $options);
-        return $this->client->request('GET', 'webhooks', ['query' => $queryParams], $responseType);
-    }
-
-    /**
-     * Get a specific webhook by ID.
-     *
-     * @param string $webhookGid The webhook GID
-     * @param array $options Additional options
-     * @param int $responseType Response type format
-     * 
-     * @return array The webhook details
-     */
-    public function getWebhook(
-        string $webhookGid,
-        array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
-    ): array {
-        return $this->client->request('GET', "webhooks/{$webhookGid}", ['query' => $options], $responseType);
-    }
-
-    /**
-     * Delete a webhook.
-     *
-     * @param string $webhookGid The webhook GID
-     * @param int $responseType Response type format
-     * 
-     * @return array Empty response on success
-     */
-    public function deleteWebhook(
-        string $webhookGid,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
-    ): array {
-        return $this->client->request('DELETE', "webhooks/{$webhookGid}", [], $responseType);
-    }
-
-    /**
-     * Verify a webhook request signature.
-     *
-     * @param string $requestBody The raw request body
-     * @param string $signature The X-Hook-Signature header value
-     * @param string $secret The webhook secret
-     * 
-     * @return bool True if the signature is valid
-     */
-    public function verifyWebhookSignature(string $requestBody, string $signature, string $secret): bool
-    {
-        $calculatedSignature = hash_hmac('sha256', $requestBody, $secret);
-        return hash_equals($calculatedSignature, $signature);
-    }
-}
-
-// In AsanaClient.php
-/**
- * Get the webhook API service.
- * 
- * @return WebhookApiService
- * @throws TokenInvalidException If the token is invalid or cannot be refreshed
- */
-public function webhooks(): WebhookApiService
-{
-    if (!isset($this->webhooks)) {
-        $this->webhooks = new WebhookApiService($this->getApiClient());
-    }
-
-    $this->ensureValidToken();
-
-    return $this->webhooks;
-}
-```
+### Critical Evaluation
+- **Actual Impact**: High - Missing endpoints limit the library's usefulness for many applications
+- **Priority Level**: High - Should be addressed to make the library more complete and useful
+- **Implementation Status**: Partially implemented - Current code covers only a subset of API endpoints (~80-85%)
+- **Spec Compliance**: Partial - Technical audit shows specific missing resource groups and intra-service endpoints
+- **Difficulty/Complexity**: High - Requires implementing numerous API service classes and ensuring consistent request patterns
 
 ### File References
 - `src/Api/`: Directory containing all API service classes

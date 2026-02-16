@@ -15,9 +15,9 @@ This document provides a comprehensive analysis of all improvement tasks for the
 
 ~~5. **Increase test coverage for API service classes** (Testing) — Completed~~
 
-6. **Implement proper error logging** (Code Quality)
+6. **Implement structured logging** (Code Quality)
    - Impact: High | Difficulty: Medium
-   - Essential for diagnosing issues in production
+   - Partially implemented in AsanaApiClient; needs expansion to Auth and Main client.
 
 7. **Refactor error handling to be more consistent** (Code Architecture)
    - Impact: High | Difficulty: Medium
@@ -25,34 +25,35 @@ This document provides a comprehensive analysis of all improvement tasks for the
 
 ### Phase 2: Core Architecture (High Priority - Short Term)
 8. **Refactor API service classes to reduce duplication** (Code Architecture)
-   - Impact: Medium | Difficulty: Medium
+   - Impact: High | Difficulty: Medium
+   - **Prerequisite**: Must be completed before adding new API services to ensure maintainability.
    - Enables easier maintenance and consistent patterns
 
-9. **Implement interfaces for all major components** (Code Architecture)
-   - Impact: Medium | Difficulty: High
-   - Enables dependency injection and better testing
+9. **Complete Webhook support** (Features)
+   - Impact: High | Difficulty: Medium
+   - Note: Security/HMAC verification and signature validation are required for production readiness.
 
-10. **Implement proper service container/dependency injection** (Code Architecture)
+10. **Expand API coverage** (Features)
+    - Impact: High | Difficulty: High
+    - Note: Priority 1: **Stories (Comments)**. Priority 2: **Memberships**.
+    - 19 services currently implemented; 23 resource groups still missing.
+
+11. **Implement interfaces for all major components** (Code Architecture)
+    - Impact: Medium | Difficulty: High
+    - Enables dependency injection and better testing
+
+12. **Implement proper service container/dependency injection** (Code Architecture)
     - Impact: Medium | Difficulty: High
     - Improves flexibility and testability
 
-~~11. **Add webhook support** (Features) — Completed~~
-
-~~12. **Support full API coverage** (Features) — Completed~~
-    ~~- 10 new API services added: Webhooks, Events, Teams, Portfolios, Goals, Time Tracking, Project Templates, Batch API, Status Updates, User Task Lists~~
-
 ### Phase 3: Enhanced Functionality (Medium Priority - Medium Term)
-11. **Implement request batching** (Performance)
+13. **Implement request batching helpers** (Performance)
    - Impact: High | Difficulty: High
-   - Note: Batch API service now available; helper methods/patterns still needed
+   - Note: Batch API service now available; high-level helper methods/patterns still needed
 
-12. **Implement cursor-based pagination helpers** (Features)
+14. **Implement cursor-based pagination helpers** (Features)
    - Impact: Medium | Difficulty: Medium
    - Improves handling of large datasets
-
-13. **Add integration tests** (Testing)
-   - Impact: High | Difficulty: High
-   - Validates real-world functionality
 
 ### Phase 4: Developer Experience (Medium Priority - Medium Term)
 14. **Add Composer scripts for common tasks** (Build & Deployment)
@@ -94,6 +95,11 @@ This document provides a comprehensive analysis of all improvement tasks for the
     - Impact: Medium | Difficulty: High
     - Advanced performance optimization
 
+24. **Add integration tests** (Testing)
+    - Impact: High | Difficulty: High
+    - **Feasibility Assessment Required**: Sandbox accounts are not automatically available and have a 1-year duration limitation.
+    - Status: Deferred until after core services expansion is complete.
+
 ## 🔍 Difficulty Breakdown
 
 ### Low Complexity (Quick Wins)
@@ -120,10 +126,10 @@ This document provides a comprehensive analysis of all improvement tasks for the
 ### High Complexity (Major Effort)
 - **Implement interfaces for all major components** - Comprehensive design and refactoring
 - **Implement proper service container/dependency injection** - Complex architectural changes
-- ~~**Add webhook support** - Security, HMAC verification, event handling — Completed~~
-- **Implement request batching** - Complex API endpoint understanding (Batch API service added; helper patterns needed)
+- **Add webhook security verification** - Implementation of HMAC signature validation
+- **Implement request batching** - Complex API endpoint understanding (Batch API service added; high-level helper patterns needed)
 - **Add integration tests** - Test environment setup, real API handling
-- ~~**Support full API coverage** - Numerous API service classes — Completed (10 new services added)~~
+- **Support full API coverage** - Numerous API service classes (Ongoing: ~85% of endpoints covered)
 - **Create model classes for Asana resources** - Complex resource relationships
 - **Add event subscription management** - Event-driven patterns, sync tokens
 - **Implement asynchronous requests** - Complex async programming patterns
@@ -189,7 +195,8 @@ This document provides a comprehensive analysis of all improvement tasks for the
 - **Interfaces** → **Dependency Injection** → **Service Container**
 - **Base Service Classes** → **API Coverage Expansion**
 - **CI/CD** → **Automated Testing** → **Automated Releases**
-- **Error Handling** → **Integration Tests** → **Production Readiness**
+- **Error Handling** → **Production Readiness**
+- **API Coverage Expansion** → **Integration Tests** (Phase 5)
 
 ### Potential Blockers
 - **API Documentation Access**: Full API coverage requires comprehensive understanding of Asana API specification
@@ -228,25 +235,25 @@ This document provides a comprehensive analysis of all improvement tasks for the
 - ✅ Static analysis tools configured and passing
 - ✅ Input validation implemented for all public methods
 - ✅ Rate limiting with automatic retry handling
-- ✅ 90%+ test coverage on core API services (654 tests, 1183 assertions)
-- 🔄 Structured logging (pending implementation)
+- ✅ 90%+ unit test coverage (654 tests, 1183 assertions)
+- 🔄 Structured logging (Partially implemented in AsanaApiClient)
 - 🔄 Consistent error handling (pending refactoring)
 
 ### Architecture Phase  
-- ✅ Zero code duplication in API service classes
-- ✅ All major components implement interfaces
-- ✅ Dependency injection working throughout codebase
+- 🔄 Zero code duplication in API service classes (pending BaseApiService)
+- 🔄 All major components implement interfaces (pending implementation)
+- 🔄 Dependency injection working throughout codebase (pending implementation)
 
 ### Feature Phase
-- ✅ Webhook support fully functional with security verification
-- ✅ 95%+ API endpoint coverage (10 new services added)
+- 🔄 Webhook support (API service exists; HMAC verification pending)
+- 🔄 Full API endpoint coverage (~80-85% complete; 10+ new services added)
 - 🔄 Pagination helpers (pending implementation)
 - 🔄 Model classes (pending implementation)
 
 ### Quality Phase
-- ✅ Integration tests passing against real API
-- ✅ Performance benchmarks meet targets
-- ✅ Documentation complete and community-ready
+- 🔄 Integration tests (Moved to Phase 5; pending feasibility assessment)
+- 🔄 Performance benchmarks (pending implementation)
+- ✅ Documentation (Contributing/Changelog) complete
 
 ---
 

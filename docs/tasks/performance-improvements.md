@@ -122,7 +122,7 @@ The Asana API supports batch requests through the `/batch` endpoint, as document
 ### Critical Evaluation
 - **Actual Impact**: High - Without batching, applications making multiple API requests experience significant overhead
 - **Priority Level**: High - Should be addressed to improve performance for applications making multiple requests
-- **Implementation Status**: Not implemented - Current code makes individual requests for each operation
+- **Implementation Status**: Partially implemented - `BatchApiService` exists for low-level batching. High-level `BatchRequest` helper and `AsanaClient::batch()` method are still needed.
 - **Spec Compliance**: Required - The Asana API provides a batch endpoint that should be utilized
 - **Difficulty/Complexity**: High - Requires implementing new BatchRequest class, understanding Asana API batch endpoint format, and handling complex response parsing
 
@@ -222,7 +222,7 @@ HTTP client configuration is a client-side optimization that doesn't directly re
 ### Critical Evaluation
 - **Actual Impact**: Medium - Suboptimal HTTP client configuration can lead to performance issues, especially under high load
 - **Priority Level**: Medium - Should be addressed to improve performance for applications making many requests
-- **Implementation Status**: Minimal - Current configuration is basic and may not be optimized for performance
+- **Implementation Status**: Partially implemented - `AsanaApiClient` now includes basic retry logic for rate limits and configurable backoff. Optimized pooling and advanced Guzzle handler configurations are still pending.
 - **Spec Compliance**: N/A - This is a client-side optimization
 - **Difficulty/Complexity**: Medium - Requires understanding of Guzzle HTTP client configuration options and performance tuning, but follows established patterns
 

@@ -2,10 +2,10 @@
 
 This document outlines code quality enhancements needed for the Asana Client PHP library. Each item includes detailed explanations, code examples, and validation against API specifications.
 
-## 2. Implement proper error logging
+## 2. Complete structured logging
 
 ### Problem Statement
-The current error handling lacks proper logging, making it difficult to diagnose issues in production. Implementing structured logging would improve error visibility and help with troubleshooting.
+The current error handling has basic logging in `AsanaApiClient`, but it needs to be expanded to the Auth handlers and the main client to provide full visibility.
 
 ### Code Examples
 
