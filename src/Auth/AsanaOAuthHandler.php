@@ -31,7 +31,12 @@ class AsanaOAuthHandler
      * @param LoggerInterface|null $logger PSR-3 compatible logger instance.
      * @return void
      */
-    public function __construct(string $clientId, string $clientSecret, string $redirectUri, ?LoggerInterface $logger = null)
+    public function __construct(
+        string $clientId,
+        string $clientSecret,
+        string $redirectUri,
+        ?LoggerInterface $logger = null
+    )
     {
         $this->provider = new OAuth2Provider([
             'clientId'     => $clientId,
