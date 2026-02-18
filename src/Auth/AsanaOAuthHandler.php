@@ -36,8 +36,7 @@ class AsanaOAuthHandler
         string $clientSecret,
         string $redirectUri,
         ?LoggerInterface $logger = null
-    )
-    {
+    ) {
         $this->provider = new OAuth2Provider([
             'clientId'     => $clientId,
             'clientSecret' => $clientSecret,
