@@ -7,6 +7,7 @@ use BrightleafDigital\Auth\OAuth2Provider;
 use League\OAuth2\Client\Token\AccessToken;
 use PHPUnit\Framework\MockObject\Exception as MockException;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use ReflectionClass;
 
 class AsanaOAuthHandlerTest extends TestCase
@@ -290,5 +291,20 @@ class AsanaOAuthHandlerTest extends TestCase
         $url2 = $this->handler->getAuthorizationUrl($options);
 
         $this->assertSame($url1, $url2);
+    }
+
+    /**
+     * Test that the logger receives messages in AsanaOAuthHandler
+     */
+    public function testLoggerReceivesCalls(): void
+    {
+        $mockLogger = $this->createMock(LoggerInterface::class);
+        $mockLogger->expects($this->atLeastOnce())
+            ->method('info');
+
+        $handler = new AsanaOAuthHandler('client-id', 'client-secret', 'redirect-uri', $mockLogger);
+
+        $this->mockProvider->method('getAuthorizationUrl')->willReturn('https://example.com/auth');
+        $handler->getAuthorizationUrl([]);
     }
 }

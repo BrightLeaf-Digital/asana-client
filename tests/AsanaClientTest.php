@@ -28,6 +28,7 @@ use League\OAuth2\Client\Token\AccessToken;
 use PHPUnit\Framework\MockObject\Exception as MockException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
+use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionException;
 
@@ -1524,5 +1525,17 @@ class AsanaClientTest extends TestCase
             $exceptionClassToThrow,
             ['context' => 'test-context']
         ]);
+    }
+
+    /**
+     * Test that the logger receives messages in AsanaClient
+     */
+    public function testLoggerReceivesCalls(): void
+    {
+        $mockLogger = $this->createMock(LoggerInterface::class);
+        $mockLogger->expects($this->atLeastOnce())
+            ->method('info');
+
+        new AsanaClient('client-id', 'client-secret', 'redirect-uri', null, $mockLogger);
     }
 }

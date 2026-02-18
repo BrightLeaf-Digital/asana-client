@@ -6,6 +6,7 @@ use BrightleafDigital\Exceptions\AsanaApiException;
 use BrightleafDigital\Exceptions\RateLimitException;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -53,17 +54,25 @@ class AsanaApiClient
     private int $initialBackoff;
 
     /**
+     * Maximum length for truncated response body in logs.
+     * @var int
+     */
+    private int $maxLogBodyLength;
+
+    /**
      * Creates a new Asana API client instance.
      * @param string $accessToken OAuth2 access token for authentication
      * @param LoggerInterface|null $logger PSR-3 compatible logger instance
      * @param int $maxRetries Maximum number of retry attempts for rate-limited requests
      * @param int $initialBackoff Initial backoff time in seconds for exponential backoff
+     * @param int $maxLogBodyLength Maximum length for truncated response body in logs
      */
     public function __construct(
         string $accessToken,
         ?LoggerInterface $logger = null,
         int $maxRetries = self::DEFAULT_MAX_RETRIES,
-        int $initialBackoff = self::DEFAULT_INITIAL_BACKOFF
+        int $initialBackoff = self::DEFAULT_INITIAL_BACKOFF,
+        int $maxLogBodyLength = 1000
     ) {
         $this->httpClient = new GuzzleClient([
             'base_uri' => 'https://app.asana.com/api/1.0/',
@@ -75,6 +84,7 @@ class AsanaApiClient
         $this->logger = $logger ?? new NullLogger();
         $this->maxRetries = $maxRetries;
         $this->initialBackoff = $initialBackoff;
+        $this->maxLogBodyLength = $maxLogBodyLength;
     }
 
     /**
@@ -124,6 +134,7 @@ class AsanaApiClient
             'method' => $method,
             'uri' => $uri,
             'retry_count' => $retryCount,
+            'options' => $this->sanitizeOptions($options),
         ]);
 
         try {
@@ -143,6 +154,7 @@ class AsanaApiClient
                 'method' => $method,
                 'uri' => $uri,
                 'status_code' => $response->getStatusCode(),
+                'response' => $this->truncateResponseBody((string) $response->getBody()),
             ]);
 
             switch ($responseType) {
@@ -269,6 +281,7 @@ class AsanaApiClient
             'uri' => $uri,
             'status_code' => $statusCode,
             'error' => $message,
+            'response' => $response ? $this->truncateResponseBody((string) $response->getBody()) : null,
         ]);
 
         throw new AsanaApiException($message, $e->getCode(), $details, $e);
@@ -277,10 +290,10 @@ class AsanaApiClient
     /**
      * Get the number of seconds to wait before retrying based on the Retry-After header
      * or calculate using exponential backoff.
-     * @param \Psr\Http\Message\ResponseInterface|null $response The HTTP response.
+     * @param ResponseInterface|null $response The HTTP response.
      * @return int The number of seconds to wait before retrying.
      */
-    private function getRetryAfterSeconds($response): int
+    private function getRetryAfterSeconds(?ResponseInterface $response): int
     {
         if ($response && $response->hasHeader('Retry-After')) {
             $retryAfter = $response->getHeaderLine('Retry-After');
@@ -303,6 +316,22 @@ class AsanaApiClient
     }
 
     /**
+     * Truncate the response body for logging purposes.
+     * @param string $body The response body.
+     * @return string The truncated body.
+     */
+    private function truncateResponseBody(string $body): string
+    {
+        $limit = $this->maxLogBodyLength;
+
+        if (strlen($body) <= $limit) {
+            return $body;
+        }
+
+        return substr($body, 0, $limit) . '... [truncated]';
+    }
+
+    /**
      * Sanitize request options for logging by removing sensitive information.
      * @param array $options The request options to sanitize.
      * @return array The sanitized options.
@@ -314,6 +343,18 @@ class AsanaApiClient
         // Remove Authorization header if present
         if (isset($sanitized['headers']['Authorization'])) {
             $sanitized['headers']['Authorization'] = '[REDACTED]';
+        }
+
+        // Truncate large request bodies if present
+        if (isset($sanitized['body']) && is_string($sanitized['body'])) {
+            $sanitized['body'] = $this->truncateResponseBody($sanitized['body']);
+        }
+
+        if (isset($sanitized['json'])) {
+            $jsonString = json_encode($sanitized['json']);
+            if (strlen($jsonString) > $this->maxLogBodyLength) {
+                $sanitized['json'] = '[TRUNCATED LARGE JSON DATA]';
+            }
         }
 
         return $sanitized;
@@ -336,6 +377,26 @@ class AsanaApiClient
     public function setLogger(LoggerInterface $logger): self
     {
         $this->logger = $logger;
+        return $this;
+    }
+
+    /**
+     * Get the maximum length for response body truncation in logs.
+     * @return int
+     */
+    public function getMaxLogBodyLength(): int
+    {
+        return $this->maxLogBodyLength;
+    }
+
+    /**
+     * Set the maximum length for response body truncation in logs.
+     * @param int $length
+     * @return self
+     */
+    public function setMaxLogBodyLength(int $length): self
+    {
+        $this->maxLogBodyLength = $length;
         return $this;
     }
 }

@@ -31,6 +31,8 @@ use GuzzleHttp\Exception\GuzzleException;
 use JsonException;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Throwable;
 
 class AsanaClient
@@ -58,6 +60,12 @@ class AsanaClient
      * @var string
      */
     private string $tokenStoragePath;
+
+    /**
+     * PSR-3 compatible logger instance
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
 
     /**
      * Tasks API service instance
@@ -175,18 +183,28 @@ class AsanaClient
      * @param string|null $clientSecret Optional client secret for authentication.
      * @param string|null $redirectUri Optional redirect URI for OAuth flow.
      * @param string|null $tokenStoragePath Path to token storage file. Defaults to token.json in working dir.
+     * @param LoggerInterface|null $logger PSR-3 compatible logger instance.
      */
     public function __construct(
         ?string $clientId = null,
         ?string $clientSecret = null,
         ?string $redirectUri = null,
-        ?string $tokenStoragePath = null
+        ?string $tokenStoragePath = null,
+        ?LoggerInterface $logger = null
     ) {
+        $this->logger = $logger ?? new NullLogger();
+
         if ($clientId && $clientSecret) {
-            $this->authHandler = new AsanaOAuthHandler($clientId, $clientSecret, $redirectUri);
+            $this->authHandler = new AsanaOAuthHandler($clientId, $clientSecret, $redirectUri, $this->logger);
         }
 
         $this->tokenStoragePath = $tokenStoragePath ?? getcwd() . '/token.json';
+
+        $this->logger->info('AsanaClient initialized', [
+            'client_id' => $clientId,
+            'redirect_uri' => $redirectUri,
+            'token_storage_path' => $this->tokenStoragePath,
+        ]);
     }
 
     /**
@@ -196,14 +214,16 @@ class AsanaClient
      * @param string|null $clientSecret Optional client secret for authentication.
      * @param string|null $redirectUri Optional redirect URI for OAuth flow.
      * @param string|null $tokenStoragePath Path to token storage file. Defaults to token.json in working dir.
+     * @param LoggerInterface|null $logger PSR-3 compatible logger instance.
      */
     public static function OAuth(
         ?string $clientId = null,
         ?string $clientSecret = null,
         ?string $redirectUri = null,
-        ?string $tokenStoragePath = null
+        ?string $tokenStoragePath = null,
+        ?LoggerInterface $logger = null
     ): self {
-        return new self($clientId, $clientSecret, $redirectUri, $tokenStoragePath);
+        return new self($clientId, $clientSecret, $redirectUri, $tokenStoragePath, $logger);
     }
 
     /**
@@ -213,19 +233,22 @@ class AsanaClient
      * @param string $clientSecret OAuth client secret
      * @param array $token The user's preexisting access token
      * @param string|null $tokenStoragePath Path to token storage file. Defaults to token.json in working dir.
+     * @param LoggerInterface|null $logger PSR-3 compatible logger instance.
      * @return self
      */
     public static function withAccessToken(
         string $clientId,
         string $clientSecret,
         array $token,
-        ?string $tokenStoragePath = null
+        ?string $tokenStoragePath = null,
+        ?LoggerInterface $logger = null
     ): self {
         $instance = new self(
             $clientId,
             $clientSecret,
             '', // No redirect URI required when preloading a token
-            $tokenStoragePath
+            $tokenStoragePath,
+            $logger
         );
         $instance->accessToken = new AccessToken($token);
         return $instance;
@@ -236,14 +259,16 @@ class AsanaClient
      *
      * @param string $personalAccessToken The user's PAT from Asana
      * @param string|null $tokenStoragePath Path to token storage file. Defaults to token.json in working dir.
+     * @param LoggerInterface|null $logger PSR-3 compatible logger instance.
      *
      * @return self
      */
     public static function withPAT(
         string $personalAccessToken,
-        ?string $tokenStoragePath = null
+        ?string $tokenStoragePath = null,
+        ?LoggerInterface $logger = null
     ): self {
-        $instance = new self('', '', '', $tokenStoragePath); // clientId, clientSecret, & redirectUri not needed for PAT
+        $instance = new self('', '', '', $tokenStoragePath, $logger); // clientId, clientSecret, & redirectUri not needed for PAT
         $instance->accessToken = new AccessToken(['access_token' => $personalAccessToken]);
         return $instance;
     }
@@ -893,7 +918,7 @@ class AsanaClient
         }
 
         if ($this->apiClient === null) {
-            $this->apiClient = new AsanaApiClient($this->accessToken->getToken());
+            $this->apiClient = new AsanaApiClient($this->accessToken->getToken(), $this->logger);
         }
 
         return $this->apiClient;
