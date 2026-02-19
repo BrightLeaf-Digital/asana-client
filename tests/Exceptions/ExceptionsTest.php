@@ -2,7 +2,7 @@
 
 namespace BrightleafDigital\Tests\Exceptions;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\OAuthCallbackException;
 use BrightleafDigital\Exceptions\TokenInvalidException;
 use Exception;
@@ -11,15 +11,15 @@ use PHPUnit\Framework\TestCase;
 class ExceptionsTest extends TestCase
 {
     // ========================================
-    // AsanaApiException Tests
+    // ApiException Tests
     // ========================================
 
     /**
-     * Test AsanaApiException can be created with message only.
+     * Test ApiException can be created with message only.
      */
-    public function testAsanaApiExceptionWithMessageOnly(): void
+    public function testApiExceptionWithMessageOnly(): void
     {
-        $exception = new AsanaApiException('Test error message');
+        $exception = new ApiException('Test error message');
 
         $this->assertSame('Test error message', $exception->getMessage());
         $this->assertSame(0, $exception->getCode());
@@ -28,11 +28,11 @@ class ExceptionsTest extends TestCase
     }
 
     /**
-     * Test AsanaApiException can be created with message and code.
+     * Test ApiException can be created with message and code.
      */
-    public function testAsanaApiExceptionWithMessageAndCode(): void
+    public function testApiExceptionWithMessageAndCode(): void
     {
-        $exception = new AsanaApiException('Not found', 404);
+        $exception = new ApiException('Not found', 404);
 
         $this->assertSame('Not found', $exception->getMessage());
         $this->assertSame(404, $exception->getCode());
@@ -40,9 +40,9 @@ class ExceptionsTest extends TestCase
     }
 
     /**
-     * Test AsanaApiException can be created with response data.
+     * Test ApiException can be created with response data.
      */
-    public function testAsanaApiExceptionWithResponseData(): void
+    public function testApiExceptionWithResponseData(): void
     {
         $responseData = [
             'errors' => [
@@ -50,7 +50,7 @@ class ExceptionsTest extends TestCase
             ]
         ];
 
-        $exception = new AsanaApiException('Invalid task', 400, $responseData);
+        $exception = new ApiException('Invalid task', 400, [], $responseData);
 
         $this->assertSame('Invalid task', $exception->getMessage());
         $this->assertSame(400, $exception->getCode());
@@ -58,33 +58,33 @@ class ExceptionsTest extends TestCase
     }
 
     /**
-     * Test AsanaApiException can be created with previous exception.
+     * Test ApiException can be created with previous exception.
      */
-    public function testAsanaApiExceptionWithPreviousException(): void
+    public function testApiExceptionWithPreviousException(): void
     {
         $previous = new Exception('Original error');
-        $exception = new AsanaApiException('Wrapped error', 500, [], $previous);
+        $exception = new ApiException('Wrapped error', 500, [], [], $previous);
 
         $this->assertSame($previous, $exception->getPrevious());
     }
 
     /**
-     * Test AsanaApiException getResponseData returns empty array by default.
+     * Test ApiException getResponseData returns empty array by default.
      */
-    public function testAsanaApiExceptionGetResponseDataReturnsEmptyArray(): void
+    public function testApiExceptionGetResponseDataReturnsEmptyArray(): void
     {
-        $exception = new AsanaApiException('Error');
+        $exception = new ApiException('Error');
 
         $this->assertIsArray($exception->getResponseData());
         $this->assertEmpty($exception->getResponseData());
     }
 
     /**
-     * Test AsanaApiException extends Exception class.
+     * Test ApiException extends Exception class.
      */
-    public function testAsanaApiExceptionExtendsException(): void
+    public function testApiExceptionExtendsException(): void
     {
-        $exception = new AsanaApiException('Error');
+        $exception = new ApiException('Error');
 
         $this->assertInstanceOf(Exception::class, $exception);
     }
@@ -291,7 +291,7 @@ class ExceptionsTest extends TestCase
     public function testAllExceptionsCanBeCaughtAsException(): void
     {
         $exceptions = [
-            new AsanaApiException('API error'),
+            new ApiException('API error'),
             new OAuthCallbackException('OAuth error'),
             new TokenInvalidException('Token error'),
         ];

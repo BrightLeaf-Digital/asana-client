@@ -2,10 +2,10 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class BatchApiService
 {
@@ -90,9 +90,9 @@ class BatchApiService
      * - status_code: HTTP status code for the individual request
      * - headers: Response headers for the individual request
      * - body: Decoded response body for the individual request
-     * @throws InvalidArgumentException If actions array is empty or actions are missing
+     * @throws ValidationException If actions array is empty or actions are missing
      *                                  required fields (relative_path, method)
-     * @throws AsanaApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
      */
     public function createBatchRequest(
         array $actions,
@@ -114,19 +114,19 @@ class BatchApiService
      * Ensures the actions array is non-empty and each action contains
      * the required fields: relative_path and method.
      * @param array $actions The actions array to validate.
-     * @throws InvalidArgumentException If actions is empty or any action is missing required fields.
+     * @throws ValidationException If actions is empty or any action is missing required fields.
      */
     private function validateActions(array $actions): void
     {
         if (empty($actions)) {
-            throw new InvalidArgumentException(
+            throw new ValidationException(
                 'Actions array must not be empty for batch request.'
             );
         }
 
         foreach ($actions as $index => $action) {
             if (!is_array($action)) {
-                throw new InvalidArgumentException(
+                throw new ValidationException(
                     sprintf(
                         'Each action must be an array, invalid action at index %d.',
                         $index
@@ -151,7 +151,7 @@ class BatchApiService
             }
 
             if (!empty($missingFields)) {
-                throw new InvalidArgumentException(
+                throw new ValidationException(
                     sprintf(
                         'Action at index %d is missing required field(s): %s',
                         $index,

@@ -56,7 +56,7 @@ class WebhookApiService
      * @return array The API response containing the created webhook:
      *               - data: (array) The webhook object
      * 
-     * @throws AsanaApiException If the API request fails
+     * @throws ApiException If the API request fails
      * 
      * @link https://developers.asana.com/docs/establish-a-webhook
      */
@@ -80,7 +80,7 @@ class WebhookApiService
      *               - data: (array) The list of webhook objects
      *               - next_page: (array|null) Pagination information
      * 
-     * @throws AsanaApiException If the API request fails
+     * @throws ApiException If the API request fails
      * 
      * @link https://developers.asana.com/docs/get-multiple-webhooks
      */
@@ -100,7 +100,7 @@ class WebhookApiService
      * @return array The API response containing the webhook:
      *               - data: (array) The webhook object
      * 
-     * @throws AsanaApiException If the API request fails
+     * @throws ApiException If the API request fails
      * 
      * @link https://developers.asana.com/docs/get-a-webhook
      */
@@ -121,7 +121,7 @@ class WebhookApiService
      * @return array The API response:
      *               - data: (array) Empty object
      * 
-     * @throws AsanaApiException If the API request fails
+     * @throws ApiException If the API request fails
      * 
      * @link https://developers.asana.com/docs/delete-a-webhook
      */
@@ -787,7 +787,7 @@ class Task
  * 
  * @return Task The task object
  * 
- * @throws AsanaApiException If the API request fails
+ * @throws ApiException If the API request fails
  */
 public function getTask(string $taskId, array $options = []): Task
 {
@@ -804,7 +804,7 @@ public function getTask(string $taskId, array $options = []): Task
  *               - data: (array) The list of task objects as Task instances
  *               - next_page: (array|null) Pagination information
  * 
- * @throws AsanaApiException If the API request fails
+ * @throws ApiException If the API request fails
  */
 public function getTasks(array $options = []): array
 {
@@ -904,7 +904,7 @@ class EventApiService
      *               - sync: (string) The sync token for the next request
      *               - has_more: (bool) Whether there are more events to retrieve
      * 
-     * @throws AsanaApiException If the API request fails
+     * @throws ApiException If the API request fails
      * 
      * @link https://developers.asana.com/docs/get-events-on-a-resource
      */
@@ -930,7 +930,7 @@ class EventApiService
      * @return array The API response containing the created subscription:
      *               - data: (array) The subscription object
      * 
-     * @throws AsanaApiException If the API request fails
+     * @throws ApiException If the API request fails
      * 
      * @link https://developers.asana.com/docs/establish-a-webhook
      */
@@ -951,7 +951,7 @@ class EventApiService
      *               - data: (array) The list of subscription objects
      *               - next_page: (array|null) Pagination information
      * 
-     * @throws AsanaApiException If the API request fails
+     * @throws ApiException If the API request fails
      * 
      * @link https://developers.asana.com/docs/get-multiple-webhooks
      */
@@ -969,7 +969,7 @@ class EventApiService
      * @return array The API response containing the subscription:
      *               - data: (array) The subscription object
      * 
-     * @throws AsanaApiException If the API request fails
+     * @throws ApiException If the API request fails
      * 
      * @link https://developers.asana.com/docs/get-a-webhook
      */
@@ -986,7 +986,7 @@ class EventApiService
      * @return array The API response:
      *               - data: (array) Empty object
      * 
-     * @throws AsanaApiException If the API request fails
+     * @throws ApiException If the API request fails
      * 
      * @link https://developers.asana.com/docs/delete-a-webhook
      */

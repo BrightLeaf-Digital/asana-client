@@ -3,7 +3,7 @@
 namespace BrightleafDigital\Tests\Utils;
 
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 use PHPUnit\Framework\TestCase;
 
 class ValidationTraitTest extends TestCase
@@ -25,7 +25,7 @@ class ValidationTraitTest extends TestCase
      */
     public function testValidateGidThrowsForEmptyString(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Task GID must be a non-empty string.');
 
         $this->validateGid('', 'Task GID');
@@ -36,7 +36,7 @@ class ValidationTraitTest extends TestCase
      */
     public function testValidateGidThrowsForWhitespaceOnly(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Project GID must be a non-empty string.');
 
         $this->validateGid('   ', 'Project GID');
@@ -47,7 +47,7 @@ class ValidationTraitTest extends TestCase
      */
     public function testValidateGidThrowsForNonNumericString(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Task GID must be a numeric string.');
 
         $this->validateGid('abc123', 'Task GID');
@@ -58,7 +58,7 @@ class ValidationTraitTest extends TestCase
      */
     public function testValidateGidThrowsForSpecialCharacters(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Project GID must be a numeric string.');
 
         $this->validateGid('123-456', 'Project GID');
@@ -83,7 +83,7 @@ class ValidationTraitTest extends TestCase
     {
         $data = ['name' => 'Task Name'];
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for task creation: workspace');
 
         $this->validateRequiredFields($data, ['name', 'workspace'], 'task creation');
@@ -96,7 +96,7 @@ class ValidationTraitTest extends TestCase
     {
         $data = ['name' => '', 'workspace' => '12345'];
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for task creation: name');
 
         $this->validateRequiredFields($data, ['name', 'workspace'], 'task creation');
@@ -121,7 +121,7 @@ class ValidationTraitTest extends TestCase
     {
         $data = ['other' => 'value'];
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'At least one of the following fields is required for project query: workspace, team'
         );
@@ -144,7 +144,7 @@ class ValidationTraitTest extends TestCase
      */
     public function testValidateDateFormatThrowsForInvalidFormat(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('due_on must be in YYYY-MM-DD format.');
 
         $this->validateDateFormat('12/31/2024', 'due_on');
@@ -167,7 +167,7 @@ class ValidationTraitTest extends TestCase
      */
     public function testValidateColorThrowsForInvalidColor(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Invalid color "red".');
 
         $this->validateColor('red');
@@ -190,7 +190,7 @@ class ValidationTraitTest extends TestCase
      */
     public function testValidateLimitThrowsForBelowMinimum(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Limit must be between 1 and 100.');
 
         $this->validateLimit(0);
@@ -201,7 +201,7 @@ class ValidationTraitTest extends TestCase
      */
     public function testValidateLimitThrowsForAboveMaximum(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Limit must be between 1 and 100.');
 
         $this->validateLimit(101);
@@ -222,7 +222,7 @@ class ValidationTraitTest extends TestCase
      */
     public function testValidateGidArrayThrowsForEmptyArray(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('followers must be a non-empty array.');
 
         $this->validateGidArray([], 'followers');
@@ -233,7 +233,7 @@ class ValidationTraitTest extends TestCase
      */
     public function testValidateGidArrayThrowsForInvalidElement(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('members[1] must be a non-empty string.');
 
         $this->validateGidArray(['12345', ''], 'members');
@@ -244,7 +244,7 @@ class ValidationTraitTest extends TestCase
      */
     public function testValidateGidArrayThrowsForNonNumericElement(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('followers[1] must be a numeric string.');
 
         $this->validateGidArray(['12345', 'abc'], 'followers');

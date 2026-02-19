@@ -2,10 +2,11 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
+use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class GoalsApiService
 {
@@ -35,6 +36,7 @@ class GoalsApiService
      * GET /goals/{goal_gid}
      * Returns the full record for a single goal.
      * API Documentation: https://developers.asana.com/reference/getgoal
+     *
      * @param string $goalGid The unique global ID of the goal to retrieve.
      *                        Example: "12345"
      * @param array $options Optional parameters to customize the request:
@@ -73,8 +75,10 @@ class GoalsApiService
      * - status: Status of the goal
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid goal GID provided, insufficient permissions,
+     * @throws ApiException If invalid goal GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getGoal(
         string $goalGid,
@@ -92,6 +96,7 @@ class GoalsApiService
      * Updates the properties of a goal. Only the fields provided in the data block will be updated;
      * any unspecified fields will remain unchanged.
      * API Documentation: https://developers.asana.com/reference/updategoal
+     *
      * @param string $goalGid The unique global ID of the goal to update.
      *                        Example: "12345"
      * @param array $data The properties of the goal to update. Can include:
@@ -128,8 +133,10 @@ class GoalsApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the updated goal details
-     * @throws AsanaApiException If invalid goal GID provided, malformed data,
+     * @throws ApiException If invalid goal GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function updateGoal(
         string $goalGid,
@@ -152,6 +159,7 @@ class GoalsApiService
      * DELETE /goals/{goal_gid}
      * Deletes the specified goal. This action is permanent and cannot be undone.
      * API Documentation: https://developers.asana.com/reference/deletegoal
+     *
      * @param string $goalGid The unique global ID of the goal to delete.
      *                        Example: "12345"
      * @param int $responseType The type of response to return:
@@ -175,13 +183,15 @@ class GoalsApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid goal GID
      * - Goal not found
      * - Insufficient permissions to delete the goal
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function deleteGoal(string $goalGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
     {
@@ -240,7 +250,7 @@ class GoalsApiService
      * - name: Name of the goal
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
      */
     public function getGoals(
         array $options = [],
@@ -294,7 +304,7 @@ class GoalsApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the created goal details
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Missing required fields
      * - Invalid field values
@@ -321,6 +331,7 @@ class GoalsApiService
      * Creates and sets a goal metric for a specified goal. This defines the metric
      * used to track progress on the goal, such as a numeric value or percentage.
      * API Documentation: https://developers.asana.com/reference/creategoalmetric
+     *
      * @param string $goalGid The unique global ID of the goal to set the metric on.
      *                        Example: "12345"
      * @param array $data Data for creating the goal metric. Supported fields include:
@@ -357,8 +368,10 @@ class GoalsApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the goal details with the created metric
-     * @throws AsanaApiException If invalid goal GID provided, insufficient permissions,
+     * @throws ApiException If invalid goal GID provided, insufficient permissions,
      *                          or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function createGoalMetric(
         string $goalGid,
@@ -382,6 +395,7 @@ class GoalsApiService
      * Updates the current value of a goal metric. This is used to track progress
      * toward the target value of the metric.
      * API Documentation: https://developers.asana.com/reference/updategoalmetric
+     *
      * @param string $goalGid The unique global ID of the goal to update the metric for.
      *                        Example: "12345"
      * @param array $data Data for updating the goal metric. Supported fields include:
@@ -413,8 +427,10 @@ class GoalsApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the goal details with the updated metric
-     * @throws AsanaApiException If invalid goal GID provided, insufficient permissions,
+     * @throws ApiException If invalid goal GID provided, insufficient permissions,
      *                          or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function updateGoalMetric(
         string $goalGid,
@@ -438,6 +454,7 @@ class GoalsApiService
      * Adds the specified list of users as followers of the goal. Followers of a goal
      * receive notifications about updates to the goal.
      * API Documentation: https://developers.asana.com/reference/addfollowersforgoal
+     *
      * @param string $goalGid The unique global ID of the goal to add followers to.
      *                        Example: "12345"
      * @param array $followers An array of user GIDs representing the followers to add to the goal.
@@ -469,8 +486,10 @@ class GoalsApiService
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the updated goal details including
      *                 the newly added followers
-     * @throws AsanaApiException If invalid goal GID provided, invalid user GIDs,
+     * @throws ApiException If invalid goal GID provided, invalid user GIDs,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function addFollowers(
         string $goalGid,
@@ -493,6 +512,7 @@ class GoalsApiService
      * POST /goals/{goal_gid}/removeFollowers
      * Removes the specified list of users from the followers of the goal.
      * API Documentation: https://developers.asana.com/reference/removefollowersforgoal
+     *
      * @param string $goalGid The unique global ID of the goal to remove followers from.
      *                        Example: "12345"
      * @param array $followers An array of user GIDs representing the followers to remove from the goal.
@@ -524,8 +544,10 @@ class GoalsApiService
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the updated goal details with
      *                 the specified followers removed
-     * @throws AsanaApiException If invalid goal GID provided, invalid user GIDs,
+     * @throws ApiException If invalid goal GID provided, invalid user GIDs,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function removeFollowers(
         string $goalGid,
@@ -548,6 +570,7 @@ class GoalsApiService
      * GET /goals/{goal_gid}/parentGoals
      * Returns the compact records for all parent goals of the given goal.
      * API Documentation: https://developers.asana.com/reference/getparentgoalsforgoal
+     *
      * @param string $goalGid The unique global ID of the goal.
      *                        Example: "12345"
      * @param array $options Optional parameters to customize the request:
@@ -576,8 +599,10 @@ class GoalsApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data array containing the list of parent goals
-     * @throws AsanaApiException If invalid goal GID provided, insufficient permissions,
+     * @throws ApiException If invalid goal GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getParentGoalsForGoal(
         string $goalGid,
@@ -600,6 +625,7 @@ class GoalsApiService
      * Adds a custom field to the specified goal. Custom fields are defined per-workspace
      * and must exist before they can be added to a goal.
      * API Documentation: https://developers.asana.com/reference/addcustomfieldsettingforgoal
+     *
      * @param string $goalGid The unique global ID of the goal to add the custom field to.
      *                        Example: "12345"
      * @param array $data Data for adding the custom field setting. Supported fields include:
@@ -635,8 +661,10 @@ class GoalsApiService
      * - resource_type: Always "custom_field_setting"
      * - custom_field: Object containing custom field details
      * - is_important: Boolean indicating if the custom field is important
-     * @throws AsanaApiException If invalid goal GID provided, invalid custom field GID,
+     * @throws ApiException If invalid goal GID provided, invalid custom field GID,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function addCustomFieldSettingForGoal(
         string $goalGid,
@@ -658,6 +686,7 @@ class GoalsApiService
      * POST /goals/{goal_gid}/removeCustomFieldSetting
      * Removes a custom field from the specified goal.
      * API Documentation: https://developers.asana.com/reference/removecustomfieldsettingforgoal
+     *
      * @param string $goalGid The unique global ID of the goal to remove the custom field from.
      *                        Example: "12345"
      * @param array $data Data for removing the custom field setting. Supported fields include:
@@ -685,8 +714,10 @@ class GoalsApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal
-     * @throws AsanaApiException If invalid goal GID provided, invalid custom field GID,
+     * @throws ApiException If invalid goal GID provided, invalid custom field GID,
      *                          insufficient permissions, or network issues occur
+     * @throws ValidationException
+     * @throws RateLimitException
      */
     public function removeCustomFieldSettingForGoal(
         string $goalGid,

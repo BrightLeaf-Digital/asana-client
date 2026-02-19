@@ -1,7 +1,7 @@
 <?php
 
 use BrightleafDigital\AsanaClient;
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\TokenInvalidException;
 use BrightleafDigital\Http\AsanaApiClient;
 use Dotenv\Dotenv;
@@ -66,6 +66,6 @@ try {
 
     $href = 'projects.php?workspace=' . urlencode($workspace);
     echo '<a href="' . htmlspecialchars($href, ENT_QUOTES, 'UTF-8') . '">Back to projects</a>';
-} catch (AsanaApiException | TokenInvalidException $e) {
+} catch (ApiException | TokenInvalidException $e) {
     echo 'Error: ' . $e->getMessage();
 }

@@ -2,10 +2,10 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 use RuntimeException;
 
 class AttachmentApiService
@@ -65,9 +65,9 @@ class AttachmentApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the attachment details
-     * @throws AsanaApiException If the API request fails due to invalid attachment GID,
+     * @throws ApiException If the API request fails due to invalid attachment GID,
      *                          insufficient permissions, network issues, or rate limiting
-     * @throws InvalidArgumentException If attachment GID is empty or not numeric
+     * @throws ValidationException If attachment GID is empty or not numeric
      */
     public function getAttachment(
         string $attachmentGid,
@@ -109,13 +109,13 @@ class AttachmentApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {})
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid attachment GID
      * - Insufficient permissions to delete the attachment
      * - Network connectivity issues
      * - Rate limiting
-     * @throws InvalidArgumentException If attachment GID is empty or not numeric
+     * @throws ValidationException If attachment GID is empty or not numeric
      */
     public function deleteAttachment(string $attachmentGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
     {
@@ -158,9 +158,9 @@ class AttachmentApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data array containing the list of attachments
-     * @throws AsanaApiException If invalid parent GID provided, insufficient permissions,
+     * @throws ApiException If invalid parent GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
-     * @throws InvalidArgumentException If parent GID is empty or not numeric
+     * @throws ValidationException If parent GID is empty or not numeric
      */
     public function getAttachmentsForObject(
         string $parentGid,
@@ -207,10 +207,10 @@ class AttachmentApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the created attachment
-     * @throws AsanaApiException If the file doesn't exist, is too large, invalid parent GID,
+     * @throws ApiException If the file doesn't exist, is too large, invalid parent GID,
      *                          insufficient permissions, or network issues occur
      * @throws RuntimeException If the file does not exist or is not readable
-     * @throws InvalidArgumentException If parent GID is empty or not numeric
+     * @throws ValidationException If parent GID is empty or not numeric
      */
     public function uploadAttachment(
         string $parentGid,
@@ -281,9 +281,9 @@ class AttachmentApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the created attachment
-     * @throws AsanaApiException If the file is too large, invalid parent GID, or network issues occur, etc.
+     * @throws ApiException If the file is too large, invalid parent GID, or network issues occur, etc.
      * @throws RuntimeException If the stream cannot be created or written to or if the stream is not writable
-     * @throws InvalidArgumentException If parent GID is empty or not numeric
+     * @throws ValidationException If parent GID is empty or not numeric
      */
     public function uploadAttachmentFromContents(
         string $parentGid,

@@ -2,10 +2,10 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class EventsApiService
 {
@@ -89,8 +89,8 @@ class EventsApiService
      * - change: Object describing what changed (field, action, new_value, etc.)
      *                 Additional fields as specified in opt_fields
      *
-     * @throws InvalidArgumentException If the resource GID is empty or not numeric
-     * @throws AsanaApiException If the sync token is invalid/expired (412 Precondition Failed),
+     * @throws ValidationException If the resource GID is empty or not numeric
+     * @throws ApiException If the sync token is invalid/expired (412 Precondition Failed),
      *                          insufficient permissions, network issues, or rate limiting occurs
      */
     public function getEvents(
@@ -177,8 +177,8 @@ class EventsApiService
      * - change: Object describing what changed (field, action, new_value, added_value, removed_value)
      *                 Additional fields as specified in opt_fields
      *
-     * @throws InvalidArgumentException If the workspace GID is empty or not numeric
-     * @throws AsanaApiException If the sync token is invalid/expired (412 Precondition Failed),
+     * @throws ValidationException If the workspace GID is empty or not numeric
+     * @throws ApiException If the sync token is invalid/expired (412 Precondition Failed),
      *                          insufficient permissions (requires Enterprise+ service account),
      *                          network issues, or rate limiting occurs
      */

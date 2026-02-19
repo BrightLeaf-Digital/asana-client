@@ -2,7 +2,7 @@
 
 namespace BrightleafDigital\Tests\Http;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
 use GuzzleHttp\Client as GuzzleClient;
@@ -10,6 +10,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\MockObject\Exception as MockException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
@@ -18,11 +19,11 @@ use ReflectionClass;
 
 class AsanaApiClientTest extends TestCase
 {
-    /** @var GuzzleClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var GuzzleClient&MockObject */
     private $mockHttpClient;
 
     /** @var AsanaApiClient */
-    private $apiClient;
+    private AsanaApiClient $apiClient;
 
     /**
      * @throws MockException
@@ -53,7 +54,8 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test successful GET request returns data only (default response type).
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testRequestReturnsDataByDefault(): void
     {
@@ -78,7 +80,8 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test request with RESPONSE_NORMAL returns complete JSON body.
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testRequestReturnsNormalResponse(): void
     {
@@ -105,7 +108,8 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test request with RESPONSE_FULL returns complete response details.
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testRequestReturnsFullResponse(): void
     {
@@ -148,7 +152,8 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test that response without 'data' key returns full body in RESPONSE_DATA mode.
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testRequestReturnsFullBodyWhenNoDataKey(): void
     {
@@ -171,8 +176,9 @@ class AsanaApiClientTest extends TestCase
     }
 
     /**
-     * Test that invalid JSON response throws AsanaApiException.
-     * @throws MockException
+     * Test that invalid JSON response throws ApiException.
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testRequestThrowsExceptionOnInvalidJson(): void
     {
@@ -187,7 +193,7 @@ class AsanaApiClientTest extends TestCase
             ->method('request')
             ->willReturn($mockResponse);
 
-        $this->expectException(AsanaApiException::class);
+        $this->expectException(ApiException::class);
         $this->expectExceptionMessage('Invalid JSON response from Asana API.');
 
         $this->apiClient->request('GET', 'tasks');
@@ -195,7 +201,8 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test that GuzzleException with response is handled correctly.
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testRequestHandlesGuzzleExceptionWithResponse(): void
     {
@@ -229,7 +236,7 @@ class AsanaApiClientTest extends TestCase
             ->method('request')
             ->willThrowException($exception);
 
-        $this->expectException(AsanaApiException::class);
+        $this->expectException(ApiException::class);
         $this->expectExceptionMessage('task: Not a valid gid');
 
         $this->apiClient->request('GET', 'tasks/invalid');
@@ -237,7 +244,8 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test that GuzzleException without response is handled correctly.
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testRequestHandlesGuzzleExceptionWithoutResponse(): void
     {
@@ -253,7 +261,7 @@ class AsanaApiClientTest extends TestCase
             ->method('request')
             ->willThrowException($exception);
 
-        $this->expectException(AsanaApiException::class);
+        $this->expectException(ApiException::class);
         $this->expectExceptionMessage('Network error');
 
         $this->apiClient->request('GET', 'tasks');
@@ -261,7 +269,8 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test that GuzzleException with non-JSON response body is handled.
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testRequestHandlesGuzzleExceptionWithPlainTextBody(): void
     {
@@ -285,7 +294,7 @@ class AsanaApiClientTest extends TestCase
             ->method('request')
             ->willThrowException($exception);
 
-        $this->expectException(AsanaApiException::class);
+        $this->expectException(ApiException::class);
         $this->expectExceptionMessage('Service Unavailable');
 
         $this->apiClient->request('GET', 'tasks');
@@ -293,7 +302,8 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test request with query parameters.
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testRequestWithQueryParameters(): void
     {
@@ -324,7 +334,8 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test request with JSON body for POST.
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testRequestWithJsonBody(): void
     {
@@ -359,7 +370,8 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test PUT request for updating resources.
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testPutRequest(): void
     {
@@ -386,7 +398,8 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test DELETE request.
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testDeleteRequest(): void
     {
@@ -410,10 +423,10 @@ class AsanaApiClientTest extends TestCase
     }
 
     /**
-     * Test AsanaApiException contains response data.
+     * Test ApiException contains response data.
      * @throws MockException
      */
-    public function testAsanaApiExceptionContainsResponseData(): void
+    public function testApiExceptionContainsResponseData(): void
     {
         $errorBody = [
             'errors' => [
@@ -447,8 +460,8 @@ class AsanaApiClientTest extends TestCase
 
         try {
             $this->apiClient->request('GET', 'tasks');
-            $this->fail('Expected AsanaApiException was not thrown');
-        } catch (AsanaApiException $e) {
+            $this->fail('Expected ApiException was not thrown');
+        } catch (ApiException $e) {
             $this->assertSame(400, $e->getCode());
             $this->assertIsArray($e->getResponseData());
             $this->assertArrayHasKey('errors', $e->getResponseData());
@@ -538,7 +551,8 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test rate limit exception is thrown after max retries.
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testRateLimitExceptionAfterMaxRetries(): void
     {
@@ -586,7 +600,7 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test that rate limit exception contains retry after value.
-     * @throws MockException
+     * @throws ApiException
      */
     public function testRateLimitExceptionContainsRetryAfter(): void
     {
@@ -635,7 +649,8 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test logger receives debug calls during successful request.
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testLoggerReceivesDebugCalls(): void
     {
@@ -671,7 +686,8 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test logger receives error call on API failure.
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testLoggerReceivesErrorOnFailure(): void
     {
@@ -711,14 +727,15 @@ class AsanaApiClientTest extends TestCase
             ->method('request')
             ->willThrowException($exception);
 
-        $this->expectException(AsanaApiException::class);
+        $this->expectException(ApiException::class);
 
         $apiClient->request('GET', 'tasks');
     }
 
     /**
      * Test RESPONSE_FULL sanitizes options in output.
-     * @throws MockException
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function testResponseFullSanitizesOptions(): void
     {

@@ -1,7 +1,7 @@
 <?php
 
 use BrightleafDigital\AsanaClient;
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\TokenInvalidException;
 use Dotenv\Dotenv;
 
@@ -41,6 +41,6 @@ try {
         $href = "customField.php?gid=$gid";
         echo '<a href="' . htmlspecialchars($href) . '">View Custom field</a>';
     }
-} catch (AsanaApiException | TokenInvalidException $e) {
+} catch (ApiException | TokenInvalidException $e) {
     echo 'Error: ' . $e->getMessage();
 }

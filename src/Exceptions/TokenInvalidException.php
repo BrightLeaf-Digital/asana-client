@@ -2,10 +2,9 @@
 
 namespace BrightleafDigital\Exceptions;
 
-use Exception;
 use Throwable;
 
-class TokenInvalidException extends Exception
+class TokenInvalidException extends AuthException
 {
     protected array $data;
 

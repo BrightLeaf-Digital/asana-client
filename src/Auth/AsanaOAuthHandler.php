@@ -9,6 +9,7 @@ use League\OAuth2\Client\Token\AccessToken;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use UnexpectedValueException;
+use BrightleafDigital\Exceptions\AuthException;
 
 class AsanaOAuthHandler
 {
@@ -76,6 +77,7 @@ class AsanaOAuthHandler
      * @throws GuzzleException
      * @throws IdentityProviderException
      * @throws UnexpectedValueException
+     * @throws AuthException
      */
     public function handleCallback(string $authorizationCode, ?string $codeVerifier = null): AccessToken
     {
@@ -96,7 +98,7 @@ class AsanaOAuthHandler
             $this->logger->error('OAuth callback failed', [
                 'error' => $e->getMessage()
             ]);
-            throw $e;
+            throw new AuthException('OAuth callback failed: ' . $e->getMessage(), 0, $e);
         }
     }
 
@@ -122,6 +124,7 @@ class AsanaOAuthHandler
      * @return AccessToken The access token details, typically including token type, expiry, and other information.
      * @throws GuzzleException
      * @throws IdentityProviderException
+     * @throws AuthException
      */
     public function getAccessToken(string $authorizationCode): AccessToken
     {
@@ -141,7 +144,7 @@ class AsanaOAuthHandler
             $this->logger->error('Failed to retrieve access token', [
                 'error' => $e->getMessage()
             ]);
-            throw $e;
+            throw new AuthException('Failed to retrieve access token: ' . $e->getMessage(), 0, $e);
         }
     }
 
@@ -153,6 +156,7 @@ class AsanaOAuthHandler
      * @return AccessToken The newly refreshed access token.
      * @throws GuzzleException
      * @throws IdentityProviderException
+     * @throws AuthException
      */
     public function refreshToken(AccessToken $token): AccessToken
     {
@@ -178,7 +182,7 @@ class AsanaOAuthHandler
             $this->logger->error('Failed to refresh access token', [
                 'error' => $e->getMessage()
             ]);
-            throw $e;
+            throw new AuthException('Failed to refresh access token: ' . $e->getMessage(), 0, $e);
         }
     }
 }

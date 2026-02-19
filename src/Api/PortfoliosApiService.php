@@ -2,10 +2,11 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
+use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class PortfoliosApiService
 {
@@ -36,6 +37,7 @@ class PortfoliosApiService
      * Returns a list of the portfolios in the given workspace that are owned by the given user.
      * Both the workspace and owner parameters are required.
      * API Documentation: https://developers.asana.com/reference/getportfolios
+     *
      * @param string $workspaceGid The unique global ID of the workspace to get portfolios from.
      *                             Example: "12345"
      * @param string $ownerGid The unique global ID of the user who owns the portfolios.
@@ -78,8 +80,10 @@ class PortfoliosApiService
      * - name: Name of the portfolio
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid GIDs provided, insufficient permissions,
+     * @throws ApiException If invalid GIDs provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getPortfolios(
         string $workspaceGid,
@@ -140,8 +144,8 @@ class PortfoliosApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the created portfolio details
-     * @throws InvalidArgumentException If required fields (name, workspace) are missing
-     * @throws AsanaApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws ValidationException If required fields (name, workspace) are missing
+     * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
      */
     public function createPortfolio(
         array $data,
@@ -163,6 +167,7 @@ class PortfoliosApiService
      * GET /portfolios/{portfolio_gid}
      * Returns the full record for a single portfolio.
      * API Documentation: https://developers.asana.com/reference/getportfolio
+     *
      * @param string $portfolioGid The unique global ID of the portfolio to retrieve.
      *                             Example: "12345"
      * @param array $options Optional parameters to customize the request:
@@ -204,8 +209,10 @@ class PortfoliosApiService
      * - permalink_url: URL to the portfolio in Asana
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid portfolio GID provided, insufficient permissions,
+     * @throws ApiException If invalid portfolio GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getPortfolio(
         string $portfolioGid,
@@ -223,6 +230,7 @@ class PortfoliosApiService
      * Updates the properties of a portfolio. Only the fields provided in the data block will be updated;
      * any unspecified fields will remain unchanged.
      * API Documentation: https://developers.asana.com/reference/updateportfolio
+     *
      * @param string $portfolioGid The unique global ID of the portfolio to update.
      *                             Example: "12345"
      * @param array $data The properties of the portfolio to update. Can include:
@@ -257,8 +265,10 @@ class PortfoliosApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the updated portfolio details
-     * @throws AsanaApiException If invalid portfolio GID provided, malformed data,
+     * @throws ApiException If invalid portfolio GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function updatePortfolio(
         string $portfolioGid,
@@ -282,6 +292,7 @@ class PortfoliosApiService
      * Deletes the specified portfolio. This does not delete the items (projects) in the
      * portfolio; they will still exist independently.
      * API Documentation: https://developers.asana.com/reference/deleteportfolio
+     *
      * @param string $portfolioGid The unique global ID of the portfolio to delete.
      *                             Example: "12345"
      * @param int $responseType The type of response to return:
@@ -305,13 +316,15 @@ class PortfoliosApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid portfolio GID
      * - Portfolio not found
      * - Insufficient permissions to delete the portfolio
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function deletePortfolio(string $portfolioGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
     {
@@ -325,6 +338,7 @@ class PortfoliosApiService
      * GET /portfolios/{portfolio_gid}/items
      * Returns the compact records for all items (projects) in the given portfolio.
      * API Documentation: https://developers.asana.com/reference/getitemsforportfolio
+     *
      * @param string $portfolioGid The unique global ID of the portfolio.
      *                             Example: "12345"
      * @param array $options Optional parameters to customize the request:
@@ -359,8 +373,10 @@ class PortfoliosApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data array containing the list of portfolio items
-     * @throws AsanaApiException If invalid portfolio GID provided, insufficient permissions,
+     * @throws ApiException If invalid portfolio GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getPortfolioItems(
         string $portfolioGid,
@@ -417,8 +433,8 @@ class PortfoliosApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful addition
-     * @throws InvalidArgumentException If the portfolio GID is invalid or item field is missing
-     * @throws AsanaApiException If the item doesn't exist, insufficient permissions,
+     * @throws ValidationException If the portfolio GID is invalid or item field is missing
+     * @throws ApiException If the item doesn't exist, insufficient permissions,
      *                          or network issues occur
      */
     public function addItemToPortfolio(
@@ -475,8 +491,8 @@ class PortfoliosApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal
-     * @throws InvalidArgumentException If the portfolio GID is invalid or item field is missing
-     * @throws AsanaApiException If the item doesn't exist in portfolio, insufficient permissions,
+     * @throws ValidationException If the portfolio GID is invalid or item field is missing
+     * @throws ApiException If the item doesn't exist in portfolio, insufficient permissions,
      *                          or network issues occur
      */
     public function removeItemFromPortfolio(
@@ -502,6 +518,7 @@ class PortfoliosApiService
      * Adds a custom field to the specified portfolio. Custom fields are defined per-workspace
      * and must exist before they can be added to a portfolio.
      * API Documentation: https://developers.asana.com/reference/addcustomfieldsettingforportfolio
+     *
      * @param string $portfolioGid The unique global ID of the portfolio to add the custom field to.
      *                             Example: "12345"
      * @param array $data Data for adding the custom field setting. Supported fields include:
@@ -539,8 +556,10 @@ class PortfoliosApiService
      * - resource_type: Always "custom_field_setting"
      * - custom_field: Object containing custom field details
      * - is_important: Boolean indicating if the custom field is important
-     * @throws AsanaApiException If invalid portfolio GID provided, invalid custom field GID,
+     * @throws ApiException If invalid portfolio GID provided, invalid custom field GID,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function addCustomFieldSettingForPortfolio(
         string $portfolioGid,
@@ -562,6 +581,7 @@ class PortfoliosApiService
      * POST /portfolios/{portfolio_gid}/removeCustomFieldSetting
      * Removes a custom field from the specified portfolio.
      * API Documentation: https://developers.asana.com/reference/removecustomfieldsettingforportfolio
+     *
      * @param string $portfolioGid The unique global ID of the portfolio to remove the custom field from.
      *                             Example: "12345"
      * @param array $data Data for removing the custom field setting. Supported fields include:
@@ -589,8 +609,10 @@ class PortfoliosApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal
-     * @throws AsanaApiException If invalid portfolio GID provided, invalid custom field GID,
+     * @throws ApiException If invalid portfolio GID provided, invalid custom field GID,
      *                          insufficient permissions, or network issues occur
+     * @throws ValidationException
+     * @throws RateLimitException
      */
     public function removeCustomFieldSettingForPortfolio(
         string $portfolioGid,
@@ -644,8 +666,8 @@ class PortfoliosApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the updated portfolio details
-     * @throws InvalidArgumentException If the portfolio GID is invalid or members field is missing
-     * @throws AsanaApiException If the users don't exist, insufficient permissions,
+     * @throws ValidationException If the portfolio GID is invalid or members field is missing
+     * @throws ApiException If the users don't exist, insufficient permissions,
      *                          or network issues occur
      */
     public function addMembersToPortfolio(
@@ -702,8 +724,8 @@ class PortfoliosApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the updated portfolio details
-     * @throws InvalidArgumentException If the portfolio GID is invalid or members field is missing
-     * @throws AsanaApiException If the users don't exist in portfolio, insufficient permissions,
+     * @throws ValidationException If the portfolio GID is invalid or members field is missing
+     * @throws ApiException If the users don't exist in portfolio, insufficient permissions,
      *                          or network issues occur
      */
     public function removeMembersFromPortfolio(

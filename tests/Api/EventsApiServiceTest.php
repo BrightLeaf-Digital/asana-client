@@ -4,17 +4,18 @@ namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\EventsApiService;
 use BrightleafDigital\Http\AsanaApiClient;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 use PHPUnit\Framework\MockObject\Exception as MockException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class EventsApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AsanaApiClient&MockObject */
     private $mockClient;
 
     /** @var EventsApiService */
-    private $service;
+    private EventsApiService $service;
 
     /**
      * @throws MockException
@@ -168,7 +169,7 @@ class EventsApiServiceTest extends TestCase
      */
     public function testGetEventsThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Resource GID must be a non-empty string.');
 
         $this->service->getEvents('');
@@ -179,7 +180,7 @@ class EventsApiServiceTest extends TestCase
      */
     public function testGetEventsThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Resource GID must be a numeric string.');
 
         $this->service->getEvents('abc');
@@ -190,7 +191,7 @@ class EventsApiServiceTest extends TestCase
      */
     public function testGetEventsThrowsExceptionForWhitespaceGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Resource GID must be a non-empty string.');
 
         $this->service->getEvents('   ');
@@ -347,7 +348,7 @@ class EventsApiServiceTest extends TestCase
      */
     public function testGetWorkspaceEventsThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Workspace GID must be a non-empty string.');
 
         $this->service->getWorkspaceEvents('');
@@ -358,7 +359,7 @@ class EventsApiServiceTest extends TestCase
      */
     public function testGetWorkspaceEventsThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Workspace GID must be a numeric string.');
 
         $this->service->getWorkspaceEvents('abc');
@@ -369,7 +370,7 @@ class EventsApiServiceTest extends TestCase
      */
     public function testGetWorkspaceEventsThrowsExceptionForWhitespaceGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Workspace GID must be a non-empty string.');
 
         $this->service->getWorkspaceEvents('   ');

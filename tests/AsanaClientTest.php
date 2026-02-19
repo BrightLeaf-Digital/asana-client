@@ -333,7 +333,7 @@ class AsanaClientTest extends TestCase
 
     /**
      * Test that getSecureAuthorizationUrl() generates a URL with state and PKCE enabled.
-     * @throws MockException
+     * @throws TokenInvalidException
      */
     public function testGetSecureAuthorizationUrlWithAllOptions(): void
     {
@@ -365,7 +365,7 @@ class AsanaClientTest extends TestCase
 
     /**
      * Test that getSecureAuthorizationUrl() generates a URL without state.
-     * @throws MockException
+     * @throws TokenInvalidException
      */
     public function testGetSecureAuthorizationUrlWithoutState(): void
     {
@@ -397,7 +397,7 @@ class AsanaClientTest extends TestCase
 
     /**
      * Test that getSecureAuthorizationUrl() generates a URL without PKCE.
-     * @throws MockException
+     * @throws TokenInvalidException
      */
     public function testGetSecureAuthorizationUrlWithoutPKCE(): void
     {
@@ -429,7 +429,7 @@ class AsanaClientTest extends TestCase
 
     /**
      * Test that getSecureAuthorizationUrl() generates a URL without state and PKCE.
-     * @throws MockException
+     * @throws TokenInvalidException
      */
     public function testGetSecureAuthorizationUrlWithoutStateAndPKCE(): void
     {
@@ -656,7 +656,7 @@ class AsanaClientTest extends TestCase
      * URL as provided by the OAuth handler.
      *
      * @return void
-     * @throws MockException
+     * @throws TokenInvalidException
      */
     public function testGetAuthorizationUrlReturnsCorrectUrl(): void
     {

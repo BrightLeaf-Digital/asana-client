@@ -2,10 +2,11 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
+use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class MembershipApiService
 {
@@ -82,7 +83,7 @@ class MembershipApiService
      * - parent: Object containing parent resource details
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Missing required parameters
      * - Invalid parameter values
@@ -148,7 +149,7 @@ class MembershipApiService
      * - parent: Object containing parent resource details
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Missing required fields
      * - Invalid field values
@@ -174,6 +175,7 @@ class MembershipApiService
      * GET /memberships/{membership_gid}
      * Returns the complete membership record for a single membership.
      * API Documentation: https://developers.asana.com/reference/getmembership
+     *
      * @param string $membershipGid The unique global ID of the membership to retrieve.
      *                              This identifier can be found in the membership URL or
      *                              returned from membership-related API endpoints.
@@ -211,8 +213,10 @@ class MembershipApiService
      * - parent: Object containing parent resource details
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid membership GID provided, insufficient permissions,
+     * @throws ApiException If invalid membership GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getMembership(
         string $membershipGid,
@@ -230,6 +234,7 @@ class MembershipApiService
      * Updates the properties of a membership. Only the fields provided in the data block
      * will be updated; any unspecified fields will remain unchanged.
      * API Documentation: https://developers.asana.com/reference/updatemembership
+     *
      * @param string $membershipGid The unique global ID of the membership to update.
      *                              This identifier can be found in the membership URL or
      *                              returned from membership-related API endpoints.
@@ -275,8 +280,10 @@ class MembershipApiService
      * - parent: Object containing parent resource details
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid membership GID provided, malformed data,
+     * @throws ApiException If invalid membership GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function updateMembership(
         string $membershipGid,
@@ -300,6 +307,7 @@ class MembershipApiService
      * Deletes a membership. This is the way to remove a user or team from a
      * portfolio, project, goal, or custom_field.
      * API Documentation: https://developers.asana.com/reference/deletemembership
+     *
      * @param string $membershipGid The unique global ID of the membership to delete.
      *                              This identifier can be found in the membership URL or
      *                              returned from membership-related API endpoints.
@@ -325,12 +333,14 @@ class MembershipApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid membership GID
      * - Insufficient permissions to delete the membership
      * - Network connectivity issues
      * - Rate limiting
+     * @throws ValidationException
+     * @throws RateLimitException
      */
     public function deleteMembership(string $membershipGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
     {

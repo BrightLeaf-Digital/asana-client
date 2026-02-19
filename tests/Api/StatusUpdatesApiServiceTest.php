@@ -4,13 +4,14 @@ namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\StatusUpdatesApiService;
 use BrightleafDigital\Http\AsanaApiClient;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 use PHPUnit\Framework\MockObject\Exception as MockException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class StatusUpdatesApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AsanaApiClient&MockObject */
     private $mockClient;
 
     /** @var StatusUpdatesApiService */
@@ -102,7 +103,7 @@ class StatusUpdatesApiServiceTest extends TestCase
      */
     public function testGetStatusUpdateThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Status Update GID must be a non-empty string.'
         );
@@ -115,7 +116,7 @@ class StatusUpdatesApiServiceTest extends TestCase
      */
     public function testGetStatusUpdateThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Status Update GID must be a numeric string.'
         );
@@ -171,7 +172,7 @@ class StatusUpdatesApiServiceTest extends TestCase
      */
     public function testDeleteStatusUpdateThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Status Update GID must be a non-empty string.'
         );
@@ -184,7 +185,7 @@ class StatusUpdatesApiServiceTest extends TestCase
      */
     public function testDeleteStatusUpdateThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Status Update GID must be a numeric string.'
         );
@@ -292,7 +293,7 @@ class StatusUpdatesApiServiceTest extends TestCase
      */
     public function testGetStatusUpdatesForObjectThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Parent GID must be a non-empty string.'
         );
@@ -305,7 +306,7 @@ class StatusUpdatesApiServiceTest extends TestCase
      */
     public function testGetStatusUpdatesForObjectThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Parent GID must be a numeric string.'
         );
@@ -430,7 +431,7 @@ class StatusUpdatesApiServiceTest extends TestCase
      */
     public function testCreateStatusUpdateThrowsExceptionForMissingParent(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Missing required field(s) for status update creation: parent'
         );
@@ -446,7 +447,7 @@ class StatusUpdatesApiServiceTest extends TestCase
      */
     public function testCreateStatusUpdateThrowsExceptionForMissingText(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Missing required field(s) for status update creation: text'
         );
@@ -462,7 +463,7 @@ class StatusUpdatesApiServiceTest extends TestCase
      */
     public function testCreateStatusUpdateThrowsExceptionForMissingStatusType(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Missing required field(s) for status update creation: status_type'
         );
@@ -478,7 +479,7 @@ class StatusUpdatesApiServiceTest extends TestCase
      */
     public function testCreateStatusUpdateThrowsExceptionForMissingAllFields(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Missing required field(s) for status update creation: '
             . 'parent, text, status_type'

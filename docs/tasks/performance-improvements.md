@@ -269,11 +269,11 @@ class AsyncApiClient extends ApiClient
                     return json_decode($response->getBody(), true);
                 },
                 function ($exception) {
-                    throw new AsanaApiException($exception->getMessage(), $exception->getCode(), $exception);
+                    throw new ApiException($exception->getMessage(), $exception->getCode(), $exception);
                 }
             );
         } catch (Exception $e) {
-            throw new AsanaApiException($e->getMessage(), $e->getCode(), $e);
+            throw new ApiException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }

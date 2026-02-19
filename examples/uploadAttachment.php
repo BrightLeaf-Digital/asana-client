@@ -1,8 +1,9 @@
 <?php
 
 use BrightleafDigital\AsanaClient;
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\TokenInvalidException;
+use BrightleafDigital\Exceptions\ValidationException;
 use Dotenv\Dotenv;
 
 require '../vendor/autoload.php';
@@ -29,7 +30,7 @@ $asanaClient->onTokenRefresh(function ($token) use ($asanaClient, $password) {
 try {
     $taskGid = $_GET['task'] ?? null;
     if (!$taskGid) {
-        throw new InvalidArgumentException('Task parameter is required');
+        throw new ValidationException('Task parameter is required');
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['attachment'])) {
@@ -57,6 +58,6 @@ try {
     </form>
     <p><a href="viewTask.php?task=<?php echo htmlspecialchars($taskGid); ?>">Back to task</a></p>
     <?php
-} catch (AsanaApiException | TokenInvalidException | RuntimeException | InvalidArgumentException $e) {
+} catch (ApiException | TokenInvalidException | RuntimeException | ValidationException $e) {
     echo 'Error: ' . $e->getMessage();
 }

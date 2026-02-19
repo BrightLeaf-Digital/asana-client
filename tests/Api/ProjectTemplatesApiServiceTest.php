@@ -4,13 +4,14 @@ namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\ProjectTemplatesApiService;
 use BrightleafDigital\Http\AsanaApiClient;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 use PHPUnit\Framework\MockObject\Exception as MockException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ProjectTemplatesApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AsanaApiClient&MockObject */
     private $mockClient;
 
     /** @var ProjectTemplatesApiService */
@@ -100,7 +101,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testGetProjectTemplateThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Project Template GID must be a non-empty string.'
         );
@@ -113,7 +114,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testGetProjectTemplateThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Project Template GID must be a numeric string.'
         );
@@ -169,7 +170,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testDeleteProjectTemplateThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Project Template GID must be a non-empty string.'
         );
@@ -182,7 +183,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testDeleteProjectTemplateThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Project Template GID must be a numeric string.'
         );
@@ -372,7 +373,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testGetProjectTemplatesForTeamThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Team GID must be a non-empty string.'
         );
@@ -385,7 +386,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testGetProjectTemplatesForTeamThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Team GID must be a numeric string.'
         );
@@ -498,7 +499,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testInstantiateProjectThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Project Template GID must be a non-empty string.'
         );
@@ -514,7 +515,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testInstantiateProjectThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Project Template GID must be a numeric string.'
         );
@@ -530,7 +531,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testInstantiateProjectThrowsExceptionForMissingName(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Missing required field(s) for project instantiation: name'
         );
@@ -543,7 +544,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testInstantiateProjectThrowsExceptionForMissingNameWithOtherFields(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Missing required field(s) for project instantiation: name'
         );

@@ -22,6 +22,7 @@ use BrightleafDigital\Api\UserTaskListsApiService;
 use BrightleafDigital\Api\WebhooksApiService;
 use BrightleafDigital\Api\WorkspaceApiService;
 use BrightleafDigital\Auth\AsanaOAuthHandler;
+use BrightleafDigital\Exceptions\AuthException;
 use BrightleafDigital\Exceptions\TokenInvalidException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Exceptions\OAuthCallbackException;
@@ -663,16 +664,17 @@ class AsanaClient
     }
 
 
-   /**
-    * Handle callback and retrieve an access token.
-    *
-    * @param string $authorizationCode The code returned by the OAuth callback.
-    * @param string|null $codeVerifier The PKCE code verifier (optional).
-    *
-    * @return array Access Token data as array.
-    *
-    * @throws OAuthCallbackException If the callback handling process fails.
-    */
+    /**
+     * Handle callback and retrieve an access token.
+     *
+     * @param string $authorizationCode The code returned by the OAuth callback.
+     * @param string|null $codeVerifier The PKCE code verifier (optional).
+     *
+     * @return array Access Token data as array.
+     *
+     * @throws OAuthCallbackException If the callback handling process fails.
+     * @throws TokenInvalidException
+     */
     public function handleCallback(string $authorizationCode, ?string $codeVerifier = null): ?array
     {
         if ($this->authHandler === null) {
@@ -770,6 +772,7 @@ class AsanaClient
      * Check if access token is valid (PATs are always valid unless null).
      *
      * @return bool True if token is valid (either a valid OAuth token or PAT)
+     * @throws OAuthCallbackException
      * @throws TokenInvalidException If no token or it's expired and error refreshing it.
      */
     public function ensureValidToken(): bool
@@ -826,6 +829,8 @@ class AsanaClient
      *
      * @return array|null Returns the current access token, after refreshing it if necessary.
      *
+     * @throws AuthException
+     * @throws OAuthCallbackException
      * @throws TokenInvalidException If no token or it's expired and error refreshing it.
      */
     public function refreshToken(): ?array

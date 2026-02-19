@@ -2,10 +2,10 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class TagsApiService
 {
@@ -79,7 +79,7 @@ class TagsApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid parameter values
      * - Insufficient permissions
@@ -150,7 +150,7 @@ class TagsApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If missing required fields, invalid field values,
+     * @throws ApiException If missing required fields, invalid field values,
      *                          insufficient permissions, network issues, or rate limiting occurs
      */
     public function createTag(
@@ -208,7 +208,7 @@ class TagsApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid tag GID provided, insufficient permissions,
+     * @throws ApiException If invalid tag GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getTag(
@@ -269,7 +269,7 @@ class TagsApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid tag GID provided, malformed data,
+     * @throws ApiException If invalid tag GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
      */
     public function updateTag(
@@ -318,7 +318,7 @@ class TagsApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws AsanaApiException If invalid tag GID provided, insufficient permissions,
+     * @throws ApiException If invalid tag GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function deleteTag(string $tagGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
@@ -382,7 +382,7 @@ class TagsApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid tag GID provided, insufficient permissions,
+     * @throws ApiException If invalid tag GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getTasksForTag(
@@ -446,7 +446,7 @@ class TagsApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid workspace GID provided, insufficient permissions,
+     * @throws ApiException If invalid workspace GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getTagsForWorkspace(
@@ -516,7 +516,7 @@ class TagsApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid workspace GID provided, malformed data,
+     * @throws ApiException If invalid workspace GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
      */
     public function createTagInWorkspace(

@@ -4,17 +4,18 @@ namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\GoalsApiService;
 use BrightleafDigital\Http\AsanaApiClient;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 use PHPUnit\Framework\MockObject\Exception as MockException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class GoalsApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AsanaApiClient&MockObject */
     private $mockClient;
 
     /** @var GoalsApiService */
-    private $service;
+    private GoalsApiService $service;
 
     /**
      * @throws MockException
@@ -77,7 +78,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testGetGoalThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a non-empty string.');
 
         $this->service->getGoal('');
@@ -88,7 +89,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testGetGoalThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a numeric string.');
 
         $this->service->getGoal('abc');
@@ -165,7 +166,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testUpdateGoalThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a non-empty string.');
 
         $this->service->updateGoal('', ['name' => 'Test']);
@@ -176,7 +177,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testUpdateGoalThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a numeric string.');
 
         $this->service->updateGoal('abc', ['name' => 'Test']);
@@ -217,7 +218,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testDeleteGoalThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a non-empty string.');
 
         $this->service->deleteGoal('');
@@ -228,7 +229,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testDeleteGoalThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a numeric string.');
 
         $this->service->deleteGoal('abc');
@@ -470,7 +471,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testCreateGoalMetricThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a non-empty string.');
 
         $this->service->createGoalMetric('', ['metric_type' => 'number']);
@@ -481,7 +482,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testCreateGoalMetricThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a numeric string.');
 
         $this->service->createGoalMetric('abc', ['metric_type' => 'number']);
@@ -558,7 +559,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testUpdateGoalMetricThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a non-empty string.');
 
         $this->service->updateGoalMetric('', ['current_number_value' => 50]);
@@ -569,7 +570,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testUpdateGoalMetricThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a numeric string.');
 
         $this->service->updateGoalMetric('abc', ['current_number_value' => 50]);
@@ -646,7 +647,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testAddFollowersThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a non-empty string.');
 
         $this->service->addFollowers('', ['67890']);
@@ -657,7 +658,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testAddFollowersThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a numeric string.');
 
         $this->service->addFollowers('abc', ['67890']);
@@ -734,7 +735,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testRemoveFollowersThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a non-empty string.');
 
         $this->service->removeFollowers('', ['67890']);
@@ -745,7 +746,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testRemoveFollowersThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a numeric string.');
 
         $this->service->removeFollowers('abc', ['67890']);
@@ -803,7 +804,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testGetParentGoalsForGoalThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a non-empty string.');
 
         $this->service->getParentGoalsForGoal('');
@@ -814,7 +815,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testGetParentGoalsForGoalThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a numeric string.');
 
         $this->service->getParentGoalsForGoal('abc');
@@ -874,7 +875,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testAddCustomFieldSettingForGoalThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a non-empty string.');
 
         $this->service->addCustomFieldSettingForGoal('', ['custom_field' => '67890']);
@@ -885,7 +886,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testAddCustomFieldSettingForGoalThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a numeric string.');
 
         $this->service->addCustomFieldSettingForGoal('abc', ['custom_field' => '67890']);
@@ -940,7 +941,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testRemoveCustomFieldSettingForGoalThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a non-empty string.');
 
         $this->service->removeCustomFieldSettingForGoal('', ['custom_field' => '67890']);
@@ -951,7 +952,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testRemoveCustomFieldSettingForGoalThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Goal GID must be a numeric string.');
 
         $this->service->removeCustomFieldSettingForGoal('abc', ['custom_field' => '67890']);

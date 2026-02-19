@@ -4,13 +4,14 @@ namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\ProjectApiService;
 use BrightleafDigital\Http\AsanaApiClient;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 use PHPUnit\Framework\MockObject\Exception as MockException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ProjectApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AsanaApiClient&MockObject */
     private $mockClient;
 
     /** @var ProjectApiService */
@@ -71,7 +72,7 @@ class ProjectApiServiceTest extends TestCase
      */
     public function testGetProjectsThrowsExceptionWithoutWorkspaceOrTeam(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('You must provide either a "workspace" or "team" parameter.');
 
         $this->service->getProjects(null, null);

@@ -2,10 +2,11 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
+use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class CustomFieldApiService
 {
@@ -88,7 +89,7 @@ class CustomFieldApiService
      *   - resource_subtype: The type of the custom field
      *   Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to invalid data, insufficient permissions,
+     * @throws ApiException If the API request fails due to invalid data, insufficient permissions,
      *                          network issues, or rate limiting
      */
     public function createCustomField(
@@ -109,6 +110,7 @@ class CustomFieldApiService
      * GET /custom_fields/{custom_field_gid}
      * Returns the complete definition of a custom field's metadata.
      * API Documentation: https://developers.asana.com/reference/getcustomfield
+     *
      * @param string $customFieldGid The globally unique identifier for the custom field.
      *                               Example: "12345"
      * @param array $options Optional parameters to customize the request:
@@ -137,8 +139,10 @@ class CustomFieldApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the custom field details
-     * @throws AsanaApiException If invalid custom field GID provided, permission errors,
+     * @throws ApiException If invalid custom field GID provided, permission errors,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getCustomField(
         string $customFieldGid,
@@ -156,6 +160,7 @@ class CustomFieldApiService
      * Updates a custom field's metadata. Updates the name, format, description, or enum_options
      * of a custom field.
      * API Documentation: https://developers.asana.com/reference/updatecustomfield
+     *
      * @param string $customFieldGid The globally unique identifier for the custom field to update.
      *                               Example: "12345"
      * @param array $data The properties of the custom field to update. Can include:
@@ -193,8 +198,10 @@ class CustomFieldApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the updated custom field details
-     * @throws AsanaApiException If invalid custom field GID provided, malformed data,
+     * @throws ApiException If invalid custom field GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function updateCustomField(
         string $customFieldGid,
@@ -219,6 +226,7 @@ class CustomFieldApiService
      * This operation is only possible for users with organization admin permissions or for the person who created
      * the custom field.
      * API Documentation: https://developers.asana.com/reference/deletecustomfield
+     *
      * @param string $customFieldGid The globally unique identifier for the custom field to delete.
      *                               Example: "12345"
      * @param int $responseType The type of response to return:
@@ -242,8 +250,10 @@ class CustomFieldApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {})
-     * @throws AsanaApiException If the API request fails due to invalid custom field GID, insufficient permissions,
+     * @throws ApiException If the API request fails due to invalid custom field GID, insufficient permissions,
      *                          network connectivity issues, or rate limiting
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function deleteCustomField(string $customFieldGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
     {
@@ -257,6 +267,7 @@ class CustomFieldApiService
      * GET /workspaces/{workspace_gid}/custom_fields
      * Returns a list of the compact representation of all custom fields in a workspace.
      * API Documentation: https://developers.asana.com/reference/getcustomfieldsforworkspace
+     *
      * @param string $workspaceGid The globally unique identifier for the workspace.
      *                             Example: "12345"
      * @param array $options Optional parameters to customize the request:
@@ -286,8 +297,10 @@ class CustomFieldApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data array containing the list of custom fields
-     * @throws AsanaApiException If invalid workspace GID provided, permission errors,
+     * @throws ApiException If invalid workspace GID provided, permission errors,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getCustomFieldsForWorkspace(
         string $workspaceGid,
@@ -311,6 +324,7 @@ class CustomFieldApiService
      * of type 'enum' or 'multi_enum'. This is also the preferred way to add options to an enum custom field
      * instead of using updateCustomField.
      * API Documentation: https://developers.asana.com/reference/createenumoptionforcustomfield
+     *
      * @param string $customFieldGid The globally unique identifier for the custom field.
      *                               Example: "12345"
      * @param array $data Data for creating the enum option:
@@ -346,9 +360,11 @@ class CustomFieldApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the created enum option
-     * @throws AsanaApiException If invalid custom field GID provided, malformed data,
+     * @throws ApiException If invalid custom field GID provided, malformed data,
      *                          custom field is not of type enum/multi_enum, insufficient permissions,
      *                          or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function createEnumOption(
         string $customFieldGid,
@@ -372,6 +388,7 @@ class CustomFieldApiService
      * Moves a particular enum option to be either before or after another specified enum option
      * in the custom field. Reordering enum options is only possible for custom fields of type 'enum'.
      * API Documentation: https://developers.asana.com/reference/insertenumoptionforcustomfield
+     *
      * @param string $customFieldGid The globally unique identifier for the custom field.
      *                               Example: "12345"
      * @param array $data Data for reordering the enum option:
@@ -406,9 +423,11 @@ class CustomFieldApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the updated custom field with reordered enum options
-     * @throws AsanaApiException If invalid custom field GID provided, malformed data,
+     * @throws ApiException If invalid custom field GID provided, malformed data,
      *                          custom field is not of type enum, insufficient permissions,
      *                          or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function reorderEnumOption(
         string $customFieldGid,
@@ -431,6 +450,7 @@ class CustomFieldApiService
      * PUT /custom_fields/{custom_field_gid}/enum_options/{enum_option_gid}
      * Updates an existing enum option. Enum custom fields require at least one enabled option.
      * API Documentation: https://developers.asana.com/reference/updateenumoption
+     *
      * @param string $customFieldGid The globally unique identifier for the custom field.
      *                               Example: "12345"
      * @param string $enumOptionGid The globally unique identifier for the enum option.
@@ -466,9 +486,11 @@ class CustomFieldApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the updated enum option
-     * @throws AsanaApiException If invalid custom field GID or enum option GID provided, malformed data,
+     * @throws ApiException If invalid custom field GID or enum option GID provided, malformed data,
      *                          custom field is not of type enum/multi_enum, insufficient permissions,
      *                          or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function updateEnumOption(
         string $customFieldGid,
@@ -496,6 +518,7 @@ class CustomFieldApiService
      * themselves. Custom field settings represent a mapping of a custom field to a particular container
      * that the field can be associated with (in this case, a project).
      * API Documentation: https://developers.asana.com/reference/getcustomfieldsettingsforproject
+     *
      * @param string $projectGid The globally unique identifier for the project.
      *                           Example: "12345"
      * @param array $options Optional parameters to customize the request:
@@ -525,8 +548,10 @@ class CustomFieldApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data array containing the list of custom field settings
-     * @throws AsanaApiException If invalid project GID provided, permission errors,
+     * @throws ApiException If invalid project GID provided, permission errors,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getCustomFieldSettingsForProject(
         string $projectGid,
@@ -551,6 +576,7 @@ class CustomFieldApiService
      * themselves. Custom field settings represent a mapping of a custom field to a particular container
      * that the field can be associated with (in this case, a portfolio).
      * API Documentation: https://developers.asana.com/reference/getcustomfieldsettingsforportfolio
+     *
      * @param string $portfolioGid The globally unique identifier for the portfolio.
      *                             Example: "12345"
      * @param array $options Optional parameters to customize the request:
@@ -580,8 +606,10 @@ class CustomFieldApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data array containing the list of custom field settings
-     * @throws AsanaApiException If invalid portfolio GID provided, permission errors,
+     * @throws ApiException If invalid portfolio GID provided, permission errors,
      *                          network issues, or rate limiting occurs
+     * @throws ValidationException
+     * @throws RateLimitException
      */
     public function getCustomFieldSettingsForPortfolio(
         string $portfolioGid,

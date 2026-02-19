@@ -2,10 +2,11 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
+use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class TeamsApiService
 {
@@ -83,8 +84,8 @@ class TeamsApiService
      * - permalink_url: URL to the team in Asana
      *                 Additional fields as specified in opt_fields
      *
-     * @throws InvalidArgumentException If required fields (name, organization) are missing
-     * @throws AsanaApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws ValidationException If required fields (name, organization) are missing
+     * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
      */
     public function createTeam(
         array $data,
@@ -106,6 +107,7 @@ class TeamsApiService
      * GET /teams/{team_gid}
      * Returns the full record for a single team.
      * API Documentation: https://developers.asana.com/reference/getteam
+     *
      * @param string $teamGid The unique global ID of the team to retrieve.
      *                        This identifier can be found in the team URL or
      *                        returned from team-related API endpoints.
@@ -145,8 +147,10 @@ class TeamsApiService
      * - permalink_url: URL to the team in Asana
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid team GID provided, insufficient permissions,
+     * @throws ApiException If invalid team GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getTeam(
         string $teamGid,
@@ -164,6 +168,7 @@ class TeamsApiService
      * Updates the properties of a team. Only the fields provided in the data block will be updated;
      * any unspecified fields will remain unchanged.
      * API Documentation: https://developers.asana.com/reference/updateteam
+     *
      * @param string $teamGid The unique global ID of the team to update.
      *                        This identifier can be found in the team URL or
      *                        returned from team-related API endpoints.
@@ -209,8 +214,10 @@ class TeamsApiService
      * - permalink_url: URL to the team in Asana
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid team GID provided, malformed data,
+     * @throws ApiException If invalid team GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function updateTeam(
         string $teamGid,
@@ -233,6 +240,7 @@ class TeamsApiService
      * GET /workspaces/{workspace_gid}/teams
      * Returns the compact records for all teams in the specified workspace.
      * API Documentation: https://developers.asana.com/reference/getteamsforworkspace
+     *
      * @param string $workspaceGid The unique global ID of the workspace to get teams for.
      *                             This identifier can be found in the workspace URL or
      *                             returned from workspace-related API endpoints.
@@ -274,8 +282,10 @@ class TeamsApiService
      * - name: Name of the team
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid workspace GID provided, insufficient permissions,
+     * @throws ApiException If invalid workspace GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getTeamsForWorkspace(
         string $workspaceGid,
@@ -293,6 +303,7 @@ class TeamsApiService
      * Returns the compact records for all teams to which the given user belongs
      * within the specified organization.
      * API Documentation: https://developers.asana.com/reference/getteamsforuser
+     *
      * @param string $userGid The unique global ID of the user. Can also be the string "me"
      *                        to refer to the current authenticated user.
      *                        Example: "12345"
@@ -335,8 +346,10 @@ class TeamsApiService
      * - name: Name of the team
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid GIDs provided, insufficient permissions,
+     * @throws ApiException If invalid GIDs provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws ValidationException
+     * @throws RateLimitException
      */
     public function getTeamsForUser(
         string $userGid,
@@ -391,8 +404,8 @@ class TeamsApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the team membership details
-     * @throws InvalidArgumentException If the team GID is invalid or user field is missing
-     * @throws AsanaApiException If the user doesn't exist, insufficient permissions,
+     * @throws ValidationException If the team GID is invalid or user field is missing
+     * @throws ApiException If the user doesn't exist, insufficient permissions,
      *                          or network issues occur
      */
     public function addUserToTeam(
@@ -450,8 +463,8 @@ class TeamsApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal
-     * @throws InvalidArgumentException If the team GID is invalid or user field is missing
-     * @throws AsanaApiException If the user doesn't exist in the team, insufficient permissions,
+     * @throws ValidationException If the team GID is invalid or user field is missing
+     * @throws ApiException If the user doesn't exist in the team, insufficient permissions,
      *                          or network issues occur
      */
     public function removeUserFromTeam(

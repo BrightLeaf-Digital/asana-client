@@ -2,10 +2,11 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
+use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class TaskApiService
 {
@@ -93,7 +94,7 @@ class TaskApiService
      *   - modified_at: Last modification timestamp
      *   Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid parameter values
      * - Insufficient permissions
@@ -168,7 +169,7 @@ class TaskApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Missing required fields
      * - Invalid field values
@@ -243,9 +244,9 @@ class TaskApiService
      * - followers: Array of follower objects
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid task GID provided, insufficient permissions,
+     * @throws ApiException If invalid task GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
-     * @throws InvalidArgumentException If task GID is empty
+     * @throws ValidationException If task GID is empty
      */
     public function getTask(
         string $taskGid,
@@ -323,9 +324,9 @@ class TaskApiService
      * - modified_at: Last modification timestamp (updated)
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid task GID provided, malformed data,
+     * @throws ApiException If invalid task GID provided, malformed data,
      *                         insufficient permissions, or network issues occur
-     * @throws InvalidArgumentException If task GID is empty
+     * @throws ValidationException If task GID is empty
      */
     public function updateTask(
         string $taskGid,
@@ -375,13 +376,13 @@ class TaskApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid task GID
      * - Insufficient permissions to delete/trash the task
      * - Network connectivity issues
      * - Rate limiting
-     * @throws InvalidArgumentException If task GID is empty
+     * @throws ValidationException If task GID is empty
      */
     public function deleteTask(string $taskGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
     {
@@ -396,6 +397,7 @@ class TaskApiService
      * Creates and returns a job that will duplicate a task, copying its properties and memberships
      * to a new task. Fields like assignee, name, notes, projects, etc. can be overridden in the duplicated task.
      * API Documentation: https://developers.asana.com/reference/duplicatetask
+     *
      * @param string $taskGid The unique global ID of the task to duplicate.
      *                        This identifier can be found in the task URL or returned from task-related API endpoints.
      *                        Example: "12345"
@@ -440,8 +442,10 @@ class TaskApiService
      * - new_task: Object containing the new duplicated task details once duplication is complete
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException For invalid task GIDs, malformed data,
+     * @throws ApiException For invalid task GIDs, malformed data,
      *                          insufficient permissions, or network issues
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function duplicateTask(
         string $taskGid,
@@ -466,6 +470,7 @@ class TaskApiService
      * in multiple projects at once. By default, tasks included are not sorted and basic task fields
      * are returned. Tasks may be filtered by specifying the query options.
      * API Documentation: https://developers.asana.com/reference/gettasksforproject
+     *
      * @param string $projectGid The unique global ID of the project to get tasks from.
      *                            This identifier can be found in the project URL or
      *                            returned from project-related API endpoints.
@@ -515,8 +520,10 @@ class TaskApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid project GID provided, permission errors,
+     * @throws ApiException If invalid project GID provided, permission errors,
      *                         network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getTasksByProject(
         string $projectGid,
@@ -534,6 +541,7 @@ class TaskApiService
      * Returns a list of tasks in a section. Tasks can be placed into a section within a project.
      * This endpoint allows retrieving all tasks that are currently in a specific section.
      * API Documentation: https://developers.asana.com/reference/gettasksforsection
+     *
      * @param string $sectionGid The unique global ID of the section to query tasks from.
      *                           This identifier can be found in the section URL or
      *                           returned from section-related API endpoints.
@@ -583,8 +591,10 @@ class TaskApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid section GID provided, permission errors,
+     * @throws ApiException If invalid section GID provided, permission errors,
      *                         network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getTasksBySection(
         string $sectionGid,
@@ -602,6 +612,7 @@ class TaskApiService
      * Returns a list of all tasks with the specified tag. Tasks can have multiple tags
      * and this endpoint allows retrieving all tasks associated with a particular tag.
      * API Documentation: https://developers.asana.com/reference/gettasksfortag
+     *
      * @param string $tagGid The global identifier for the tag to query tasks from.
      *                        This identifier can be found in the tag URL or
      *                        returned from tag-related API endpoints.
@@ -652,8 +663,10 @@ class TaskApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid tag GID is provided, permission errors,
+     * @throws ApiException If invalid tag GID is provided, permission errors,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getTasksByTag(
         string $tagGid,
@@ -672,6 +685,7 @@ class TaskApiService
      * represents the tasks assigned to a user that also appear in their My Tasks list.
      * Users can reorder their My Tasks list and specify custom sections to group tasks.
      * API Documentation: https://developers.asana.com/reference/gettasksforusertasklist
+     *
      * @param string $userTaskListGid The globally unique identifier for the user task list.
      *                                This can be found in the URL of a user's My Tasks list
      *                                or via the user_task_list endpoints.
@@ -715,12 +729,14 @@ class TaskApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid user task list GID
      * - Insufficient permissions
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getTasksByUserTaskList(
         string $userTaskListGid,
@@ -743,6 +759,7 @@ class TaskApiService
      * Retrieves a compact list of all subtasks associated with the given task. A subtask is a task that
      * represents a breakdown of a larger task and maintains a parent-child relationship with its parent task.
      * API Documentation: https://developers.asana.com/reference/getsubtasksfortask
+     *
      * @param string $taskGid The unique global ID of the parent task for which to retrieve subtasks.
      *                        This identifier can be found in the task URL or returned from
      *                        task-related API endpoints.
@@ -786,12 +803,14 @@ class TaskApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid task GID
      * - Insufficient permissions to access the task
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getSubtasksFromTask(
         string $taskGid,
@@ -810,6 +829,7 @@ class TaskApiService
      * providing the parent task's GID and basic details for the subtask like its name. The subtask
      * will be added to any projects the parent task is in.
      * API Documentation: https://developers.asana.com/reference/createsubtaskfortask
+     *
      * @param string $taskGid The unique global ID of the parent task under which to create the subtask.
      *                        This identifier can be found in the task URL or via API responses.
      *                        Example: "12345"
@@ -865,8 +885,10 @@ class TaskApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to invalid task GID, malformed data,
+     * @throws ApiException If the API request fails due to invalid task GID, malformed data,
      *                          insufficient permissions, or network issues
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function createSubtaskForTask(
         string $taskGid,
@@ -891,6 +913,7 @@ class TaskApiService
      * only have one parent at a time, and a task cannot be made its own parent. Setting parent to null makes
      * the task a top-level task.
      * API Documentation: https://developers.asana.com/reference/setparentfortask
+     *
      * @param string $taskGid Global ID of the task whose parent will be changed. Can be found in the
      *                        task URL or via API responses. Example: "12345"
      * @param array $data Data payload specifying the parent task.
@@ -940,8 +963,10 @@ class TaskApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid task GIDs provided, insufficient permissions,
+     * @throws ApiException If invalid task GIDs provided, insufficient permissions,
      *                          network issues, or if attempting to create circular dependencies
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function setParentForTask(
         string $taskGid,
@@ -966,6 +991,7 @@ class TaskApiService
      * completed before the task itself can be completed. For example, if task A is a dependency of task B, then task B
      * cannot be marked complete until task A is first completed.
      * API Documentation: https://developers.asana.com/reference/getdependenciesfortask
+     *
      * @param string $taskGid The unique global ID of the task from which to fetch dependencies.
      *                        This identifier can be found in the task URL or returned from
      *                        task-related API endpoints.
@@ -1008,12 +1034,14 @@ class TaskApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid task GID
      * - Insufficient permissions to access the task
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getDependenciesFromTask(
         string $taskGid,
@@ -1033,6 +1061,7 @@ class TaskApiService
      * (i.e., a dependency can have its own dependencies). There is a limit of 30 total dependencies
      * and dependents combined per task.
      * API Documentation: https://developers.asana.com/reference/adddependenciesfortask
+     *
      * @param string $taskGid The unique global ID of the task to set dependencies for.
      *                        This identifier can be found in the task URL or returned from
      *                        task-related API endpoints.
@@ -1062,7 +1091,7 @@ class TaskApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful addition of dependencies
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid task GID
      * - Invalid dependency task GIDs
@@ -1070,6 +1099,8 @@ class TaskApiService
      * - Network connectivity issues
      * - Circular dependencies
      * - Exceeding the 30 total dependencies/dependents limit
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function setDependenciesForTask(
         string $taskGid,
@@ -1094,6 +1125,7 @@ class TaskApiService
      * then task A must be finished before task B can be started. A task can't be dependent on itself
      * or create a circular dependency chain.
      * API Documentation: https://developers.asana.com/reference/removedependenciesfortask
+     *
      * @param string $taskGid The unique global ID of the task from which to remove dependencies.
      *                        This identifier can be found in the task URL or returned from
      *                        task-related API endpoints.
@@ -1122,12 +1154,14 @@ class TaskApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal of dependencies
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid task GID
      * - Invalid dependency task GIDs
      * - Insufficient permissions
      * - Network connectivity issues
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function unlinkDependenciesFromTask(
         string $taskGid,
@@ -1152,6 +1186,7 @@ class TaskApiService
      * task B cannot be started until task A is completed. In this case, task A would return task B
      * as its dependent.
      * API Documentation: https://developers.asana.com/reference/getdependentsfortask
+     *
      * @param string $taskGid The unique global ID of the task from which to fetch dependents.
      *                        This identifier can be found in the task URL or returned from
      *                        task-related API endpoints.
@@ -1194,12 +1229,14 @@ class TaskApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid task GID
      * - Insufficient permissions to access the task
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getDependentsFromTask(
         string $taskGid,
@@ -1220,6 +1257,7 @@ class TaskApiService
      * to create sequential workflows. Note that there is a limit of 30 total dependencies and
      * dependents combined per task.
      * API Documentation: https://developers.asana.com/reference/adddependentsfortask
+     *
      * @param string $taskGid The unique global ID of the task for which to set dependents.
      *                        This identifier can be found in the task URL or returned from
      *                        task-related API endpoints.
@@ -1249,7 +1287,7 @@ class TaskApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful addition of dependents
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid task GID
      * - Invalid dependent task GIDs
@@ -1257,6 +1295,8 @@ class TaskApiService
      * - Network connectivity issues
      * - Circular dependencies
      * - Exceeding the 30 total dependencies/dependents limit
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function setDependentsForTask(
         string $taskGid,
@@ -1281,6 +1321,7 @@ class TaskApiService
      * start until the current task is completed. If task B depends on task A, then task A must
      * be completed before task B can begin.
      * API Documentation: https://developers.asana.com/reference/removedependentsfortask
+     *
      * @param string $taskGid The unique global ID of the task from which to remove dependents.
      *                        This identifier can be found in the task URL or returned from
      *                        task-related API endpoints.
@@ -1309,12 +1350,14 @@ class TaskApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal of dependents
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid task GID
      * - Invalid dependent task GIDs
      * - Insufficient permissions
      * - Network connectivity issues
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function unlinkDependentsFromTask(
         string $taskGid,
@@ -1337,6 +1380,7 @@ class TaskApiService
      * Associates a task with a project. Tasks can be members of multiple projects at once, and
      * adding a task to a project will automatically add its parent project to the task.
      * API Documentation: https://developers.asana.com/reference/addprojectfortask
+     *
      * @param string $taskGid The unique global ID of the task that will be added to the project.
      *                        This identifier can be found in the task URL or returned from
      *                        task-related API endpoints.
@@ -1370,8 +1414,10 @@ class TaskApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful addition of project to task
-     * @throws AsanaApiException If the API request fails due to invalid task GID, invalid project GID,
+     * @throws ApiException If the API request fails due to invalid task GID, invalid project GID,
      *                          insufficient permissions, or network issues
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function addProjectToTask(
         string $taskGid,
@@ -1397,6 +1443,7 @@ class TaskApiService
      * Removes the specified project from a task. The task will no longer be associated with
      * the project, but will remain accessible in other projects and in the user's task list.
      * API Documentation: https://developers.asana.com/reference/removeprojectfortask
+     *
      * @param string $taskGid The unique global ID of the task from which to remove the project. This identifier
      *                        can be found in the task URL or returned from task-related API endpoints.
      * @param string $projectGid The unique global ID of the project to remove from the task. This identifier
@@ -1422,8 +1469,10 @@ class TaskApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal of project from task
-     * @throws AsanaApiException If the API request fails due to invalid task GID, invalid project GID,
+     * @throws ApiException If the API request fails due to invalid task GID, invalid project GID,
      *                         insufficient permissions, or network issues
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function removeProjectFromTask(
         string $taskGid,
@@ -1447,6 +1496,7 @@ class TaskApiService
      * Associates a tag with a task. Tags provide a way to organize tasks and make them more searchable.
      * A task can have multiple tags, and adding a tag that is already on the task will not create a duplicate.
      * API Documentation: https://developers.asana.com/reference/addtagfortask
+     *
      * @param string $taskGid The unique global ID of the task to which the tag will be added.
      *                        This identifier can be found in the task URL or returned from
      *                        task-related API endpoints.
@@ -1474,8 +1524,10 @@ class TaskApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful addition of tag to task
-     * @throws AsanaApiException If the API request fails due to invalid task GID, invalid tag GID,
+     * @throws ApiException If the API request fails due to invalid task GID, invalid tag GID,
      *                          insufficient permissions, or network issues
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function addTagToTask(
         string $taskGid,
@@ -1499,6 +1551,7 @@ class TaskApiService
      * Removes a tag from a task. The task will no longer be associated with the specified tag.
      * Tags provide a way to organize tasks and make them more searchable.
      * API Documentation: https://developers.asana.com/reference/removetagfortask
+     *
      * @param string $taskGid The unique global ID of the task from which to remove the tag.
      *                        This identifier can be found in the task URL or returned from
      *                        task-related API endpoints.
@@ -1526,8 +1579,10 @@ class TaskApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal of tag from task
-     * @throws AsanaApiException If the API request fails due to invalid task GID, invalid tag GID,
+     * @throws ApiException If the API request fails due to invalid task GID, invalid tag GID,
      *                          insufficient permissions, or network issues
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function removeTagFromTask(
         string $taskGid,
@@ -1551,6 +1606,7 @@ class TaskApiService
      * Adds one or more followers to a task. A follower in Asana is a user that will receive notifications
      * about any changes or comments made to the task.
      * API Documentation: https://developers.asana.com/reference/addfollowersfortask
+     *
      * @param string $taskGid The unique global ID of the task to which followers will be added. This identifier
      *                        can be found in the task URL or returned from task-related API endpoints.
      * @param array $followers An array of user GIDs representing the followers to add to the task.
@@ -1582,8 +1638,10 @@ class TaskApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful addition of followers to task
-     * @throws AsanaApiException If the API request fails due to invalid task GID, invalid user GIDs,
+     * @throws ApiException If the API request fails due to invalid task GID, invalid user GIDs,
      *                          insufficient permissions, or network issues
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function addFollowersToTask(
         string $taskGid,
@@ -1608,6 +1666,7 @@ class TaskApiService
      * Removes one or more followers from a task. A follower in Asana is a user that will receive notifications
      * about any changes or comments made to the task.
      * API Documentation: https://developers.asana.com/reference/removefollowerfortask
+     *
      * @param string $taskGid The unique global ID of the task from which to remove followers. This identifier
      *                        can be found in the task URL or returned from task-related API endpoints.
      * @param array $followers An array of user GIDs representing the followers to remove from the task.
@@ -1639,8 +1698,10 @@ class TaskApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal of followers from task
-     * @throws AsanaApiException If the API request fails due to invalid task GID, invalid user GIDs,
+     * @throws ApiException If the API request fails due to invalid task GID, invalid user GIDs,
      *                          insufficient permissions, or network issues
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function removeFollowersFromTask(
         string $taskGid,
@@ -1666,6 +1727,7 @@ class TaskApiService
      * The `custom_task_id` must be unique within the workspace. If no task matches
      * the provided custom ID, an error will be returned.
      * API Documentation: https://developers.asana.com/reference/gettaskforcustomid
+     *
      * @param string $workspaceGid The unique global ID of the workspace where the task is searched.
      * @param string $customId The custom task ID to retrieve.
      * @param int $responseType The type of response to return:
@@ -1705,7 +1767,9 @@ class TaskApiService
      * - followers: Array of follower objects
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails or no task with the provided custom ID is found.
+     * @throws ApiException If the API request fails or no task with the provided custom ID is found.
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getTaskByCustomId(
         string $workspaceGid,
@@ -1725,6 +1789,7 @@ class TaskApiService
      * search options, such as assignee, completion status, and due dates.
      * For details about available filters, refer to the Asana API documentation.
      * API Documentation: https://developers.asana.com/reference/searchtasksforworkspace
+     *
      * @param string $workspaceGid The unique global ID of the workspace where the tasks should be searched.
      * @param array $options Optional query parameters to refine the search. Supported keys include:
      * - `text` (string): A full-text search string (e.g., portions of the task name or description).
@@ -1794,7 +1859,9 @@ class TaskApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to connectivity issues or invalid query parameters.
+     * @throws ApiException If the API request fails due to connectivity issues or invalid query parameters.
+     * @throws ValidationException
+     * @throws RateLimitException
      */
     public function searchTasks(
         string $workspaceGid,
@@ -1815,6 +1882,7 @@ class TaskApiService
      * Reassign a task to a different user.
      * PUT /tasks/{task_gid}
      * Changes the assignee of a task to a specified user.
+     *
      * @param string $taskGid The unique global ID of the task to be reassigned.
      * @param string $assigneeGid The unique global ID of the user to whom the task should be reassigned.
      * @param int $responseType The type of response to return:
@@ -1851,7 +1919,8 @@ class TaskApiService
      * - modified_at: Last modification timestamp (updated)
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails.
+     * @throws ApiException If the API request fails.
+     * @throws ValidationException
      */
     public function reassignTask(
         string $taskGid,
@@ -1870,6 +1939,7 @@ class TaskApiService
      * Retrieves tasks that are past their due date (`due_on.before`) and are not completed.
      * This is useful for identifying tasks that have missed their deadlines.
      * API Documentation: https://developers.asana.com/reference/searchtasksforworkspace
+     *
      * @param string $workspaceGid The unique global ID of the workspace to search in.
      * @param array|null $assigneeGids Optionally filter tasks by a specific assignee's GID.
      * @param array $options Additional query parameters to refine the search. Supported keys include:
@@ -1910,7 +1980,8 @@ class TaskApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to connectivity issues or invalid query parameters.
+     * @throws ApiException If the API request fails due to connectivity issues or invalid query parameters.
+     * @throws ValidationException
      */
     public function getOverdueTasks(
         string $workspaceGid,

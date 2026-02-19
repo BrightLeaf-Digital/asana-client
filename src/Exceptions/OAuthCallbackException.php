@@ -2,10 +2,9 @@
 
 namespace BrightleafDigital\Exceptions;
 
-use Exception;
 use Throwable;
 
-class OAuthCallbackException extends Exception
+class OAuthCallbackException extends AuthException
 {
     protected array $data;
 

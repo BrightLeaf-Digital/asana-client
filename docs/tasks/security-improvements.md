@@ -23,7 +23,7 @@ public function request($method, $endpoint, $params = [])
         $response = $this->httpClient->request($method, $endpoint, $params);
         return json_decode($response->getBody(), true);
     } catch (RequestException $e) {
-        throw new AsanaApiException($e->getMessage(), $e->getCode(), $e);
+        throw new ApiException($e->getMessage(), $e->getCode(), $e);
     }
 }
 ```
@@ -48,7 +48,7 @@ public function request($method, $endpoint, $params = [], $retryCount = 0)
             return $this->request($method, $endpoint, $params, $retryCount + 1);
         }
         
-        throw new AsanaApiException($e->getMessage(), $e->getCode(), $e);
+        throw new ApiException($e->getMessage(), $e->getCode(), $e);
     }
 }
 ```
@@ -107,7 +107,7 @@ public function createTask($data)
 public function updateTask($taskId, $data)
 {
     if (empty($taskId) || !is_string($taskId)) {
-        throw new InvalidArgumentException('Task ID must be a non-empty string');
+        throw new ValidationException('Task ID must be a non-empty string');
     }
     
     $this->validateTaskData($data);
@@ -117,16 +117,16 @@ public function updateTask($taskId, $data)
 private function validateTaskData($data)
 {
     if (!is_array($data)) {
-        throw new InvalidArgumentException('Task data must be an array');
+        throw new ValidationException('Task data must be an array');
     }
     
     // Validate required fields
     if (isset($data['name']) && !is_string($data['name'])) {
-        throw new InvalidArgumentException('Task name must be a string');
+        throw new ValidationException('Task name must be a string');
     }
     
     if (isset($data['due_on']) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $data['due_on'])) {
-        throw new InvalidArgumentException('Due date must be in YYYY-MM-DD format');
+        throw new ValidationException('Due date must be in YYYY-MM-DD format');
     }
     
     // Additional validation as needed

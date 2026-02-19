@@ -2,10 +2,11 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
+use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class WebhooksApiService
 {
@@ -37,6 +38,7 @@ class WebhooksApiService
      * to be notified of changes in Asana. The filters on the request can be used to
      * limit the set of results returned.
      * API Documentation: https://developers.asana.com/reference/getwebhooks
+     *
      * @param string $workspaceGid The unique global ID of the workspace to get webhooks for.
      *                             This identifier can be found in the workspace URL or
      *                             returned from workspace-related API endpoints.
@@ -87,8 +89,10 @@ class WebhooksApiService
      * - last_success_at: Timestamp of last successful delivery
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid workspace GID provided, insufficient permissions,
+     * @throws ApiException If invalid workspace GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getWebhooks(
         string $workspaceGid,
@@ -162,8 +166,8 @@ class WebhooksApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws InvalidArgumentException If required fields (resource, target) are missing
-     * @throws AsanaApiException If the target URL fails the handshake, insufficient permissions,
+     * @throws ValidationException If required fields (resource, target) are missing
+     * @throws ApiException If the target URL fails the handshake, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function createWebhook(
@@ -186,6 +190,7 @@ class WebhooksApiService
      * GET /webhooks/{webhook_gid}
      * Returns the full record for the given webhook.
      * API Documentation: https://developers.asana.com/reference/getwebhook
+     *
      * @param string $webhookGid The unique global ID of the webhook to retrieve.
      *                           This identifier is returned when creating a webhook or
      *                           from the getWebhooks endpoint.
@@ -228,8 +233,10 @@ class WebhooksApiService
      * - last_success_at: Timestamp of last successful delivery
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid webhook GID provided, insufficient permissions,
+     * @throws ApiException If invalid webhook GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getWebhook(
         string $webhookGid,
@@ -248,6 +255,7 @@ class WebhooksApiService
      * any unspecified fields will remain unchanged. An application can only update webhooks that it
      * has created.
      * API Documentation: https://developers.asana.com/reference/updatewebhook
+     *
      * @param string $webhookGid The unique global ID of the webhook to update.
      *                           This identifier is returned when creating a webhook or
      *                           from the getWebhooks endpoint.
@@ -296,8 +304,10 @@ class WebhooksApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid webhook GID provided, malformed data,
+     * @throws ApiException If invalid webhook GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function updateWebhook(
         string $webhookGid,
@@ -322,6 +332,7 @@ class WebhooksApiService
      * a previously established webhook. After deletion, no further events will be delivered
      * to the target URL.
      * API Documentation: https://developers.asana.com/reference/deletewebhook
+     *
      * @param string $webhookGid The unique global ID of the webhook to delete.
      *                           This identifier is returned when creating a webhook or
      *                           from the getWebhooks endpoint.
@@ -347,13 +358,15 @@ class WebhooksApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid webhook GID
      * - Webhook not found
      * - Insufficient permissions to delete the webhook
      * - Network connectivity issues
      * - Rate limiting
+     * @throws ValidationException
+     * @throws RateLimitException
      */
     public function deleteWebhook(string $webhookGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
     {

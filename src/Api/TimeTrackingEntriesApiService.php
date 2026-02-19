@@ -2,10 +2,10 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class TimeTrackingEntriesApiService
 {
@@ -69,7 +69,7 @@ class TimeTrackingEntriesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data array containing the list of time tracking entries
-     * @throws AsanaApiException If invalid task GID provided, insufficient permissions,
+     * @throws ApiException If invalid task GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getTimeTrackingEntriesForTask(
@@ -130,9 +130,9 @@ class TimeTrackingEntriesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the created entry details
-     * @throws InvalidArgumentException If required fields (entered_on, duration_minutes) are missing
+     * @throws ValidationException If required fields (entered_on, duration_minutes) are missing
      *                                  or if the task GID is invalid
-     * @throws AsanaApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
      */
     public function createTimeTrackingEntry(
         string $taskGid,
@@ -196,7 +196,7 @@ class TimeTrackingEntriesApiService
      * - task: Object containing the associated task details
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid GID provided, insufficient permissions,
+     * @throws ApiException If invalid GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getTimeTrackingEntry(
@@ -251,7 +251,7 @@ class TimeTrackingEntriesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the updated entry details
-     * @throws AsanaApiException If invalid GID provided, malformed data,
+     * @throws ApiException If invalid GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
      */
     public function updateTimeTrackingEntry(
@@ -298,7 +298,7 @@ class TimeTrackingEntriesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid time tracking entry GID
      * - Entry not found
@@ -361,7 +361,7 @@ class TimeTrackingEntriesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data array containing the list of time tracking entries
-     * @throws AsanaApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
      */
     public function getTimeTrackingEntries(
         array $options = [],

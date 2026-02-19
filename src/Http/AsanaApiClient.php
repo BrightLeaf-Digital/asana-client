@@ -2,7 +2,7 @@
 
 namespace BrightleafDigital\Http;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\RateLimitException;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\GuzzleException;
@@ -100,7 +100,7 @@ class AsanaApiClient
      * - RESPONSE_NORMAL (2): Complete decoded JSON body
      * - RESPONSE_DATA (3): Only the data subset (default)
      * @return array The response data based on the specified response type.
-     * @throws AsanaApiException If the response indicates an error or if the request fails.
+     * @throws ApiException If the response indicates an error or if the request fails.
      * @throws RateLimitException If rate limit is exceeded and all retries are exhausted.
      */
     public function request(
@@ -120,7 +120,7 @@ class AsanaApiClient
      * @param int $responseType The type of response to return.
      * @param int $retryCount Current retry attempt number.
      * @return array The response data based on the specified response type.
-     * @throws AsanaApiException If the request fails.
+     * @throws ApiException If the request fails.
      * @throws RateLimitException If rate limit is exceeded and all retries are exhausted.
      */
     private function executeWithRetry(
@@ -147,7 +147,12 @@ class AsanaApiClient
                     'uri' => $uri,
                     'status_code' => $response->getStatusCode(),
                 ]);
-                throw new AsanaApiException('Invalid JSON response from Asana API.', $response->getStatusCode());
+                throw new ApiException(
+                    'Invalid JSON response from Asana API.',
+                    $response->getStatusCode(),
+                    ['method' => $method, 'uri' => $uri, 'options' => $this->sanitizeOptions($options)],
+                    []
+                );
             }
 
             $this->logger->debug('API request successful', [
@@ -194,7 +199,7 @@ class AsanaApiClient
      * @param int $responseType The response type requested.
      * @param int $retryCount Current retry attempt number.
      * @return array The response data if retry succeeds.
-     * @throws AsanaApiException If the request fails for non-rate-limit reasons.
+     * @throws ApiException If the request fails for non-rate-limit reasons.
      * @throws RateLimitException If rate limit is exceeded and all retries are exhausted.
      */
     private function handleGuzzleException(
@@ -246,7 +251,8 @@ class AsanaApiClient
                 'Rate limit exceeded. Please retry after ' . $retryAfter . ' seconds.',
                 $retryAfter,
                 $details,
-                $e
+                $e,
+                ['method' => $method, 'uri' => $uri, 'options' => $this->sanitizeOptions($options)]
             );
         }
 
@@ -284,7 +290,13 @@ class AsanaApiClient
             'response' => $response ? $this->truncateResponseBody((string) $response->getBody()) : null,
         ]);
 
-        throw new AsanaApiException($message, $e->getCode(), $details, $e);
+        throw new ApiException(
+            $message,
+            $e->getCode(),
+            ['method' => $method, 'uri' => $uri, 'options' => $this->sanitizeOptions($options)],
+            $details,
+            $e
+        );
     }
 
     /**

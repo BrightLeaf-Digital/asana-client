@@ -4,13 +4,14 @@ namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\TimeTrackingEntriesApiService;
 use BrightleafDigital\Http\AsanaApiClient;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 use PHPUnit\Framework\MockObject\Exception as MockException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TimeTrackingEntriesApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AsanaApiClient&MockObject */
     private $mockClient;
 
     /** @var TimeTrackingEntriesApiService */
@@ -102,7 +103,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testGetTimeTrackingEntriesForTaskThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Task GID must be a non-empty string.'
         );
@@ -115,7 +116,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testGetTimeTrackingEntriesForTaskThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Task GID must be a numeric string.'
         );
@@ -228,7 +229,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testCreateTimeTrackingEntryThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Task GID must be a non-empty string.'
         );
@@ -244,7 +245,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testCreateTimeTrackingEntryThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Task GID must be a numeric string.'
         );
@@ -260,7 +261,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testCreateTimeTrackingEntryThrowsExceptionForMissingEnteredOn(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Missing required field(s) for time tracking entry creation: entered_on'
         );
@@ -276,7 +277,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testCreateTimeTrackingEntryThrowsExceptionForMissingDuration(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Missing required field(s) for time tracking entry creation: duration_minutes'
         );
@@ -292,7 +293,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testCreateTimeTrackingEntryThrowsExceptionForMissingBothFields(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Missing required field(s) for time tracking entry creation: '
             . 'entered_on, duration_minutes'
@@ -377,7 +378,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testGetTimeTrackingEntryThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Time Tracking Entry GID must be a non-empty string.'
         );
@@ -390,7 +391,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testGetTimeTrackingEntryThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Time Tracking Entry GID must be a numeric string.'
         );
@@ -477,7 +478,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testUpdateTimeTrackingEntryThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Time Tracking Entry GID must be a non-empty string.'
         );
@@ -493,7 +494,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testUpdateTimeTrackingEntryThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Time Tracking Entry GID must be a numeric string.'
         );
@@ -552,7 +553,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testDeleteTimeTrackingEntryThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Time Tracking Entry GID must be a non-empty string.'
         );
@@ -565,7 +566,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testDeleteTimeTrackingEntryThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Time Tracking Entry GID must be a numeric string.'
         );

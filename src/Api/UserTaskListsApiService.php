@@ -2,10 +2,11 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
+use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class UserTaskListsApiService
 {
@@ -35,6 +36,7 @@ class UserTaskListsApiService
      * GET /user_task_lists/{user_task_list_gid}
      * Returns the full record for a user task list ("My Tasks").
      * API Documentation: https://developers.asana.com/reference/getusertasklist
+     *
      * @param string $userTaskListGid The unique global ID of the user task list.
      *                                Example: "12345"
      * @param array $options Optional parameters to customize the request:
@@ -70,8 +72,10 @@ class UserTaskListsApiService
      * - workspace: Object containing the workspace details
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid GID provided, insufficient permissions,
+     * @throws ApiException If invalid GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getUserTaskList(
         string $userTaskListGid,
@@ -94,6 +98,7 @@ class UserTaskListsApiService
      * Returns the full record for a user's task list in the given workspace.
      * Each user has exactly one task list per workspace.
      * API Documentation: https://developers.asana.com/reference/getusertasklistforuser
+     *
      * @param string $userGid The unique global ID of the user. Can also be the string "me"
      *                        to refer to the current authenticated user.
      *                        Example: "12345"
@@ -132,8 +137,10 @@ class UserTaskListsApiService
      * - workspace: Object containing the workspace details
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid GIDs provided, insufficient permissions,
+     * @throws ApiException If invalid GIDs provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws ValidationException
+     * @throws RateLimitException
      */
     public function getUserTaskListForUser(
         string $userGid,

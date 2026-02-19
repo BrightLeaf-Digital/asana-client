@@ -338,32 +338,32 @@ Tests OAuth handler functionality.
 #### `ExceptionsTest.php` (22 tests)
 Tests all exception classes.
 
-| Test | Description |
-|------|-------------|
-| `testAsanaApiExceptionWithMessageOnly` | Basic construction |
-| `testAsanaApiExceptionWithMessageAndCode` | With HTTP code |
-| `testAsanaApiExceptionWithResponseData` | With response data |
-| `testAsanaApiExceptionWithPreviousException` | Exception chaining |
-| `testAsanaApiExceptionGetResponseDataReturnsEmptyArray` | Default data |
-| `testAsanaApiExceptionExtendsException` | Inheritance |
-| `testOAuthCallbackExceptionWithMessageOnly` | Basic construction |
-| `testOAuthCallbackExceptionWithMessageAndCode` | With code |
-| `testOAuthCallbackExceptionWithData` | With data |
-| `testOAuthCallbackExceptionWithPreviousException` | Exception chaining |
-| `testOAuthCallbackExceptionGetDataReturnsEmptyArray` | Default data |
-| `testOAuthCallbackExceptionExtendsException` | Inheritance |
-| `testOAuthCallbackExceptionWithComplexData` | Complex data structure |
-| `testTokenInvalidExceptionWithMessageOnly` | Basic construction |
-| `testTokenInvalidExceptionWithMessageAndCode` | With code |
-| `testTokenInvalidExceptionWithData` | With data |
-| `testTokenInvalidExceptionWithPreviousException` | Exception chaining |
-| `testTokenInvalidExceptionGetDataReturnsEmptyArray` | Default data |
-| `testTokenInvalidExceptionExtendsException` | Inheritance |
-| `testTokenInvalidExceptionNoAccessToken` | Common use case |
-| `testTokenInvalidExceptionOAuthNotConfigured` | Common use case |
-| `testAllExceptionsCanBeCaughtAsException` | Polymorphism |
-| `testTokenInvalidExceptionWithContext` | Context interpolation |
-| `testExceptionChaining` | Full exception chain |
+| Test                                                 | Description            |
+|------------------------------------------------------|------------------------|
+| `testApiExceptionWithMessageOnly`                    | Basic construction     |
+| `testApiExceptionWithMessageAndCode`                 | With HTTP code         |
+| `testApiExceptionWithResponseData`                   | With response data     |
+| `testApiExceptionWithPreviousException`              | Exception chaining     |
+| `testApiExceptionGetResponseDataReturnsEmptyArray`   | Default data           |
+| `testApiExceptionExtendsException`                   | Inheritance            |
+| `testOAuthCallbackExceptionWithMessageOnly`          | Basic construction     |
+| `testOAuthCallbackExceptionWithMessageAndCode`       | With code              |
+| `testOAuthCallbackExceptionWithData`                 | With data              |
+| `testOAuthCallbackExceptionWithPreviousException`    | Exception chaining     |
+| `testOAuthCallbackExceptionGetDataReturnsEmptyArray` | Default data           |
+| `testOAuthCallbackExceptionExtendsException`         | Inheritance            |
+| `testOAuthCallbackExceptionWithComplexData`          | Complex data structure |
+| `testTokenInvalidExceptionWithMessageOnly`           | Basic construction     |
+| `testTokenInvalidExceptionWithMessageAndCode`        | With code              |
+| `testTokenInvalidExceptionWithData`                  | With data              |
+| `testTokenInvalidExceptionWithPreviousException`     | Exception chaining     |
+| `testTokenInvalidExceptionGetDataReturnsEmptyArray`  | Default data           |
+| `testTokenInvalidExceptionExtendsException`          | Inheritance            |
+| `testTokenInvalidExceptionNoAccessToken`             | Common use case        |
+| `testTokenInvalidExceptionOAuthNotConfigured`        | Common use case        |
+| `testAllExceptionsCanBeCaughtAsException`            | Polymorphism           |
+| `testTokenInvalidExceptionWithContext`               | Context interpolation  |
+| `testExceptionChaining`                              | Full exception chain   |
 
 ---
 

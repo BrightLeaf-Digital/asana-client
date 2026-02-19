@@ -2,7 +2,7 @@
 
 namespace BrightleafDigital\Utils;
 
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 /**
  * Trait providing common validation methods for API services.
@@ -21,20 +21,20 @@ trait ValidationTrait
      * @param string $gid The GID to validate.
      * @param string $parameterName The name of the parameter for the error message.
      *
-     * @throws InvalidArgumentException If the GID is empty or not numeric.
+     * @throws ValidationException If the GID is empty or not numeric.
      */
     protected function validateGid(string $gid, string $parameterName): void
     {
         $trimmedGid = trim($gid);
 
         if ($trimmedGid === '') {
-            throw new InvalidArgumentException(
+            throw new ValidationException(
                 sprintf('%s must be a non-empty string.', $parameterName)
             );
         }
 
         if (!ctype_digit($trimmedGid)) {
-            throw new InvalidArgumentException(
+            throw new ValidationException(
                 sprintf('%s must be a numeric string.', $parameterName)
             );
         }
@@ -49,14 +49,14 @@ trait ValidationTrait
      *
      * @param string $userGid The user GID to validate.
      *
-     * @throws InvalidArgumentException If the user GID is empty or not a valid identifier.
+     * @throws ValidationException If the user GID is empty or not a valid identifier.
      */
     protected function validateUserGid(string $userGid): void
     {
         $trimmedGid = trim($userGid);
 
         if ($trimmedGid === '') {
-            throw new InvalidArgumentException(
+            throw new ValidationException(
                 'User GID must be a non-empty string.'
             );
         }
@@ -66,7 +66,7 @@ trait ValidationTrait
             return;
         }
 
-        throw new InvalidArgumentException(
+        throw new ValidationException(
             'User GID must be a numeric string, "me", or a valid email address.'
         );
     }
@@ -78,7 +78,7 @@ trait ValidationTrait
      * @param array $requiredFields The list of required field names.
      * @param string $context The context for the error message (e.g., "task creation").
      *
-     * @throws InvalidArgumentException If any required field is missing.
+     * @throws ValidationException If any required field is missing.
      */
     protected function validateRequiredFields(array $data, array $requiredFields, string $context): void
     {
@@ -91,7 +91,7 @@ trait ValidationTrait
         }
 
         if (!empty($missingFields)) {
-            throw new InvalidArgumentException(
+            throw new ValidationException(
                 sprintf(
                     'Missing required field(s) for %s: %s',
                     $context,
@@ -108,7 +108,7 @@ trait ValidationTrait
      * @param array $fields The list of field names where at least one must be present.
      * @param string $context The context for the error message.
      *
-     * @throws InvalidArgumentException If none of the specified fields are present.
+     * @throws ValidationException If none of the specified fields are present.
      */
     protected function validateAtLeastOneField(array $data, array $fields, string $context): void
     {
@@ -118,7 +118,7 @@ trait ValidationTrait
             }
         }
 
-        throw new InvalidArgumentException(
+        throw new ValidationException(
             sprintf(
                 'At least one of the following fields is required for %s: %s',
                 $context,
@@ -133,12 +133,12 @@ trait ValidationTrait
      * @param string $date The date string to validate.
      * @param string $parameterName The name of the parameter for the error message.
      *
-     * @throws InvalidArgumentException If the date is not in the correct format.
+     * @throws ValidationException If the date is not in the correct format.
      */
     protected function validateDateFormat(string $date, string $parameterName): void
     {
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            throw new InvalidArgumentException(
+            throw new ValidationException(
                 sprintf('%s must be in YYYY-MM-DD format.', $parameterName)
             );
         }
@@ -149,7 +149,7 @@ trait ValidationTrait
      *
      * @param string $color The color value to validate.
      *
-     * @throws InvalidArgumentException If the color is not a valid Asana color.
+     * @throws ValidationException If the color is not a valid Asana color.
      */
     protected function validateColor(string $color): void
     {
@@ -162,7 +162,7 @@ trait ValidationTrait
         ];
 
         if (!in_array($color, $validColors, true)) {
-            throw new InvalidArgumentException(
+            throw new ValidationException(
                 sprintf(
                     'Invalid color "%s". Valid colors are: %s',
                     $color,
@@ -179,12 +179,12 @@ trait ValidationTrait
      * @param int $min The minimum allowed value (default: 1).
      * @param int $max The maximum allowed value (default: 100).
      *
-     * @throws InvalidArgumentException If the limit is outside the acceptable range.
+     * @throws ValidationException If the limit is outside the acceptable range.
      */
     protected function validateLimit(int $limit, int $min = 1, int $max = 100): void
     {
         if ($limit < $min || $limit > $max) {
-            throw new InvalidArgumentException(
+            throw new ValidationException(
                 sprintf('Limit must be between %d and %d.', $min, $max)
             );
         }
@@ -196,25 +196,25 @@ trait ValidationTrait
      * @param array $gids The array of GIDs to validate.
      * @param string $parameterName The name of the parameter for the error message.
      *
-     * @throws InvalidArgumentException If the array is empty or contains invalid GIDs.
+     * @throws ValidationException If the array is empty or contains invalid GIDs.
      */
     protected function validateGidArray(array $gids, string $parameterName): void
     {
         if (empty($gids)) {
-            throw new InvalidArgumentException(
+            throw new ValidationException(
                 sprintf('%s must be a non-empty array.', $parameterName)
             );
         }
 
         foreach ($gids as $index => $gid) {
             if (!is_string($gid) || trim($gid) === '') {
-                throw new InvalidArgumentException(
+                throw new ValidationException(
                     sprintf('%s[%d] must be a non-empty string.', $parameterName, $index)
                 );
             }
 
             if (!ctype_digit(trim($gid))) {
-                throw new InvalidArgumentException(
+                throw new ValidationException(
                     sprintf('%s[%d] must be a numeric string.', $parameterName, $index)
                 );
             }

@@ -4,13 +4,14 @@ namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\WebhooksApiService;
 use BrightleafDigital\Http\AsanaApiClient;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 use PHPUnit\Framework\MockObject\Exception as MockException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class WebhooksApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AsanaApiClient&MockObject */
     private $mockClient;
 
     /** @var WebhooksApiService */
@@ -85,7 +86,7 @@ class WebhooksApiServiceTest extends TestCase
      */
     public function testGetWebhooksThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Workspace GID must be a non-empty string.');
 
         $this->service->getWebhooks('');
@@ -96,7 +97,7 @@ class WebhooksApiServiceTest extends TestCase
      */
     public function testGetWebhooksThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Workspace GID must be a numeric string.');
 
         $this->service->getWebhooks('abc');
@@ -183,7 +184,7 @@ class WebhooksApiServiceTest extends TestCase
      */
     public function testCreateWebhookThrowsExceptionForMissingResource(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for webhook creation: resource');
 
         $this->service->createWebhook(['target' => 'https://example.com/webhooks']);
@@ -194,7 +195,7 @@ class WebhooksApiServiceTest extends TestCase
      */
     public function testCreateWebhookThrowsExceptionForMissingTarget(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for webhook creation: target');
 
         $this->service->createWebhook(['resource' => '12345']);
@@ -205,7 +206,7 @@ class WebhooksApiServiceTest extends TestCase
      */
     public function testCreateWebhookThrowsExceptionForMissingBothFields(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for webhook creation: resource, target');
 
         $this->service->createWebhook([]);
@@ -267,7 +268,7 @@ class WebhooksApiServiceTest extends TestCase
      */
     public function testGetWebhookThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Webhook GID must be a non-empty string.');
 
         $this->service->getWebhook('');
@@ -278,7 +279,7 @@ class WebhooksApiServiceTest extends TestCase
      */
     public function testGetWebhookThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Webhook GID must be a numeric string.');
 
         $this->service->getWebhook('abc');
@@ -358,7 +359,7 @@ class WebhooksApiServiceTest extends TestCase
      */
     public function testUpdateWebhookThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Webhook GID must be a non-empty string.');
 
         $this->service->updateWebhook('', ['filters' => []]);
@@ -369,7 +370,7 @@ class WebhooksApiServiceTest extends TestCase
      */
     public function testUpdateWebhookThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Webhook GID must be a numeric string.');
 
         $this->service->updateWebhook('abc', ['filters' => []]);
@@ -410,7 +411,7 @@ class WebhooksApiServiceTest extends TestCase
      */
     public function testDeleteWebhookThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Webhook GID must be a non-empty string.');
 
         $this->service->deleteWebhook('');
@@ -421,7 +422,7 @@ class WebhooksApiServiceTest extends TestCase
      */
     public function testDeleteWebhookThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Webhook GID must be a numeric string.');
 
         $this->service->deleteWebhook('abc');

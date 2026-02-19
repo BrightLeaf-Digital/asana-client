@@ -4,17 +4,18 @@ namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\UserTaskListsApiService;
 use BrightleafDigital\Http\AsanaApiClient;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 use PHPUnit\Framework\MockObject\Exception as MockException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class UserTaskListsApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AsanaApiClient&MockObject */
     private $mockClient;
 
     /** @var UserTaskListsApiService */
-    private $service;
+    private UserTaskListsApiService $service;
 
     /**
      * @throws MockException
@@ -100,7 +101,7 @@ class UserTaskListsApiServiceTest extends TestCase
      */
     public function testGetUserTaskListThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'User Task List GID must be a non-empty string.'
         );
@@ -113,7 +114,7 @@ class UserTaskListsApiServiceTest extends TestCase
      */
     public function testGetUserTaskListThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'User Task List GID must be a numeric string.'
         );
@@ -200,7 +201,7 @@ class UserTaskListsApiServiceTest extends TestCase
      */
     public function testGetUserTaskListForUserThrowsExceptionForEmptyUserGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'User GID must be a non-empty string.'
         );
@@ -213,7 +214,7 @@ class UserTaskListsApiServiceTest extends TestCase
      */
     public function testGetUserTaskListForUserThrowsExceptionForInvalidUserGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'User GID must be a numeric string, "me", or a valid email address.'
         );
@@ -278,7 +279,7 @@ class UserTaskListsApiServiceTest extends TestCase
      */
     public function testGetUserTaskListForUserThrowsExceptionForEmptyWorkspaceGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Workspace GID must be a non-empty string.'
         );
@@ -291,7 +292,7 @@ class UserTaskListsApiServiceTest extends TestCase
      */
     public function testGetUserTaskListForUserThrowsExceptionForNonNumericWorkspaceGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Workspace GID must be a numeric string.'
         );

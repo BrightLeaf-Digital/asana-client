@@ -2,10 +2,10 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class ProjectTemplatesApiService
 {
@@ -72,7 +72,7 @@ class ProjectTemplatesApiService
      * - public: Whether the template is public
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid GID provided, insufficient permissions,
+     * @throws ApiException If invalid GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getProjectTemplate(
@@ -119,7 +119,7 @@ class ProjectTemplatesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid project template GID
      * - Template not found
@@ -181,7 +181,7 @@ class ProjectTemplatesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data array containing the list of project templates
-     * @throws AsanaApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
      */
     public function getProjectTemplates(
         array $options = [],
@@ -235,7 +235,7 @@ class ProjectTemplatesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data array containing the list of project templates for the team
-     * @throws AsanaApiException If invalid team GID provided, insufficient permissions,
+     * @throws ApiException If invalid team GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getProjectTemplatesForTeam(
@@ -300,8 +300,8 @@ class ProjectTemplatesApiService
      * - resource_type: Always "job"
      * - status: Status of the job
      * - new_project: Object containing the new project details
-     * @throws InvalidArgumentException If the project template GID is invalid or name is missing
-     * @throws AsanaApiException If the template doesn't exist, insufficient permissions,
+     * @throws ValidationException If the project template GID is invalid or name is missing
+     * @throws ApiException If the template doesn't exist, insufficient permissions,
      *                          or network issues occur
      */
     public function instantiateProject(

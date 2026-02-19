@@ -2,7 +2,7 @@
 
 namespace BrightleafDigital\Tests\Exceptions;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\RateLimitException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -10,12 +10,12 @@ use RuntimeException;
 class RateLimitExceptionTest extends TestCase
 {
     /**
-     * Test that RateLimitException extends AsanaApiException.
+     * Test that RateLimitException extends ApiException.
      */
-    public function testExtendsAsanaApiException(): void
+    public function testExtendsApiException(): void
     {
         $exception = new RateLimitException('Rate limit exceeded');
-        $this->assertInstanceOf(AsanaApiException::class, $exception);
+        $this->assertInstanceOf(ApiException::class, $exception);
     }
 
     /**

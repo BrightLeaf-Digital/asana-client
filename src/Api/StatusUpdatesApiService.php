@@ -2,10 +2,10 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class StatusUpdatesApiService
 {
@@ -73,7 +73,7 @@ class StatusUpdatesApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid GID provided, insufficient permissions,
+     * @throws ApiException If invalid GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getStatusUpdate(
@@ -119,7 +119,7 @@ class StatusUpdatesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid status update GID
      * - Status update not found
@@ -186,7 +186,7 @@ class StatusUpdatesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data array containing the list of status updates
-     * @throws AsanaApiException If invalid parent GID provided, insufficient permissions,
+     * @throws ApiException If invalid parent GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getStatusUpdatesForObject(
@@ -253,8 +253,8 @@ class StatusUpdatesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the created status update details
-     * @throws InvalidArgumentException If required fields (parent, text, status_type) are missing
-     * @throws AsanaApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws ValidationException If required fields (parent, text, status_type) are missing
+     * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
      */
     public function createStatusUpdate(
         array $data,

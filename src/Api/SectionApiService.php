@@ -2,10 +2,11 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
+use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class SectionApiService
 {
@@ -36,6 +37,7 @@ class SectionApiService
      * Returns the complete record for a single section.
      * Sections are used to divide projects into smaller parts.
      * API Documentation: https://developers.asana.com/reference/getsection
+     *
      * @param string $sectionGid The unique global ID of the section to retrieve.
      *                           This identifier can be found in the section URL or
      *                           returned from section-related API endpoints.
@@ -74,8 +76,10 @@ class SectionApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid section GID provided, insufficient permissions,
+     * @throws ApiException If invalid section GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getSection(
         string $sectionGid,
@@ -93,6 +97,7 @@ class SectionApiService
      * Updates the properties of a section. Only the fields provided in the data block will be updated;
      * any unspecified fields will remain unchanged.
      * API Documentation: https://developers.asana.com/reference/updatesection
+     *
      * @param string $sectionGid The unique global ID of the section to update.
      *                           This identifier can be found in the section URL or
      *                           returned from section-related API endpoints.
@@ -135,8 +140,10 @@ class SectionApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid section GID provided, malformed data,
+     * @throws ApiException If invalid section GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function updateSection(
         string $sectionGid,
@@ -162,6 +169,7 @@ class SectionApiService
      * This does not delete tasks within the section - they will be moved to other sections
      * in the project based on the project's configuration.
      * API Documentation: https://developers.asana.com/reference/deletesection
+     *
      * @param string $sectionGid The unique global ID of the section to delete.
      *                           This identifier can be found in the section URL or
      *                           returned from section-related API endpoints.
@@ -187,13 +195,15 @@ class SectionApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid section GID
      * - Section is in a project type that doesn't support section deletion
      * - Insufficient permissions to delete the section
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function deleteSection(string $sectionGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
     {
@@ -208,6 +218,7 @@ class SectionApiService
      * Returns the compact records for all sections in the specified project.
      * Sections represent an organizational unit within a project and help group tasks.
      * API Documentation: https://developers.asana.com/reference/getsectionsforproject
+     *
      * @param string $projectGid The unique global ID of the project for which to get sections.
      *                           This identifier can be found in the project URL or
      *                           returned from project-related API endpoints.
@@ -252,8 +263,10 @@ class SectionApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid project GID provided, insufficient permissions,
+     * @throws ApiException If invalid project GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getSectionsForProject(
         string $projectGid,
@@ -271,6 +284,7 @@ class SectionApiService
      * Creates a new section in a project. Returns the full record of the newly created section.
      * Sections can be created in board projects and list projects with the layout feature enabled.
      * API Documentation: https://developers.asana.com/reference/createsectionforproject
+     *
      * @param string $projectGid The unique global ID of the project in which to create the section.
      *                           This identifier can be found in the project URL or
      *                           returned from project-related API endpoints.
@@ -319,8 +333,10 @@ class SectionApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid project GID provided, project doesn't support sections,
+     * @throws ApiException If invalid project GID provided, project doesn't support sections,
      *                          malformed data, insufficient permissions, or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function createSectionForProject(
         string $projectGid,
@@ -344,6 +360,7 @@ class SectionApiService
      * Adds a task to a specific section. This will remove the task from other sections
      * of the project.
      * API Documentation: https://developers.asana.com/reference/addtaskforsection
+     *
      * @param string $sectionGid The unique global ID of the section to add the task to.
      *                           This identifier can be found in the section URL or
      *                           returned from section-related API endpoints.
@@ -379,8 +396,10 @@ class SectionApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful addition
-     * @throws AsanaApiException If the task doesn't exist, section doesn't exist, insufficient permissions,
+     * @throws ApiException If the task doesn't exist, section doesn't exist, insufficient permissions,
      *                          task already in section, or network issues occur
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function addTaskToSection(
         string $sectionGid,
@@ -403,6 +422,7 @@ class SectionApiService
      * Move sections or insert a section in a project. This endpoint allows you to reorder sections or
      * insert a section at a specific index in the project.
      * API Documentation: https://developers.asana.com/reference/insertsectionforproject
+     *
      * @param string $projectGid The unique global ID of the project in which to reorder sections.
      *                           This identifier can be found in the project URL or
      *                           returned from project-related API endpoints.
@@ -438,8 +458,10 @@ class SectionApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful reordering
-     * @throws AsanaApiException If the project doesn't exist, sections don't exist, invalid positioning,
+     * @throws ApiException If the project doesn't exist, sections don't exist, invalid positioning,
      *                          insufficient permissions, or network issues occur
+     * @throws ValidationException
+     * @throws RateLimitException
      */
     public function insertSectionForProject(
         string $projectGid,

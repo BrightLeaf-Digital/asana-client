@@ -1,8 +1,9 @@
 <?php
 
 use BrightleafDigital\AsanaClient;
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\TokenInvalidException;
+use BrightleafDigital\Exceptions\ValidationException;
 use Dotenv\Dotenv;
 
 require '../vendor/autoload.php';
@@ -31,7 +32,7 @@ $asanaClient->onTokenRefresh(function ($token) use ($asanaClient, $password) {
 try {
     $projectGid = $_GET['project'] ?? null;
     if (!$projectGid) {
-        throw new InvalidArgumentException('Project parameter is required');
+        throw new ValidationException('Project parameter is required');
     }
 
     $project = $asanaClient->projects()->getProject($projectGid, ['opt_fields' => 'workspace.gid']);
@@ -132,13 +133,15 @@ try {
             <select id="assignee" name="assignee">
                 <option value="">Select assignee</option>
                 <?php foreach ($users as $user) : ?>
-                    <option value="<?php echo htmlspecialchars($user['gid']); ?>"><?php echo htmlspecialchars($user['name']); ?></option>
+                    <option value="<?php echo htmlspecialchars($user['gid']); ?>">
+                        <?php echo htmlspecialchars($user['name']); ?>
+                    </option>
                 <?php endforeach; ?>
             </select>
         </div>
         <button type="submit">Create Task</button>
     </form>
     <?php
-} catch (AsanaApiException | TokenInvalidException $e) {
+} catch (ApiException | TokenInvalidException | ValidationException $e) {
     echo 'Error: ' . $e->getMessage();
 }

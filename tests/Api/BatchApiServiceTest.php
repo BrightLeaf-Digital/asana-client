@@ -4,17 +4,18 @@ namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\BatchApiService;
 use BrightleafDigital\Http\AsanaApiClient;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 use PHPUnit\Framework\MockObject\Exception as MockException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class BatchApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AsanaApiClient&MockObject */
     private $mockClient;
 
     /** @var BatchApiService */
-    private $service;
+    private BatchApiService $service;
 
     /**
      * @throws MockException
@@ -230,7 +231,7 @@ class BatchApiServiceTest extends TestCase
      */
     public function testSubmitBatchRequestThrowsExceptionForEmptyActions(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Actions array must not be empty for batch request.'
         );
@@ -243,7 +244,7 @@ class BatchApiServiceTest extends TestCase
      */
     public function testSubmitBatchRequestThrowsExceptionForMissingRelativePath(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Action at index 0 is missing required field(s): relative_path'
         );
@@ -258,7 +259,7 @@ class BatchApiServiceTest extends TestCase
      */
     public function testSubmitBatchRequestThrowsExceptionForMissingMethod(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Action at index 0 is missing required field(s): method'
         );
@@ -273,7 +274,7 @@ class BatchApiServiceTest extends TestCase
      */
     public function testSubmitBatchRequestThrowsExceptionForMissingBothFields(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Action at index 0 is missing required field(s): '
             . 'relative_path, method'
@@ -289,7 +290,7 @@ class BatchApiServiceTest extends TestCase
      */
     public function testSubmitBatchRequestThrowsExceptionForInvalidActionAtIndex(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Action at index 1 is missing required field(s): method'
         );
@@ -305,7 +306,7 @@ class BatchApiServiceTest extends TestCase
      */
     public function testSubmitBatchRequestThrowsExceptionForNonArrayAction(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Each action must be an array, invalid action at index 0.'
         );
@@ -318,7 +319,7 @@ class BatchApiServiceTest extends TestCase
      */
     public function testSubmitBatchRequestThrowsExceptionForEmptyRelativePath(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Action at index 0 is missing required field(s): relative_path'
         );
@@ -333,7 +334,7 @@ class BatchApiServiceTest extends TestCase
      */
     public function testSubmitBatchRequestThrowsExceptionForEmptyMethod(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Action at index 0 is missing required field(s): method'
         );
@@ -348,7 +349,7 @@ class BatchApiServiceTest extends TestCase
      */
     public function testSubmitBatchRequestThrowsExceptionForWhitespaceRelativePath(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Action at index 0 is missing required field(s): relative_path'
         );
@@ -363,7 +364,7 @@ class BatchApiServiceTest extends TestCase
      */
     public function testSubmitBatchRequestThrowsExceptionForWhitespaceMethod(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage(
             'Action at index 0 is missing required field(s): method'
         );

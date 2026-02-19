@@ -2,10 +2,11 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
+use BrightleafDigital\Exceptions\RateLimitException;
+use BrightleafDigital\Exceptions\ValidationException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
 
 class WorkspaceApiService
 {
@@ -72,7 +73,7 @@ class WorkspaceApiService
      * - is_organization: Boolean indicating if workspace is an organization
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If permission errors, network issues, or rate limiting occurs
+     * @throws ApiException If permission errors, network issues, or rate limiting occurs
      */
     public function getWorkspaces(array $options = [], int $responseType = AsanaApiClient::RESPONSE_DATA): array
     {
@@ -84,6 +85,7 @@ class WorkspaceApiService
      * GET /workspaces/{workspace_gid}
      * Returns the full workspace record for a single workspace.
      * API Documentation: https://developers.asana.com/reference/getworkspace
+     *
      * @param string $workspaceGid The unique global ID of the workspace to retrieve.
      *                           This identifier can be found in the workspace URL or returned from
      *                           workspace-related API endpoints.
@@ -121,7 +123,7 @@ class WorkspaceApiService
      * - is_organization: Boolean indicating if workspace is an organization
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid workspace GID provided, permission errors,
+     * @throws ApiException|ValidationException If invalid workspace GID provided, permission errors,
      *                          network issues, or rate limiting occurs
      */
     public function getWorkspace(
@@ -180,7 +182,7 @@ class WorkspaceApiService
      * - is_organization: Boolean indicating if workspace is an organization
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid workspace GID provided, malformed data,
+     * @throws ApiException|ValidationException If invalid workspace GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
      */
     public function updateWorkspace(
@@ -249,7 +251,7 @@ class WorkspaceApiService
      * - workspaces: Array of workspace objects the user belongs to
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid workspace GID provided, invalid user data,
+     * @throws ApiException|ValidationException If invalid workspace GID provided, invalid user data,
      *                          insufficient permissions, or network issues occur
      */
     public function addUserToWorkspace(
@@ -306,7 +308,7 @@ class WorkspaceApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal
-     * @throws AsanaApiException If invalid workspace GID provided, invalid user data,
+     * @throws ApiException|ValidationException If invalid workspace GID provided, invalid user data,
      *                          insufficient permissions, or network issues occur
      */
     public function removeUserFromWorkspace(
@@ -329,6 +331,7 @@ class WorkspaceApiService
      * GET /workspaces/{workspace_gid}/users
      * Returns the user records for all users in the specified workspace or organization.
      * API Documentation: https://developers.asana.com/reference/getusersforworkspace
+     *
      * @param string $workspaceGid The unique global ID of the workspace to get users from.
      *                           This identifier can be found in the workspace URL or returned from
      *                           workspace-related API endpoints.
@@ -368,8 +371,10 @@ class WorkspaceApiService
      * - workspaces: Array of workspace objects the user belongs to
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid workspace GID provided, permission errors,
+     * @throws ApiException If invalid workspace GID provided, permission errors,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getUsersInWorkspace(
         string $workspaceGid,
@@ -391,6 +396,7 @@ class WorkspaceApiService
      * GET /workspaces/{workspace_gid}/teams
      * Returns the compact records for all teams in the workspace visible to the authorized user.
      * API Documentation: https://developers.asana.com/reference/getteamsforworkspace
+     *
      * @param string $workspaceGid The unique global ID of the workspace to get teams from.
      *                           This identifier can be found in the workspace URL or returned from
      *                           workspace-related API endpoints.
@@ -430,8 +436,10 @@ class WorkspaceApiService
      * - organization: Object containing organization details
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid workspace GID provided, permission errors,
+     * @throws ApiException If invalid workspace GID provided, permission errors,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getTeamsInWorkspace(
         string $workspaceGid,
@@ -454,6 +462,7 @@ class WorkspaceApiService
      * Returns the compact project records for all projects in the workspace.
      * Returns projects the authenticated user has access to.
      * API Documentation: https://developers.asana.com/reference/getprojectsforworkspace
+     *
      * @param string $workspaceGid The unique global ID of the workspace to get projects from.
      *                           This identifier can be found in the workspace URL or returned from
      *                           workspace-related API endpoints.
@@ -496,8 +505,10 @@ class WorkspaceApiService
      * - current_status: Object containing current project status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid workspace GID provided, permission errors,
+     * @throws ApiException If invalid workspace GID provided, permission errors,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getProjectsInWorkspace(
         string $workspaceGid,
@@ -520,6 +531,7 @@ class WorkspaceApiService
      * Search for tasks within a specific workspace. Results are returned based on the search criteria and
      * permissions of the user making the request.
      * API Documentation: https://developers.asana.com/reference/searchtasksforworkspace
+     *
      * @param string $workspaceGid The unique global ID of the workspace to search in.
      *                             This identifier can be found in the workspace URL or returned from
      *                             workspace-related API endpoints.
@@ -579,8 +591,10 @@ class WorkspaceApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid workspace GID provided, invalid search parameters,
+     * @throws ApiException If invalid workspace GID provided, invalid search parameters,
      *                          permission errors, network issues, or rate limiting occurs
+     * @throws RateLimitException
+     * @throws ValidationException
      */
     public function searchTasksInWorkspace(
         string $workspaceGid,
@@ -606,6 +620,7 @@ class WorkspaceApiService
      * Important note: Currently, access to this API is exclusively available through a service account
      * in an Enterprise+ domain. To get started, see the workspace events guide.
      * API Documentation: https://developers.asana.com/reference/getworkspaceevents
+     *
      * @param string $workspaceGid The unique global ID of the workspace to get events from.
      *                             This identifier can be found in the workspace URL or returned from
      *                             workspace-related API endpoints.
@@ -645,8 +660,10 @@ class WorkspaceApiService
      * - created_at: Timestamp when the event occurred
      * - type: Type of event (e.g., "task", "project", "story")
      *                 Additional sync token for subsequent requests
-     * @throws AsanaApiException If invalid workspace GID provided, permission errors,
+     * @throws ApiException If invalid workspace GID provided, permission errors,
      *                          network issues, or rate limiting occurs
+     * @throws ValidationException
+     * @throws RateLimitException
      */
     public function getWorkspaceEvents(
         string $workspaceGid,

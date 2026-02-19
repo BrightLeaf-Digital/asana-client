@@ -1,7 +1,7 @@
 <?php
 
 use BrightleafDigital\AsanaClient;
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\TokenInvalidException;
 use Dotenv\Dotenv;
 
@@ -39,6 +39,6 @@ try {
     foreach ($workspaces as $workspace) {
         echo '<a href="projects.php?workspace=' . $workspace['gid'] . '">' . $workspace['name'] . '</a><br>';
     }
-} catch (AsanaApiException | TokenInvalidException $e) {
+} catch (ApiException | TokenInvalidException $e) {
     echo 'Error: ' . $e->getMessage();
 }

@@ -2,10 +2,10 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class UserApiService
 {
@@ -82,9 +82,9 @@ class UserApiService
      * - workspaces: Array of workspace objects the user belongs to
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to authentication, validation,
+     * @throws ApiException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
-     * @throws InvalidArgumentException If neither workspace nor team is provided
+     * @throws ValidationException If neither workspace nor team is provided
      */
     public function getUsers(
         ?string $workspace = null,
@@ -93,7 +93,7 @@ class UserApiService
         int $responseType = AsanaApiClient::RESPONSE_DATA
     ): array {
         if (!$workspace && !$team) {
-            throw new InvalidArgumentException('You must provide either a "workspace" or "team".');
+            throw new ValidationException('You must provide either a "workspace" or "team".');
         }
 
         if ($workspace) {
@@ -152,7 +152,7 @@ class UserApiService
      * - teams: Array of team objects the user belongs to
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to authentication, validation,
+     * @throws ApiException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
      */
     public function getUser(
@@ -214,7 +214,7 @@ class UserApiService
      * - name: Name of the favorite resource
      *                 Additional fields as specified in opt_fields and depending on resource type
      *
-     * @throws AsanaApiException If the API request fails due to authentication, validation,
+     * @throws ApiException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
      */
     public function getUserFavorites(
@@ -271,7 +271,7 @@ class UserApiService
      * - workspaces: Array of workspace objects the user belongs to
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to authentication, validation,
+     * @throws ApiException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
      */
     public function getUsersForTeam(
@@ -331,7 +331,7 @@ class UserApiService
      * - workspaces: Array of workspace objects the user belongs to
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to authentication, validation,
+     * @throws ApiException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
      */
     public function getUsersForWorkspace(
@@ -385,7 +385,7 @@ class UserApiService
      * - teams: Array of team objects the current user belongs to
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to authentication, validation,
+     * @throws ApiException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
      */
     public function getCurrentUser(array $options = [], int $responseType = AsanaApiClient::RESPONSE_DATA): array
@@ -440,7 +440,7 @@ class UserApiService
      * - name: Name of the favorite resource
      *                 Additional fields as specified in opt_fields and depending on resource type
      *
-     * @throws AsanaApiException If the API request fails due to authentication, validation,
+     * @throws ApiException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
      */
     public function getCurrentUserFavorites(

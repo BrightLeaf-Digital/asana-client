@@ -2,10 +2,10 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 
 class ProjectApiService
 {
@@ -40,6 +40,7 @@ class ProjectApiService
      * This endpoint provides a way to get multiple projects in a single request according
      * to your search parameters.
      * API Documentation: https://developers.asana.com/reference/getprojects
+     *
      * @param string|null $workspace Filter projects by workspace. Can be workspace ID or null.
      *                               This or $team must have a value.
      *                               Example: "12345"
@@ -89,7 +90,7 @@ class ProjectApiService
      * - current_status: Object containing current project status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException|ValidationException If the API request fails due to:
      *
      * - Invalid parameter values
      * - Insufficient permissions
@@ -104,7 +105,7 @@ class ProjectApiService
     ): array {
         // Ensure one of workspace or team is provided
         if (!$workspace && !$team) {
-            throw new InvalidArgumentException('You must provide either a "workspace" or "team" parameter.');
+            throw new ValidationException('You must provide either a "workspace" or "team" parameter.');
         }
 
         // Add the provided identifier to options
@@ -183,7 +184,7 @@ class ProjectApiService
      * - current_status: Object containing current project status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Missing required fields
      * - Invalid field values
@@ -258,9 +259,9 @@ class ProjectApiService
      * - public: Boolean indicating if project is public
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If the API request fails due to invalid project GID, insufficient permissions,
+     * @throws ApiException If the API request fails due to invalid project GID, insufficient permissions,
      *                          network issues, or rate limiting occurs
-     * @throws InvalidArgumentException If project GID is empty
+     * @throws ValidationException If project GID is empty
      */
     public function getProject(
         string $projectGid,
@@ -338,7 +339,7 @@ class ProjectApiService
      * - public: Updated public status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid project GID provided, malformed data,
+     * @throws ApiException If invalid project GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
      */
     public function updateProject(
@@ -389,7 +390,7 @@ class ProjectApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws AsanaApiException If the API request fails due to:
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid project GID
      * - Insufficient permissions to delete the project
@@ -451,7 +452,7 @@ class ProjectApiService
      * - resource_type: Always "job"
      * - status: Current status of the job ("not_started", "in_progress", "succeeded", "failed")
      * - new_project: Object containing the new project details once duplication is complete
-     * @throws AsanaApiException If the API request fails due to invalid project GID, malformed data,
+     * @throws ApiException If the API request fails due to invalid project GID, malformed data,
      *                          insufficient permissions, network issues, or rate limiting
      */
     public function duplicateProject(
@@ -521,7 +522,7 @@ class ProjectApiService
      * - current_status: Object containing current project status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid task GID provided, permission errors,
+     * @throws ApiException If invalid task GID provided, permission errors,
      *                          network issues, or rate limiting occurs
      */
     public function getProjectsForTask(
@@ -588,7 +589,7 @@ class ProjectApiService
      * - current_status: Object containing current project status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid team GID provided, permission errors,
+     * @throws ApiException If invalid team GID provided, permission errors,
      *                          network issues, or rate limiting occurs
      */
     public function getProjectsForTeam(
@@ -665,7 +666,7 @@ class ProjectApiService
      * - current_status: Object containing current project status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid team GID provided, missing required fields,
+     * @throws ApiException If invalid team GID provided, missing required fields,
      *                          insufficient permissions, or network issues occur
      */
     public function createProjectInTeam(
@@ -736,7 +737,7 @@ class ProjectApiService
      * - current_status: Object containing current project status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid workspace GID provided, permission errors,
+     * @throws ApiException If invalid workspace GID provided, permission errors,
      *                          network issues, or rate limiting occurs
      */
     public function getProjectsForWorkspace(
@@ -811,7 +812,7 @@ class ProjectApiService
      * - current_status: Object containing current project status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid workspace GID provided, missing required fields,
+     * @throws ApiException If invalid workspace GID provided, missing required fields,
      *                          insufficient permissions, or network issues occur
      */
     public function createProjectInWorkspace(
@@ -877,7 +878,7 @@ class ProjectApiService
      * - custom_field: Object containing custom field details
      * - is_important: Boolean indicating if the custom field is important
      * - project: Object containing project details
-     * @throws AsanaApiException If invalid project GID provided, invalid custom field GID,
+     * @throws ApiException If invalid project GID provided, invalid custom field GID,
      *                          insufficient permissions, or network issues occur
      */
     public function addCustomFieldToProject(
@@ -931,7 +932,7 @@ class ProjectApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal
-     * @throws AsanaApiException If invalid project GID provided, invalid custom field GID,
+     * @throws ApiException If invalid project GID provided, invalid custom field GID,
      *                          insufficient permissions, or network issues occur
      */
     public function removeCustomFieldFromProject(
@@ -999,7 +1000,7 @@ class ProjectApiService
      * - project: Object containing project details
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid project GID provided, permission errors,
+     * @throws ApiException If invalid project GID provided, permission errors,
      *                          network issues, or rate limiting occurs
      */
     public function getCustomFieldsForProject(
@@ -1063,7 +1064,7 @@ class ProjectApiService
      * - num_incomplete_milestones: Number of incomplete milestones in the project
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid project GID provided, insufficient permissions,
+     * @throws ApiException If invalid project GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getTaskCountsForProject(
@@ -1122,7 +1123,7 @@ class ProjectApiService
      * - members: Array of member objects including the newly added members
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid project GID provided, invalid user GIDs,
+     * @throws ApiException If invalid project GID provided, invalid user GIDs,
      *                          insufficient permissions, or network issues occur
      */
     public function addMembersToProject(
@@ -1187,7 +1188,7 @@ class ProjectApiService
      * - members: Array of member objects with the specified members removed
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid project GID provided, invalid user GIDs,
+     * @throws ApiException If invalid project GID provided, invalid user GIDs,
      *                          insufficient permissions, or network issues occur
      */
     public function removeMembersFromProject(
@@ -1251,7 +1252,7 @@ class ProjectApiService
      * - followers: Array of follower objects including the newly added followers
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid project GID provided, invalid user GIDs,
+     * @throws ApiException If invalid project GID provided, invalid user GIDs,
      *                          insufficient permissions, or network issues occur
      */
     public function addFollowersToProject(
@@ -1315,7 +1316,7 @@ class ProjectApiService
      * - followers: Array of follower objects with the specified followers removed
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid project GID provided, invalid user GIDs,
+     * @throws ApiException If invalid project GID provided, invalid user GIDs,
      *                          insufficient permissions, or network issues occur
      */
     public function removeFollowersFromProject(
@@ -1388,7 +1389,7 @@ class ProjectApiService
      * - workspace: Object containing workspace details
      *                 Additional fields as specified in opt_fields
      *
-     * @throws AsanaApiException If invalid project GID provided, insufficient permissions,
+     * @throws ApiException If invalid project GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function createProjectTemplateFromProject(

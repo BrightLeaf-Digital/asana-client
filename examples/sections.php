@@ -1,7 +1,7 @@
 <?php
 
 use BrightleafDigital\AsanaClient;
-use BrightleafDigital\Exceptions\AsanaApiException;
+use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\TokenInvalidException;
 use BrightleafDigital\Http\AsanaApiClient;
 use Dotenv\Dotenv;
@@ -36,6 +36,6 @@ try {
     echo '<pre>';
     print_r($sections['body']['data']);
     echo '</pre>';
-} catch (AsanaApiException | TokenInvalidException $e) {
+} catch (ApiException | TokenInvalidException $e) {
     echo 'Error: ' . $e->getMessage();
 }

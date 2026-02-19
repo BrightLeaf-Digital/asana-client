@@ -4,13 +4,14 @@ namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\TeamsApiService;
 use BrightleafDigital\Http\AsanaApiClient;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 use PHPUnit\Framework\MockObject\Exception as MockException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TeamsApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AsanaApiClient&MockObject */
     private $mockClient;
 
     /** @var TeamsApiService */
@@ -101,7 +102,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testCreateTeamThrowsExceptionForMissingName(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for team creation: name');
 
         $this->service->createTeam(['organization' => '12345']);
@@ -112,7 +113,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testCreateTeamThrowsExceptionForMissingOrganization(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for team creation: organization');
 
         $this->service->createTeam(['name' => 'Engineering']);
@@ -123,7 +124,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testCreateTeamThrowsExceptionForMissingBothFields(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for team creation: name, organization');
 
         $this->service->createTeam([]);
@@ -181,7 +182,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testGetTeamThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Team GID must be a non-empty string.');
 
         $this->service->getTeam('');
@@ -192,7 +193,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testGetTeamThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Team GID must be a numeric string.');
 
         $this->service->getTeam('abc');
@@ -269,7 +270,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testUpdateTeamThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Team GID must be a non-empty string.');
 
         $this->service->updateTeam('', ['name' => 'Test']);
@@ -280,7 +281,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testUpdateTeamThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Team GID must be a numeric string.');
 
         $this->service->updateTeam('abc', ['name' => 'Test']);
@@ -327,7 +328,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testGetTeamsForWorkspaceThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Workspace GID must be a non-empty string.');
 
         $this->service->getTeamsForWorkspace('');
@@ -338,7 +339,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testGetTeamsForWorkspaceThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Workspace GID must be a numeric string.');
 
         $this->service->getTeamsForWorkspace('abc');
@@ -414,7 +415,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testGetTeamsForUserThrowsExceptionForEmptyUserGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('User GID must be a non-empty string.');
 
         $this->service->getTeamsForUser('', '67890');
@@ -425,7 +426,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testGetTeamsForUserThrowsExceptionForInvalidUserGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('User GID must be a numeric string, "me", or a valid email address.');
 
         $this->service->getTeamsForUser('abc', '67890');
@@ -484,7 +485,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testGetTeamsForUserThrowsExceptionForEmptyOrgGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Organization GID must be a non-empty string.');
 
         $this->service->getTeamsForUser('12345', '');
@@ -495,7 +496,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testGetTeamsForUserThrowsExceptionForNonNumericOrgGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Organization GID must be a numeric string.');
 
         $this->service->getTeamsForUser('12345', 'abc');
@@ -549,7 +550,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testAddUserToTeamThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Team GID must be a non-empty string.');
 
         $this->service->addUserToTeam('', ['user' => '67890']);
@@ -560,7 +561,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testAddUserToTeamThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Team GID must be a numeric string.');
 
         $this->service->addUserToTeam('abc', ['user' => '67890']);
@@ -571,7 +572,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testAddUserToTeamThrowsExceptionForMissingUser(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for adding user to team: user');
 
         $this->service->addUserToTeam('12345', []);
@@ -627,7 +628,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testRemoveUserFromTeamThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Team GID must be a non-empty string.');
 
         $this->service->removeUserFromTeam('', ['user' => '67890']);
@@ -638,7 +639,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testRemoveUserFromTeamThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Team GID must be a numeric string.');
 
         $this->service->removeUserFromTeam('abc', ['user' => '67890']);
@@ -649,7 +650,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testRemoveUserFromTeamThrowsExceptionForMissingUser(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for removing user from team: user');
 
         $this->service->removeUserFromTeam('12345', []);

@@ -4,13 +4,14 @@ namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\PortfoliosApiService;
 use BrightleafDigital\Http\AsanaApiClient;
-use InvalidArgumentException;
+use BrightleafDigital\Exceptions\ValidationException;
 use PHPUnit\Framework\MockObject\Exception as MockException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class PortfoliosApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AsanaApiClient&MockObject */
     private $mockClient;
 
     /** @var PortfoliosApiService */
@@ -95,7 +96,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testGetPortfoliosThrowsExceptionForEmptyWorkspaceGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Workspace GID must be a non-empty string.');
 
         $this->service->getPortfolios('', '67890');
@@ -106,7 +107,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testGetPortfoliosThrowsExceptionForNonNumericWorkspaceGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Workspace GID must be a numeric string.');
 
         $this->service->getPortfolios('abc', '67890');
@@ -117,7 +118,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testGetPortfoliosThrowsExceptionForEmptyOwnerGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('User GID must be a non-empty string.');
 
         $this->service->getPortfolios('12345', '');
@@ -128,7 +129,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testGetPortfoliosThrowsExceptionForInvalidOwnerGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('User GID must be a numeric string, "me", or a valid email address.');
 
         $this->service->getPortfolios('12345', 'abc');
@@ -258,7 +259,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testCreatePortfolioThrowsExceptionForMissingName(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for portfolio creation: name');
 
         $this->service->createPortfolio(['workspace' => '12345']);
@@ -269,7 +270,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testCreatePortfolioThrowsExceptionForMissingWorkspace(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for portfolio creation: workspace');
 
         $this->service->createPortfolio(['name' => 'Test']);
@@ -280,7 +281,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testCreatePortfolioThrowsExceptionForMissingBothFields(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for portfolio creation: name, workspace');
 
         $this->service->createPortfolio([]);
@@ -338,7 +339,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testGetPortfolioThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
 
         $this->service->getPortfolio('');
@@ -349,7 +350,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testGetPortfolioThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
 
         $this->service->getPortfolio('abc');
@@ -426,7 +427,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testUpdatePortfolioThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
 
         $this->service->updatePortfolio('', ['name' => 'Test']);
@@ -437,7 +438,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testUpdatePortfolioThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
 
         $this->service->updatePortfolio('abc', ['name' => 'Test']);
@@ -478,7 +479,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testDeletePortfolioThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
 
         $this->service->deletePortfolio('');
@@ -489,7 +490,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testDeletePortfolioThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
 
         $this->service->deletePortfolio('abc');
@@ -534,7 +535,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testGetPortfolioItemsThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
 
         $this->service->getPortfolioItems('');
@@ -545,7 +546,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testGetPortfolioItemsThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
 
         $this->service->getPortfolioItems('abc');
@@ -598,7 +599,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testAddItemToPortfolioThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
 
         $this->service->addItemToPortfolio('', ['item' => '67890']);
@@ -609,7 +610,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testAddItemToPortfolioThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
 
         $this->service->addItemToPortfolio('abc', ['item' => '67890']);
@@ -620,7 +621,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testAddItemToPortfolioThrowsExceptionForMissingItem(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for adding item to portfolio: item');
 
         $this->service->addItemToPortfolio('12345', []);
@@ -655,7 +656,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testRemoveItemFromPortfolioThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
 
         $this->service->removeItemFromPortfolio('', ['item' => '67890']);
@@ -666,7 +667,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testRemoveItemFromPortfolioThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
 
         $this->service->removeItemFromPortfolio('abc', ['item' => '67890']);
@@ -677,7 +678,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testRemoveItemFromPortfolioThrowsExceptionForMissingItem(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for removing item from portfolio: item');
 
         $this->service->removeItemFromPortfolio('12345', []);
@@ -737,7 +738,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testAddCustomFieldSettingForPortfolioThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
 
         $this->service->addCustomFieldSettingForPortfolio('', ['custom_field' => '67890']);
@@ -748,7 +749,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testAddCustomFieldSettingForPortfolioThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
 
         $this->service->addCustomFieldSettingForPortfolio('abc', ['custom_field' => '67890']);
@@ -803,7 +804,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testRemoveCustomFieldSettingForPortfolioThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
 
         $this->service->removeCustomFieldSettingForPortfolio('', ['custom_field' => '67890']);
@@ -814,7 +815,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testRemoveCustomFieldSettingForPortfolioThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
 
         $this->service->removeCustomFieldSettingForPortfolio('abc', ['custom_field' => '67890']);
@@ -868,7 +869,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testAddMembersToPortfolioThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
 
         $this->service->addMembersToPortfolio('', ['members' => '67890']);
@@ -879,7 +880,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testAddMembersToPortfolioThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
 
         $this->service->addMembersToPortfolio('abc', ['members' => '67890']);
@@ -890,7 +891,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testAddMembersToPortfolioThrowsExceptionForMissingMembers(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for adding members to portfolio: members');
 
         $this->service->addMembersToPortfolio('12345', []);
@@ -946,7 +947,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testRemoveMembersFromPortfolioThrowsExceptionForEmptyGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
 
         $this->service->removeMembersFromPortfolio('', ['members' => '67890']);
@@ -957,7 +958,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testRemoveMembersFromPortfolioThrowsExceptionForNonNumericGid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
 
         $this->service->removeMembersFromPortfolio('abc', ['members' => '67890']);
@@ -968,7 +969,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testRemoveMembersFromPortfolioThrowsExceptionForMissingMembers(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Missing required field(s) for removing members from portfolio: members');
 
         $this->service->removeMembersFromPortfolio('12345', []);
