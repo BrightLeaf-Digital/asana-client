@@ -4,6 +4,14 @@ This document outlines critical security enhancements needed for the Asana Clien
 
 **Status:** Security audit completed on 2026-02-03
 
+<!-- links:items:start -->
+Links to items:
+- [1. Implement rate limiting handling ✅ COMPLETED](#1-implement-rate-limiting-handling-completed)
+- [2. Add input validation for all public methods ✅ COMPLETED](#2-add-input-validation-for-all-public-methods-completed)
+- [Security Audit Summary (2026-02-03)](#security-audit-summary-2026-02-03)
+<!-- links:items:end -->
+
+
 ## 1. Implement rate limiting handling ✅ COMPLETED
 
 ### Status

@@ -2,6 +2,13 @@
 
 This document outlines documentation enhancements needed for the Asana Client PHP library. Each item includes detailed explanations, code examples, and validation against API specifications.
 
+<!-- links:items:start -->
+Links to items:
+- [1. Create a contributing guide](#1-create-a-contributing-guide)
+- [2. Create changelog and versioning documentation](#2-create-changelog-and-versioning-documentation)
+<!-- links:items:end -->
+
+
 ## 1. Create a contributing guide
 
 ### Problem Statement

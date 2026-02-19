@@ -2,6 +2,15 @@
 
 This document outlines build and deployment enhancements needed for the Asana Client PHP library. Each item includes detailed explanations, code examples, and validation against API specifications.
 
+<!-- links:items:start -->
+Links to items:
+- [1. Implement Continuous Integration](#1-implement-continuous-integration)
+- [2. Add Composer scripts for common tasks](#2-add-composer-scripts-for-common-tasks)
+- [3. Implement semantic versioning](#3-implement-semantic-versioning)
+- [4. Implement automated release process](#4-implement-automated-release-process)
+<!-- links:items:end -->
+
+
 ## 1. Implement Continuous Integration
 
 ### Problem Statement

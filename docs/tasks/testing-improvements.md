@@ -2,6 +2,13 @@
 
 This document outlines testing enhancements needed for the Asana Client PHP library. Each item includes detailed explanations, code examples, and validation against API specifications.
 
+<!-- links:items:start -->
+Links to items:
+- [1. Maintain and expand unit test coverage](#1-maintain-and-expand-unit-test-coverage)
+- [2. Add integration tests](#2-add-integration-tests)
+<!-- links:items:end -->
+
+
 ## 1. Maintain and expand unit test coverage
 
 ### Problem Statement

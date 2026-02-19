@@ -2,6 +2,15 @@
 
 This document outlines architectural enhancements needed for the Asana Client PHP library. Each item includes detailed explanations, code examples, and validation against API specifications.
 
+<!-- links:items:start -->
+Links to items:
+- [1. Refactor API service classes to reduce duplication](#1-refactor-api-service-classes-to-reduce-duplication)
+- [2. Implement interfaces for all major components](#2-implement-interfaces-for-all-major-components)
+- [3. Separate configuration from implementation](#3-separate-configuration-from-implementation)
+- [4. Implement proper service container/dependency injection](#4-implement-proper-service-containerdependency-injection)
+<!-- links:items:end -->
+
+
 ## 1. Refactor API service classes to reduce duplication
 
 ### Problem Statement
