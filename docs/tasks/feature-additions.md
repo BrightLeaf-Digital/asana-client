@@ -1,14 +1,16 @@
-# Feature Additions
+ # Feature Additions
+ 
+ [← Back to Roadmap](roadmap.md)
 
 This document outlines feature enhancements needed for the Asana Client PHP library. Each item includes detailed explanations, code examples, and validation against API specifications.
 
 <!-- links:items:start -->
-Links to items:
-- [1. Complete Webhook support](#1-complete-webhook-support)
-- [2. Implement cursor-based pagination helpers](#2-implement-cursor-based-pagination-helpers)
-- [3. Create model classes for Asana resources](#3-create-model-classes-for-asana-resources)
-- [4. Add event subscription management](#4-add-event-subscription-management)
-- [6. Support full API coverage](#6-support-full-api-coverage)
+ Links to items:
+ - [1. Complete Webhook support](#1-complete-webhook-support) (Roadmap Item 9)
+ - [2. Implement cursor-based pagination helpers](#2-implement-cursor-based-pagination-helpers) (Roadmap Item 14)
+ - [3. Create model classes for Asana resources](#3-create-model-classes-for-asana-resources) (Roadmap Item 22)
+ - [4. Add event subscription management](#4-add-event-subscription-management) (Roadmap Item 23)
+ - [6. Support full API coverage](#6-support-full-api-coverage) (Roadmap Item 12)
 <!-- links:items:end -->
 
 

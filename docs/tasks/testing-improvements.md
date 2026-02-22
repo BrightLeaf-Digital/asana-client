@@ -1,140 +1,15 @@
-# Testing Improvements
+ # Testing Improvements
+ 
+ [← Back to Roadmap](roadmap.md)
 
 This document outlines testing enhancements needed for the Asana Client PHP library. Each item includes detailed explanations, code examples, and validation against API specifications.
 
 <!-- links:items:start -->
-Links to items:
-- [1. Maintain and expand unit test coverage](#1-maintain-and-expand-unit-test-coverage)
-- [2. Add integration tests](#2-add-integration-tests)
+ Links to items:
+ - [1. Add integration tests](#1-add-integration-tests) (Roadmap Item 25)
 <!-- links:items:end -->
 
-
-## 1. Maintain and expand unit test coverage
-
-### Problem Statement
-While the current unit test coverage is high (650+ tests), it is essential to maintain this level of coverage as new features (like Model classes or Pagination helpers) are added. 
-
-### Implementation Status: Completed for existing services
-Comprehensive unit tests now exist for all implemented API service classes (Task, Project, Workspace, etc.), utilizing mocks to simulate API responses.
-
-### Code Examples
-
-#### Current Implementation:
-```php
-// In tests/AsanaClientTest.php
-class AsanaClientTest extends TestCase
-{
-    public function testWithAccessToken()
-    {
-        $client = AsanaClient::withAccessToken('client_id', 'client_secret', 'token_data');
-        $this->assertInstanceOf(AsanaClient::class, $client);
-    }
-
-    public function testWithPAT()
-    {
-        $client = AsanaClient::withPAT('personal_access_token');
-        $this->assertInstanceOf(AsanaClient::class, $client);
-    }
-
-    // Other AsanaClient tests...
-}
-
-// Missing tests for API service classes
-```
-
-#### Expected Implementation:
-```php
-// In tests/Api/TaskApiServiceTest.php
-class TaskApiServiceTest extends TestCase
-{
-    private $mockClient;
-    private $taskService;
-
-    protected function setUp(): void
-    {
-        $this->mockClient = $this->createMock(ApiClient::class);
-        $this->taskService = new TaskApiService($this->mockClient);
-    }
-
-    public function testGetTasks()
-    {
-        $expectedResponse = [
-            'data' => [
-                ['gid' => '12345', 'name' => 'Test Task 1'],
-                ['gid' => '67890', 'name' => 'Test Task 2']
-            ]
-        ];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with('GET', 'tasks', ['query' => ['workspace' => '1234']])
-            ->willReturn($expectedResponse);
-
-        $result = $this->taskService->getTasks(['workspace' => '1234']);
-        $this->assertEquals($expectedResponse, $result);
-    }
-
-    public function testGetTask()
-    {
-        $taskId = '12345';
-        $expectedResponse = [
-            'data' => ['gid' => $taskId, 'name' => 'Test Task']
-        ];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with('GET', "tasks/{$taskId}", ['query' => []])
-            ->willReturn($expectedResponse);
-
-        $result = $this->taskService->getTask($taskId);
-        $this->assertEquals($expectedResponse, $result);
-    }
-
-    public function testCreateTask()
-    {
-        $taskData = ['name' => 'New Task', 'notes' => 'Task notes'];
-        $expectedResponse = [
-            'data' => ['gid' => '12345', 'name' => 'New Task', 'notes' => 'Task notes']
-        ];
-
-        $this->mockClient->expects($this->once())
-            ->method('request')
-            ->with('POST', 'tasks', ['json' => ['data' => $taskData]])
-            ->willReturn($expectedResponse);
-
-        $result = $this->taskService->createTask($taskData);
-        $this->assertEquals($expectedResponse, $result);
-    }
-
-    // Additional tests for other methods...
-}
-
-// Similar test classes for other API services
-```
-
-### File References
-- `tests/AsanaClientTest.php`: Existing tests for the main client
-- `tests/Api/TaskApiServiceTest.php`: New tests for TaskApiService
-- `tests/Api/ProjectApiServiceTest.php`: New tests for ProjectApiService
-- `tests/Api/WorkspaceApiServiceTest.php`: New tests for WorkspaceApiService
-
-### API Spec Validation
-Tests should validate that the client correctly implements the API specification. This includes verifying that:
-1. Endpoints are correctly formatted
-2. Request parameters match the API specification
-3. Response handling correctly processes the API's response format
-
-### Critical Evaluation
-- **Actual Impact**: High - Lack of test coverage increases the risk of undetected bugs and regressions
-- **Priority Level**: High - Should be addressed early to ensure reliability
-- **Implementation Status**: High - 654 unit tests exist covering all major API services.
-- **Spec Compliance**: Partial - Current tests don't verify compliance with the API specification
-- **Difficulty/Complexity**: Medium - Requires understanding of existing codebase and testing patterns, but follows established practices
-
-### Recommended Action
-Create comprehensive unit tests for all API service classes using mocks to simulate API responses. Ensure tests cover all public methods and edge cases.
-
-## 2. Add integration tests
+## 1. Add integration tests
 
 ### Problem Statement
 The library lacks integration tests that verify its behavior against the actual Asana API. This means that while individual components might work correctly in isolation, there's no guarantee they work correctly together or with the real API.

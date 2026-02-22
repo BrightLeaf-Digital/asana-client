@@ -20,34 +20,34 @@ This document provides a comprehensive analysis of all improvement tasks for the
 ~~7. **Refactor error handling to be more consistent** (Code Architecture) — Completed~~
 
 ### Phase 2: Core Architecture (High Priority - Short Term)
-8. **Refactor API service classes to reduce duplication** (Code Architecture)
+8. **[Refactor API service classes to reduce duplication](code-architecture-improvements.md#1-refactor-api-service-classes-to-reduce-duplication)** (Code Architecture)
    - Impact: High | Difficulty: Medium
    - **Prerequisite**: Must be completed before adding new API services to ensure maintainability.
    - Enables easier maintenance and consistent patterns
 
-9. **Complete Webhook support** (Features)
+9. **[Complete Webhook support](feature-additions.md#1-complete-webhook-support)** (Features)
    - Impact: High | Difficulty: Medium
    - Note: Security/HMAC verification and signature validation are required for production readiness.
 
-10. **Expand API coverage** (Features)
+10. **[Implement interfaces for all major components](code-architecture-improvements.md#2-implement-interfaces-for-all-major-components)** (Code Architecture)
+    - Impact: Medium | Difficulty: High
+    - Enables dependency injection and better testing
+
+11. **[Implement proper service container/dependency injection](code-architecture-improvements.md#4-implement-proper-service-containerdependency-injection)** (Code Architecture)
+    - Impact: Medium | Difficulty: High
+    - Improves flexibility and testability
+
+12. **[Expand API coverage](feature-additions.md#6-support-full-api-coverage)** (Features)
     - Impact: High | Difficulty: High
     - Note: Priority 1: **Stories (Comments)**. Priority 2: **Memberships**.
     - 19 services currently implemented; 23 resource groups still missing.
 
-11. **Implement interfaces for all major components** (Code Architecture)
-    - Impact: Medium | Difficulty: High
-    - Enables dependency injection and better testing
-
-12. **Implement proper service container/dependency injection** (Code Architecture)
-    - Impact: Medium | Difficulty: High
-    - Improves flexibility and testability
-
 ### Phase 3: Enhanced Functionality (Medium Priority - Medium Term)
-13. **Implement request batching helpers** (Performance)
+13. **[Implement request batching helpers](performance-improvements.md#1-implement-request-batching)** (Performance)
    - Impact: High | Difficulty: High
    - Note: Batch API service now available; high-level helper methods/patterns still needed
 
-14. **Implement cursor-based pagination helpers** (Features)
+14. **[Implement cursor-based pagination helpers](feature-additions.md#2-implement-cursor-based-pagination-helpers)** (Features)
    - Impact: Medium | Difficulty: Medium
    - Improves handling of large datasets
 
@@ -60,36 +60,32 @@ This document provides a comprehensive analysis of all improvement tasks for the
 ~~17. **Create changelog and versioning documentation** (Documentation) — Completed~~
     ~~- CHANGELOG.md exists in repository root~~
 
-18. **Separate configuration from implementation** (Code Architecture)
+18. **[Separate configuration from implementation](code-architecture-improvements.md#3-separate-configuration-from-implementation)** (Code Architecture)
    - Impact: Medium | Difficulty: Medium
    - Improves flexibility and customization
 
 ### Phase 5: Advanced Features (Lower Priority - Long Term)
-19. **Optimize HTTP client configuration** (Performance)
+19. **[Optimize HTTP client configuration](performance-improvements.md#2-optimize-http-client-configuration)** (Performance)
     - Impact: Medium | Difficulty: Medium
     - Performance optimization for high-load scenarios
 
-20. **Implement semantic versioning** (Build & Deployment)
-    - Impact: Medium | Difficulty: Low
-    - Improves user experience with version management
+~~20. **Implement semantic versioning** (Build & Deployment)~~
 
-21. **Implement automated release process** (Build & Deployment)
-    - Impact: Medium | Difficulty: Medium
-    - Streamlines release management
+~~21. **Implement automated release process** (Build & Deployment)~~
 
-22. **Create model classes for Asana resources** (Features)
+22. **[Create model classes for Asana resources](feature-additions.md#3-create-model-classes-for-asana-resources)** (Features)
     - Impact: Medium | Difficulty: High
     - Improves type safety and developer experience
 
-23. **Add event subscription management** (Features)
+23. **[Add event subscription management](feature-additions.md#4-add-event-subscription-management)** (Features)
     - Impact: Medium | Difficulty: High
     - Advanced real-time functionality
 
-24. **Implement asynchronous requests** (Performance)
+24. **[Implement asynchronous requests](performance-improvements.md#3-implement-asynchronous-requests)** (Performance)
     - Impact: Medium | Difficulty: High
     - Advanced performance optimization
 
-25. **Add integration tests** (Testing)
+25. **[Add integration tests](testing-improvements.md#1-add-integration-tests)** (Testing)
     - Impact: High | Difficulty: High
     - **Feasibility Assessment Required**: Sandbox accounts are not automatically available and have a 1-year duration limitation.
     - Status: Deferred until after core services expansion is complete.

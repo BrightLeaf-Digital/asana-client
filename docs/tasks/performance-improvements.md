@@ -1,12 +1,14 @@
-# Performance Improvements
+ # Performance Improvements
+ 
+ [← Back to Roadmap](roadmap.md)
 
 This document outlines performance enhancements needed for the Asana Client PHP library. Each item includes detailed explanations, code examples, and validation against API specifications.
 
 <!-- links:items:start -->
-Links to items:
-- [1. Implement request batching](#1-implement-request-batching)
-- [2. Optimize HTTP client configuration](#2-optimize-http-client-configuration)
-- [3. Implement asynchronous requests](#3-implement-asynchronous-requests)
+ Links to items:
+ - [1. Implement request batching](#1-implement-request-batching) (Roadmap Item 13)
+ - [2. Optimize HTTP client configuration](#2-optimize-http-client-configuration) (Roadmap Item 19)
+ - [3. Implement asynchronous requests](#3-implement-asynchronous-requests) (Roadmap Item 24)
 <!-- links:items:end -->
 
 
