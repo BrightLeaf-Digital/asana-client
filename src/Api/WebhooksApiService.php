@@ -343,4 +343,69 @@ class WebhooksApiService extends BaseApiService
 
         return $this->deleteResource('webhooks', $webhookGid, $responseType);
     }
+
+    /**
+     * Verify a webhook request from Asana.
+     *
+     * Asana sends an X-Hook-Signature header with each webhook request.
+     * This method verifies that the signature is valid.
+     *
+     * @param string $requestBody The raw request body
+     * @param string $signature The X-Hook-Signature header value
+     * @param string $secret The webhook secret
+     *
+     * @return bool True if the signature is valid, false otherwise
+     */
+    public function verifyWebhookRequest(string $requestBody, string $signature, string $secret): bool
+    {
+        $calculatedSignature = hash_hmac('sha256', $requestBody, $secret);
+        return hash_equals($calculatedSignature, $signature);
+    }
+
+    /**
+     * Handle a webhook event.
+     *
+     * Processes a webhook event from Asana, verifying the signature and
+     * returning the parsed event data.
+     *
+     * @param string $requestBody The raw request body
+     * @param string $signature The X-Hook-Signature header value
+     * @param string $secret The webhook secret
+     *
+     * @return array|null The parsed event data, or null if the signature is invalid
+     */
+    public function handleWebhookEvent(string $requestBody, string $signature, string $secret): ?array
+    {
+        if (!$this->verifyWebhookRequest($requestBody, $signature, $secret)) {
+            return null;
+        }
+
+        return json_decode($requestBody, true);
+    }
+
+    /**
+     * Check if a request is a webhook handshake request.
+     *
+     * Asana sends an X-Hook-Secret header during a handshake request.
+     *
+     * @param array $headers The request headers
+     * @return bool True if it's a handshake request
+     */
+    public function isHandshakeRequest(array $headers): bool
+    {
+        $normalizedHeaders = array_change_key_case($headers, CASE_LOWER);
+        return isset($normalizedHeaders['x-hook-secret']);
+    }
+
+    /**
+     * Get the handshake secret from headers.
+     *
+     * @param array $headers The request headers
+     * @return string|null The secret or null if not found
+     */
+    public function getHandshakeSecret(array $headers): ?string
+    {
+        $normalizedHeaders = array_change_key_case($headers);
+        return $normalizedHeaders['x-hook-secret'] ?? null;
+    }
 }

@@ -427,4 +427,91 @@ class WebhooksApiServiceTest extends TestCase
 
         $this->service->deleteWebhook('abc');
     }
+
+    /**
+     * Test verifyWebhookRequest with valid signature.
+     */
+    public function testVerifyWebhookRequestValid(): void
+    {
+        $requestBody = '{"events":[{"action":"changed","resource":{"gid":"123","resource_type":"task"}}]}';
+        $secret = 'test_secret';
+        $signature = hash_hmac('sha256', $requestBody, $secret);
+
+        $result = $this->service->verifyWebhookRequest($requestBody, $signature, $secret);
+
+        $this->assertTrue($result);
+    }
+
+    /**
+     * Test verifyWebhookRequest with invalid signature.
+     */
+    public function testVerifyWebhookRequestInvalid(): void
+    {
+        $requestBody = '{"events":[]}';
+        $secret = 'test_secret';
+        $signature = 'invalid_signature';
+
+        $result = $this->service->verifyWebhookRequest($requestBody, $signature, $secret);
+
+        $this->assertFalse($result);
+    }
+
+    /**
+     * Test handleWebhookEvent with valid signature.
+     */
+    public function testHandleWebhookEventValid(): void
+    {
+        $eventData = ['events' => [['action' => 'changed', 'resource' => ['gid' => '123', 'resource_type' => 'task']]]];
+        $requestBody = json_encode($eventData);
+        $secret = 'test_secret';
+        $signature = hash_hmac('sha256', $requestBody, $secret);
+
+        $result = $this->service->handleWebhookEvent($requestBody, $signature, $secret);
+
+        $this->assertSame($eventData, $result);
+    }
+
+    /**
+     * Test handleWebhookEvent with invalid signature.
+     */
+    public function testHandleWebhookEventInvalid(): void
+    {
+        $requestBody = '{"events":[]}';
+        $secret = 'test_secret';
+        $signature = 'invalid_signature';
+
+        $result = $this->service->handleWebhookEvent($requestBody, $signature, $secret);
+
+        $this->assertNull($result);
+    }
+
+    /**
+     * Test isHandshakeRequest.
+     */
+    public function testIsHandshakeRequest(): void
+    {
+        $headers = ['X-Hook-Secret' => 'some_secret'];
+        $this->assertTrue($this->service->isHandshakeRequest($headers));
+
+        $headersLower = ['x-hook-secret' => 'some_secret'];
+        $this->assertTrue($this->service->isHandshakeRequest($headersLower));
+
+        $noHeaders = ['Content-Type' => 'application/json'];
+        $this->assertFalse($this->service->isHandshakeRequest($noHeaders));
+    }
+
+    /**
+     * Test getHandshakeSecret.
+     */
+    public function testGetHandshakeSecret(): void
+    {
+        $headers = ['X-Hook-Secret' => 'some_secret'];
+        $this->assertSame('some_secret', $this->service->getHandshakeSecret($headers));
+
+        $headersLower = ['x-hook-secret' => 'another_secret'];
+        $this->assertSame('another_secret', $this->service->getHandshakeSecret($headersLower));
+
+        $noHeaders = ['Content-Type' => 'application/json'];
+        $this->assertNull($this->service->getHandshakeSecret($noHeaders));
+    }
 }
