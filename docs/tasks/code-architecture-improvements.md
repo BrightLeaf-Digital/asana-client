@@ -6,141 +6,12 @@ This document outlines architectural enhancements needed for the Asana Client PH
 
 <!-- links:items:start -->
  Links to items:
- - [1. Refactor API service classes to reduce duplication](#1-refactor-api-service-classes-to-reduce-duplication) (Roadmap Item 8)
- - [2. Implement interfaces for all major components](#2-implement-interfaces-for-all-major-components) (Roadmap Item 10)
- - [3. Separate configuration from implementation](#3-separate-configuration-from-implementation) (Roadmap Item 18)
- - [4. Implement proper service container/dependency injection](#4-implement-proper-service-containerdependency-injection) (Roadmap Item 11)
+ - [2. Implement interfaces for all major components](#1-implement-interfaces-for-all-major-components) (Roadmap Item 10)
+ - [3. Separate configuration from implementation](#2-separate-configuration-from-implementation) (Roadmap Item 18)
+ - [4. Implement proper service container/dependency injection](#3-implement-proper-service-containerdependency-injection) (Roadmap Item 11)
 <!-- links:items:end -->
 
-
-## 1. Refactor API service classes to reduce duplication
-
-### Problem Statement
-The current API service classes contain significant code duplication, particularly in request handling and response processing. This makes maintenance difficult and increases the likelihood of inconsistencies.
-
-### Code Examples
-
-#### Current Implementation:
-```php
-// In Api/TaskApiService.php
-public function getTasks($options = [])
-{
-    return $this->client->request('GET', 'tasks', ['query' => $options]);
-}
-
-public function getTask($taskId, $options = [])
-{
-    return $this->client->request('GET', "tasks/{$taskId}", ['query' => $options]);
-}
-
-// In Api/ProjectApiService.php
-public function getProjects($options = [])
-{
-    return $this->client->request('GET', 'projects', ['query' => $options]);
-}
-
-public function getProject($projectId, $options = [])
-{
-    return $this->client->request('GET', "projects/{$projectId}", ['query' => $options]);
-}
-```
-
-#### Expected Implementation:
-```php
-// In Api/BaseApiService.php
-abstract class BaseApiService
-{
-    protected $client;
-    protected $resourceName;
-    
-    public function __construct($client)
-    {
-        $this->client = $client;
-    }
-    
-    protected function getAll($options = [])
-    {
-        return $this->client->request('GET', $this->resourceName, ['query' => $options]);
-    }
-    
-    protected function getById($id, $options = [])
-    {
-        return $this->client->request('GET', "{$this->resourceName}/{$id}", ['query' => $options]);
-    }
-    
-    protected function create($data)
-    {
-        return $this->client->request('POST', $this->resourceName, ['json' => ['data' => $data]]);
-    }
-    
-    protected function update($id, $data)
-    {
-        return $this->client->request('PUT', "{$this->resourceName}/{$id}", ['json' => ['data' => $data]]);
-    }
-    
-    protected function delete($id)
-    {
-        return $this->client->request('DELETE', "{$this->resourceName}/{$id}");
-    }
-}
-
-// In Api/TaskApiService.php
-class TaskApiService extends BaseApiService
-{
-    protected $resourceName = 'tasks';
-    
-    public function getTasks($options = [])
-    {
-        return $this->getAll($options);
-    }
-    
-    public function getTask($taskId, $options = [])
-    {
-        return $this->getById($taskId, $options);
-    }
-    
-    // Task-specific methods here
-}
-
-// In Api/ProjectApiService.php
-class ProjectApiService extends BaseApiService
-{
-    protected $resourceName = 'projects';
-    
-    public function getProjects($options = [])
-    {
-        return $this->getAll($options);
-    }
-    
-    public function getProject($projectId, $options = [])
-    {
-        return $this->getById($projectId, $options);
-    }
-    
-    // Project-specific methods here
-}
-```
-
-### File References
-- `src/Api/TaskApiService.php`: Contains task-related API methods
-- `src/Api/ProjectApiService.php`: Contains project-related API methods
-- `src/Api/WorkspaceApiService.php`: Contains workspace-related API methods
-- `src/Api/UserApiService.php`: Contains user-related API methods
-
-### API Spec Validation
-The Asana API follows RESTful principles with consistent patterns for resource operations. A base service class would align well with this structure while maintaining compliance with the API specification.
-
-### Critical Evaluation
-- **Actual Impact**: Medium - Code duplication increases maintenance burden and risk of inconsistencies
-- **Priority Level**: High - Should be addressed early in the refactoring process
-- **Implementation Status**: Not implemented - Current code has significant duplication
-- **Spec Compliance**: N/A - This is a client-side architecture concern, not an API specification issue
-- **Difficulty/Complexity**: Medium - Requires refactoring existing API service classes and creating base abstractions, but follows established inheritance patterns
-
-### Recommended Action
-Create a BaseApiService class that implements common CRUD operations and have specific API service classes extend it. This will reduce duplication and ensure consistent behavior across all API services.
-
-## 2. Implement interfaces for all major components
+## 1. Implement interfaces for all major components
 
 ### Problem Statement
 The current codebase lacks interfaces for major components, making it difficult to implement alternative implementations or mock components for testing.
@@ -243,7 +114,7 @@ This is a client-side architecture concern and doesn't directly relate to API sp
 ### Recommended Action
 Define interfaces for all major components (HTTP client, authentication handlers, API services) and update implementations to use these interfaces. This will improve testability and flexibility.
 
-## 3. Separate configuration from implementation
+## 2. Separate configuration from implementation
 
 ### Problem Statement
 Configuration options are currently hardcoded or tightly coupled with implementation classes, making it difficult to customize behavior without modifying code.
@@ -351,7 +222,7 @@ This is a client-side architecture concern and doesn't directly relate to API sp
 ### Recommended Action
 Create a dedicated configuration class that encapsulates all configurable options. Update all components to use this configuration class instead of hardcoded values.
 
-## 4. Implement proper service container/dependency injection
+## 3. Implement proper service container/dependency injection
 
 ### Problem Statement
 The current code manually instantiates dependencies, making it difficult to replace components or inject mock objects for testing.

@@ -4,32 +4,10 @@ namespace BrightleafDigital\Api;
 
 use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Http\AsanaApiClient;
-use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
-class ProjectTemplatesApiService
+class ProjectTemplatesApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * An HTTP client instance configured to interact with the Asana API.
-     * This property stores an instance of AsanaApiClient which handles all HTTP communication
-     * with the Asana API endpoints. It provides authenticated access to API resources and
-     * manages request/response handling.
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor for initializing the service with an Asana API client.
-     * Sets up the service instance using the provided Asana API client.
-     * @param AsanaApiClient $client The Asana API client instance used to interact with the Asana API.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Get a project template
      * GET /project_templates/{project_template_gid}
@@ -72,7 +50,7 @@ class ProjectTemplatesApiService
      * - public: Whether the template is public
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid GID provided, insufficient permissions,
+     * @throws ApiException|ValidationException If invalid GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getProjectTemplate(
@@ -82,12 +60,7 @@ class ProjectTemplatesApiService
     ): array {
         $this->validateGid($projectTemplateGid, 'Project Template GID');
 
-        return $this->client->request(
-            'GET',
-            "project_templates/$projectTemplateGid",
-            ['query' => $options],
-            $responseType
-        );
+        return $this->getResource('project_templates', $projectTemplateGid, $options, $responseType);
     }
 
     /**
@@ -119,7 +92,7 @@ class ProjectTemplatesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws ApiException If the API request fails due to:
+     * @throws ApiException|ValidationException If the API request fails due to:
      *
      * - Invalid project template GID
      * - Template not found
@@ -133,12 +106,7 @@ class ProjectTemplatesApiService
     ): array {
         $this->validateGid($projectTemplateGid, 'Project Template GID');
 
-        return $this->client->request(
-            'DELETE',
-            "project_templates/$projectTemplateGid",
-            [],
-            $responseType
-        );
+        return $this->deleteResource('project_templates', $projectTemplateGid, $responseType);
     }
 
     /**
@@ -187,12 +155,7 @@ class ProjectTemplatesApiService
         array $options = [],
         int $responseType = AsanaApiClient::RESPONSE_DATA
     ): array {
-        return $this->client->request(
-            'GET',
-            'project_templates',
-            ['query' => $options],
-            $responseType
-        );
+        return $this->getResources('project_templates', $options, $responseType);
     }
 
     /**

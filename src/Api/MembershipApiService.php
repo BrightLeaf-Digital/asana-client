@@ -5,32 +5,10 @@ namespace BrightleafDigital\Api;
 use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
-use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
-class MembershipApiService
+class MembershipApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * An HTTP client instance configured to interact with the Asana API.
-     * This property stores an instance of AsanaApiClient which handles all HTTP communication
-     * with the Asana API endpoints. It provides authenticated access to API resources and
-     * manages request/response handling.
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor for initializing the service with an Asana API client.
-     * Sets up the service instance using the provided Asana API client.
-     * @param AsanaApiClient $client The Asana API client instance used to interact with the Asana API.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Get multiple memberships
      * GET /memberships
@@ -93,7 +71,7 @@ class MembershipApiService
      */
     public function getMemberships(array $options = [], int $responseType = AsanaApiClient::RESPONSE_DATA): array
     {
-        return $this->client->request('GET', 'memberships', ['query' => $options], $responseType);
+        return $this->getResources('memberships', $options, $responseType);
     }
 
     /**
@@ -162,12 +140,7 @@ class MembershipApiService
         array $options = [],
         int $responseType = AsanaApiClient::RESPONSE_DATA
     ): array {
-        return $this->client->request(
-            'POST',
-            'memberships',
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->createResource('memberships', $data, $options, $responseType);
     }
 
     /**
@@ -225,7 +198,7 @@ class MembershipApiService
     ): array {
         $this->validateGid($membershipGid, 'Membership GID');
 
-        return $this->client->request('GET', "memberships/$membershipGid", ['query' => $options], $responseType);
+        return $this->getResource('memberships', $membershipGid, $options, $responseType);
     }
 
     /**
@@ -293,12 +266,7 @@ class MembershipApiService
     ): array {
         $this->validateGid($membershipGid, 'Membership GID');
 
-        return $this->client->request(
-            'PUT',
-            "memberships/$membershipGid",
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->updateResource('memberships', $membershipGid, $data, $options, $responseType);
     }
 
     /**
@@ -346,6 +314,6 @@ class MembershipApiService
     {
         $this->validateGid($membershipGid, 'Membership GID');
 
-        return $this->client->request('DELETE', "memberships/$membershipGid", [], $responseType);
+        return $this->deleteResource('memberships', $membershipGid, $responseType);
     }
 }

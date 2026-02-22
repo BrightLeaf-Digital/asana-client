@@ -8,29 +8,8 @@ use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
-class UserTaskListsApiService
+class UserTaskListsApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * An HTTP client instance configured to interact with the Asana API.
-     * This property stores an instance of AsanaApiClient which handles all HTTP communication
-     * with the Asana API endpoints. It provides authenticated access to API resources and
-     * manages request/response handling.
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor for initializing the service with an Asana API client.
-     * Sets up the service instance using the provided Asana API client.
-     * @param AsanaApiClient $client The Asana API client instance used to interact with the Asana API.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Get a user task list
      * GET /user_task_lists/{user_task_list_gid}
@@ -84,12 +63,7 @@ class UserTaskListsApiService
     ): array {
         $this->validateGid($userTaskListGid, 'User Task List GID');
 
-        return $this->client->request(
-            'GET',
-            "user_task_lists/$userTaskListGid",
-            ['query' => $options],
-            $responseType
-        );
+        return $this->getResource('user_task_lists', $userTaskListGid, $options, $responseType);
     }
 
     /**

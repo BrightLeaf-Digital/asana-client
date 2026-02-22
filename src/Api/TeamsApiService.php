@@ -8,29 +8,8 @@ use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
-class TeamsApiService
+class TeamsApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * An HTTP client instance configured to interact with the Asana API.
-     * This property stores an instance of AsanaApiClient which handles all HTTP communication
-     * with the Asana API endpoints. It provides authenticated access to API resources and
-     * manages request/response handling.
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor for initializing the service with an Asana API client.
-     * Sets up the service instance using the provided Asana API client.
-     * @param AsanaApiClient $client The Asana API client instance used to interact with the Asana API.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Create a team
      * POST /teams
@@ -94,12 +73,7 @@ class TeamsApiService
     ): array {
         $this->validateRequiredFields($data, ['name', 'organization'], 'team creation');
 
-        return $this->client->request(
-            'POST',
-            'teams',
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->createResource('teams', $data, $options, $responseType);
     }
 
     /**
@@ -159,7 +133,7 @@ class TeamsApiService
     ): array {
         $this->validateGid($teamGid, 'Team GID');
 
-        return $this->client->request('GET', "teams/$teamGid", ['query' => $options], $responseType);
+        return $this->getResource('teams', $teamGid, $options, $responseType);
     }
 
     /**

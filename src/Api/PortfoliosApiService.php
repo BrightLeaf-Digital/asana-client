@@ -5,32 +5,10 @@ namespace BrightleafDigital\Api;
 use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
-use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
-class PortfoliosApiService
+class PortfoliosApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * An HTTP client instance configured to interact with the Asana API.
-     * This property stores an instance of AsanaApiClient which handles all HTTP communication
-     * with the Asana API endpoints. It provides authenticated access to API resources and
-     * manages request/response handling.
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor for initializing the service with an Asana API client.
-     * Sets up the service instance using the provided Asana API client.
-     * @param AsanaApiClient $client The Asana API client instance used to interact with the Asana API.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Get multiple portfolios
      * GET /portfolios
@@ -97,7 +75,7 @@ class PortfoliosApiService
         $options['workspace'] = $workspaceGid;
         $options['owner'] = $ownerGid;
 
-        return $this->client->request('GET', 'portfolios', ['query' => $options], $responseType);
+        return $this->getResources('portfolios', $options, $responseType);
     }
 
     /**
@@ -154,12 +132,7 @@ class PortfoliosApiService
     ): array {
         $this->validateRequiredFields($data, ['name', 'workspace'], 'portfolio creation');
 
-        return $this->client->request(
-            'POST',
-            'portfolios',
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->createResource('portfolios', $data, $options, $responseType);
     }
 
     /**
@@ -221,7 +194,7 @@ class PortfoliosApiService
     ): array {
         $this->validateGid($portfolioGid, 'Portfolio GID');
 
-        return $this->client->request('GET', "portfolios/$portfolioGid", ['query' => $options], $responseType);
+        return $this->getResource('portfolios', $portfolioGid, $options, $responseType);
     }
 
     /**
@@ -278,12 +251,7 @@ class PortfoliosApiService
     ): array {
         $this->validateGid($portfolioGid, 'Portfolio GID');
 
-        return $this->client->request(
-            'PUT',
-            "portfolios/$portfolioGid",
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->updateResource('portfolios', $portfolioGid, $data, $options, $responseType);
     }
 
     /**
@@ -330,7 +298,7 @@ class PortfoliosApiService
     {
         $this->validateGid($portfolioGid, 'Portfolio GID');
 
-        return $this->client->request('DELETE', "portfolios/$portfolioGid", [], $responseType);
+        return $this->deleteResource('portfolios', $portfolioGid, $responseType);
     }
 
     /**

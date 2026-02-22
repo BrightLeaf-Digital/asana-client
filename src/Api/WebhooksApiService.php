@@ -8,29 +8,8 @@ use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
-class WebhooksApiService
+class WebhooksApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * An HTTP client instance configured to interact with the Asana API.
-     * This property stores an instance of AsanaApiClient which handles all HTTP communication
-     * with the Asana API endpoints. It provides authenticated access to API resources and
-     * manages request/response handling.
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor for initializing the service with an Asana API client.
-     * Sets up the service instance using the provided Asana API client.
-     * @param AsanaApiClient $client The Asana API client instance used to interact with the Asana API.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Get multiple webhooks
      * GET /webhooks
@@ -103,7 +82,7 @@ class WebhooksApiService
 
         $options['workspace'] = $workspaceGid;
 
-        return $this->client->request('GET', 'webhooks', ['query' => $options], $responseType);
+        return $this->getResources('webhooks', $options, $responseType);
     }
 
     /**
@@ -177,12 +156,7 @@ class WebhooksApiService
     ): array {
         $this->validateRequiredFields($data, ['resource', 'target'], 'webhook creation');
 
-        return $this->client->request(
-            'POST',
-            'webhooks',
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->createResource('webhooks', $data, $options, $responseType);
     }
 
     /**
@@ -245,7 +219,7 @@ class WebhooksApiService
     ): array {
         $this->validateGid($webhookGid, 'Webhook GID');
 
-        return $this->client->request('GET', "webhooks/$webhookGid", ['query' => $options], $responseType);
+        return $this->getResource('webhooks', $webhookGid, $options, $responseType);
     }
 
     /**
@@ -317,12 +291,7 @@ class WebhooksApiService
     ): array {
         $this->validateGid($webhookGid, 'Webhook GID');
 
-        return $this->client->request(
-            'PUT',
-            "webhooks/$webhookGid",
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->updateResource('webhooks', $webhookGid, $data, $options, $responseType);
     }
 
     /**
@@ -372,6 +341,6 @@ class WebhooksApiService
     {
         $this->validateGid($webhookGid, 'Webhook GID');
 
-        return $this->client->request('DELETE', "webhooks/$webhookGid", [], $responseType);
+        return $this->deleteResource('webhooks', $webhookGid, $responseType);
     }
 }

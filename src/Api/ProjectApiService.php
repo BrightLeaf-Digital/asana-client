@@ -7,32 +7,8 @@ use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
-class ProjectApiService
+class ProjectApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * The Asana API client instance
-     * Handles HTTP requests to the Asana API endpoints with proper authentication
-     * and request formatting. This client manages the API connection details and
-     * provides methods for making authenticated requests.
-     * @var AsanaApiClient An authenticated client for making Asana API requests
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor
-     * Initializes the instance with the provided Asana API client. The client is
-     * used to make authenticated requests to the Asana API.
-     * @param AsanaApiClient $client An instance of the AsanaApiClient responsible for
-     *                               handling API requests and authentication.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Get multiple projects
      * GET /projects
@@ -116,7 +92,7 @@ class ProjectApiService
             $options['team'] = $team;
         }
 
-        return $this->client->request('GET', 'projects', ['query' => $options], $responseType);
+        return $this->getResources('projects', $options, $responseType);
     }
 
     /**
@@ -197,12 +173,7 @@ class ProjectApiService
         array $options = [],
         int $responseType = AsanaApiClient::RESPONSE_DATA
     ): array {
-        return $this->client->request(
-            'POST',
-            'projects',
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->createResource('projects', $data, $options, $responseType);
     }
 
     /**
@@ -270,7 +241,7 @@ class ProjectApiService
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
-        return $this->client->request('GET', "projects/$projectGid", ['query' => $options], $responseType);
+        return $this->getResource('projects', $projectGid, $options, $responseType);
     }
 
     /**
@@ -350,12 +321,7 @@ class ProjectApiService
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
-        return $this->client->request(
-            'PUT',
-            "projects/$projectGid",
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->updateResource('projects', $projectGid, $data, $options, $responseType);
     }
 
     /**
@@ -401,7 +367,7 @@ class ProjectApiService
     {
         $this->validateGid($projectGid, 'Project GID');
 
-        return $this->client->request('DELETE', "projects/$projectGid", [], $responseType);
+        return $this->deleteResource('projects', $projectGid, $responseType);
     }
 
     /**

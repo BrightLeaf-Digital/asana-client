@@ -5,32 +5,10 @@ namespace BrightleafDigital\Api;
 use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
-use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
-class SectionApiService
+class SectionApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * An HTTP client instance configured to interact with the Asana API.
-     * This property stores an instance of AsanaApiClient which handles all HTTP communication
-     * with the Asana API endpoints. It provides authenticated access to API resources and
-     * manages request/response handling.
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor for initializing the service with an Asana API client.
-     * Sets up the service instance using the provided Asana API client.
-     * @param AsanaApiClient $client The Asana API client instance used to interact with the Asana API.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Get a section
      * GET /sections/{section_gid}
@@ -88,7 +66,7 @@ class SectionApiService
     ): array {
         $this->validateGid($sectionGid, 'Section GID');
 
-        return $this->client->request('GET', "sections/$sectionGid", ['query' => $options], $responseType);
+        return $this->getResource('sections', $sectionGid, $options, $responseType);
     }
 
     /**
@@ -153,12 +131,7 @@ class SectionApiService
     ): array {
         $this->validateGid($sectionGid, 'Section GID');
 
-        return $this->client->request(
-            'PUT',
-            "sections/$sectionGid",
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->updateResource('sections', $sectionGid, $data, $options, $responseType);
     }
 
     /**
@@ -209,7 +182,7 @@ class SectionApiService
     {
         $this->validateGid($sectionGid, 'Section GID');
 
-        return $this->client->request('DELETE', "sections/$sectionGid", [], $responseType);
+        return $this->deleteResource('sections', $sectionGid, $responseType);
     }
 
     /**

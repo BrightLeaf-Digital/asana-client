@@ -4,32 +4,10 @@ namespace BrightleafDigital\Api;
 
 use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Http\AsanaApiClient;
-use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
-class StatusUpdatesApiService
+class StatusUpdatesApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * An HTTP client instance configured to interact with the Asana API.
-     * This property stores an instance of AsanaApiClient which handles all HTTP communication
-     * with the Asana API endpoints. It provides authenticated access to API resources and
-     * manages request/response handling.
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor for initializing the service with an Asana API client.
-     * Sets up the service instance using the provided Asana API client.
-     * @param AsanaApiClient $client The Asana API client instance used to interact with the Asana API.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Get a status update
      * GET /status_updates/{status_update_gid}
@@ -73,7 +51,7 @@ class StatusUpdatesApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid GID provided, insufficient permissions,
+     * @throws ApiException|ValidationException If invalid GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getStatusUpdate(
@@ -83,12 +61,7 @@ class StatusUpdatesApiService
     ): array {
         $this->validateGid($statusUpdateGid, 'Status Update GID');
 
-        return $this->client->request(
-            'GET',
-            "status_updates/$statusUpdateGid",
-            ['query' => $options],
-            $responseType
-        );
+        return $this->getResource('status_updates', $statusUpdateGid, $options, $responseType);
     }
 
     /**
@@ -119,7 +92,7 @@ class StatusUpdatesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws ApiException If the API request fails due to:
+     * @throws ApiException|ValidationException If the API request fails due to:
      *
      * - Invalid status update GID
      * - Status update not found
@@ -133,12 +106,7 @@ class StatusUpdatesApiService
     ): array {
         $this->validateGid($statusUpdateGid, 'Status Update GID');
 
-        return $this->client->request(
-            'DELETE',
-            "status_updates/$statusUpdateGid",
-            [],
-            $responseType
-        );
+        return $this->deleteResource('status_updates', $statusUpdateGid, $responseType);
     }
 
     /**
@@ -186,7 +154,7 @@ class StatusUpdatesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data array containing the list of status updates
-     * @throws ApiException If invalid parent GID provided, insufficient permissions,
+     * @throws ApiException|ValidationException If invalid parent GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getStatusUpdatesForObject(
@@ -198,12 +166,7 @@ class StatusUpdatesApiService
 
         $options['parent'] = $parentGid;
 
-        return $this->client->request(
-            'GET',
-            'status_updates',
-            ['query' => $options],
-            $responseType
-        );
+        return $this->getResources('status_updates', $options, $responseType);
     }
 
     /**
@@ -267,11 +230,6 @@ class StatusUpdatesApiService
             'status update creation'
         );
 
-        return $this->client->request(
-            'POST',
-            'status_updates',
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->createResource('status_updates', $data, $options, $responseType);
     }
 }

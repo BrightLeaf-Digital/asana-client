@@ -8,32 +8,8 @@ use BrightleafDigital\Exceptions\ValidationException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
 
-class WorkspaceApiService
+class WorkspaceApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * The Asana API client instance
-     * Handles HTTP requests to the Asana API endpoints with proper authentication
-     * and request formatting. This client manages the API connection details and
-     * provides methods for making authenticated requests.
-     * @var AsanaApiClient An authenticated client for making Asana API requests
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor
-     * Initializes the instance with the provided Asana API client. The client is
-     * used to make authenticated requests to the Asana API.
-     * @param AsanaApiClient $client An instance of the AsanaApiClient responsible for
-     *                               handling API requests and authentication.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Get multiple workspaces
      * GET /workspaces
@@ -77,7 +53,7 @@ class WorkspaceApiService
      */
     public function getWorkspaces(array $options = [], int $responseType = AsanaApiClient::RESPONSE_DATA): array
     {
-        return $this->client->request('GET', 'workspaces', ['query' => $options], $responseType);
+        return $this->getResources('workspaces', $options, $responseType);
     }
 
     /**
@@ -133,7 +109,7 @@ class WorkspaceApiService
     ): array {
         $this->validateGid($workspaceGid, 'Workspace GID');
 
-        return $this->client->request('GET', "workspaces/$workspaceGid", ['query' => $options], $responseType);
+        return $this->getResource('workspaces', $workspaceGid, $options, $responseType);
     }
 
     /**
@@ -193,12 +169,7 @@ class WorkspaceApiService
     ): array {
         $this->validateGid($workspaceGid, 'Workspace GID');
 
-        return $this->client->request(
-            'PUT',
-            "workspaces/$workspaceGid",
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->updateResource('workspaces', $workspaceGid, $data, $options, $responseType);
     }
 
     /**

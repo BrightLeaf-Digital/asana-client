@@ -7,29 +7,8 @@ use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
-class TagsApiService
+class TagsApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * An HTTP client instance configured to interact with the Asana API.
-     * This property stores an instance of AsanaApiClient which handles all HTTP communication
-     * with the Asana API endpoints. It provides authenticated access to API resources and
-     * manages request/response handling.
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor for initializing the service with an Asana API client.
-     * Sets up the service instance using the provided Asana API client.
-     * @param AsanaApiClient $client The Asana API client instance used to interact with the Asana API.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Get multiple tags
      * GET /tags
@@ -96,7 +75,7 @@ class TagsApiService
         // Include workspace in options
         $options['workspace'] = $workspace;
 
-        return $this->client->request('GET', 'tags', ['query' => $options], $responseType);
+        return $this->getResources('tags', $options, $responseType);
     }
 
     /**
@@ -158,12 +137,7 @@ class TagsApiService
         array $options = [],
         int $responseType = AsanaApiClient::RESPONSE_DATA
     ): array {
-        return $this->client->request(
-            'POST',
-            'tags',
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->createResource('tags', $data, $options, $responseType);
     }
 
     /**
@@ -218,7 +192,7 @@ class TagsApiService
     ): array {
         $this->validateGid($tagGid, 'Tag GID');
 
-        return $this->client->request('GET', "tags/$tagGid", ['query' => $options], $responseType);
+        return $this->getResource('tags', $tagGid, $options, $responseType);
     }
 
     /**
@@ -269,7 +243,7 @@ class TagsApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid tag GID provided, malformed data,
+     * @throws ApiException|ValidationException If invalid tag GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
      */
     public function updateTag(
@@ -280,12 +254,7 @@ class TagsApiService
     ): array {
         $this->validateGid($tagGid, 'Tag GID');
 
-        return $this->client->request(
-            'PUT',
-            "tags/$tagGid",
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->updateResource('tags', $tagGid, $data, $options, $responseType);
     }
 
     /**
@@ -318,14 +287,14 @@ class TagsApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws ApiException If invalid tag GID provided, insufficient permissions,
+     * @throws ApiException|ValidationException If invalid tag GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function deleteTag(string $tagGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
     {
         $this->validateGid($tagGid, 'Tag GID');
 
-        return $this->client->request('DELETE', "tags/$tagGid", [], $responseType);
+        return $this->deleteResource('tags', $tagGid, $responseType);
     }
 
     /**

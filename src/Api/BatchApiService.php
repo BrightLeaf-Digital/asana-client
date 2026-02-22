@@ -7,29 +7,8 @@ use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
-class BatchApiService
+class BatchApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * An HTTP client instance configured to interact with the Asana API.
-     * This property stores an instance of AsanaApiClient which handles all HTTP communication
-     * with the Asana API endpoints. It provides authenticated access to API resources and
-     * manages request/response handling.
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor for initializing the service with an Asana API client.
-     * Sets up the service instance using the provided Asana API client.
-     * @param AsanaApiClient $client The Asana API client instance used to interact with the Asana API.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Submit a batch request
      * POST /batch
@@ -101,12 +80,7 @@ class BatchApiService
     ): array {
         $this->validateActions($actions);
 
-        return $this->client->request(
-            'POST',
-            'batch',
-            ['json' => ['data' => ['actions' => $actions]], 'query' => $options],
-            $responseType
-        );
+        return $this->createResource('batch', ['actions' => $actions], $options, $responseType);
     }
 
     /**

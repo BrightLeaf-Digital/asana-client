@@ -8,32 +8,8 @@ use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
-class CustomFieldApiService
+class CustomFieldApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * The Asana API client instance
-     * Handles HTTP requests to the Asana API endpoints with proper authentication
-     * and request formatting. This client manages the API connection details and
-     * provides methods for making authenticated requests.
-     * @var AsanaApiClient An authenticated client for making Asana API requests
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor
-     * Initializes the instance with the provided Asana API client. The client is
-     * used to make authenticated requests to the Asana API.
-     * @param AsanaApiClient $client An instance of the AsanaApiClient responsible for
-     *                               handling API requests and authentication.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Create a custom field
      * POST /custom_fields
@@ -97,12 +73,7 @@ class CustomFieldApiService
         array $options = [],
         int $responseType = AsanaApiClient::RESPONSE_DATA
     ): array {
-        return $this->client->request(
-            'POST',
-            'custom_fields',
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->createResource('custom_fields', $data, $options, $responseType);
     }
 
     /**
@@ -151,7 +122,7 @@ class CustomFieldApiService
     ): array {
         $this->validateGid($customFieldGid, 'Custom field GID');
 
-        return $this->client->request('GET', "custom_fields/$customFieldGid", ['query' => $options], $responseType);
+        return $this->getResource('custom_fields', $customFieldGid, $options, $responseType);
     }
 
     /**
@@ -211,12 +182,7 @@ class CustomFieldApiService
     ): array {
         $this->validateGid($customFieldGid, 'Custom field GID');
 
-        return $this->client->request(
-            'PUT',
-            "custom_fields/$customFieldGid",
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->updateResource('custom_fields', $customFieldGid, $data, $options, $responseType);
     }
 
     /**
@@ -259,7 +225,7 @@ class CustomFieldApiService
     {
         $this->validateGid($customFieldGid, 'Custom field GID');
 
-        return $this->client->request('DELETE', "custom_fields/$customFieldGid", [], $responseType);
+        return $this->deleteResource('custom_fields', $customFieldGid, $responseType);
     }
 
     /**

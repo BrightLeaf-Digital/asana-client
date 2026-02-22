@@ -5,32 +5,10 @@ namespace BrightleafDigital\Api;
 use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
-use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
-class GoalsApiService
+class GoalsApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * An HTTP client instance configured to interact with the Asana API.
-     * This property stores an instance of AsanaApiClient which handles all HTTP communication
-     * with the Asana API endpoints. It provides authenticated access to API resources and
-     * manages request/response handling.
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor for initializing the service with an Asana API client.
-     * Sets up the service instance using the provided Asana API client.
-     * @param AsanaApiClient $client The Asana API client instance used to interact with the Asana API.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Get a goal
      * GET /goals/{goal_gid}
@@ -87,7 +65,7 @@ class GoalsApiService
     ): array {
         $this->validateGid($goalGid, 'Goal GID');
 
-        return $this->client->request('GET', "goals/$goalGid", ['query' => $options], $responseType);
+        return $this->getResource('goals', $goalGid, $options, $responseType);
     }
 
     /**
@@ -146,12 +124,7 @@ class GoalsApiService
     ): array {
         $this->validateGid($goalGid, 'Goal GID');
 
-        return $this->client->request(
-            'PUT',
-            "goals/$goalGid",
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->updateResource('goals', $goalGid, $data, $options, $responseType);
     }
 
     /**
@@ -197,7 +170,7 @@ class GoalsApiService
     {
         $this->validateGid($goalGid, 'Goal GID');
 
-        return $this->client->request('DELETE', "goals/$goalGid", [], $responseType);
+        return $this->deleteResource('goals', $goalGid, $responseType);
     }
 
     /**
@@ -256,7 +229,7 @@ class GoalsApiService
         array $options = [],
         int $responseType = AsanaApiClient::RESPONSE_DATA
     ): array {
-        return $this->client->request('GET', 'goals', ['query' => $options], $responseType);
+        return $this->getResources('goals', $options, $responseType);
     }
 
     /**
@@ -317,12 +290,7 @@ class GoalsApiService
         array $options = [],
         int $responseType = AsanaApiClient::RESPONSE_DATA
     ): array {
-        return $this->client->request(
-            'POST',
-            'goals',
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->createResource('goals', $data, $options, $responseType);
     }
 
     /**

@@ -4,32 +4,10 @@ namespace BrightleafDigital\Api;
 
 use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Http\AsanaApiClient;
-use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
-class TimeTrackingEntriesApiService
+class TimeTrackingEntriesApiService extends BaseApiService
 {
-    use ValidationTrait;
-
-    /**
-     * An HTTP client instance configured to interact with the Asana API.
-     * This property stores an instance of AsanaApiClient which handles all HTTP communication
-     * with the Asana API endpoints. It provides authenticated access to API resources and
-     * manages request/response handling.
-     */
-    private AsanaApiClient $client;
-
-    /**
-     * Constructor for initializing the service with an Asana API client.
-     * Sets up the service instance using the provided Asana API client.
-     * @param AsanaApiClient $client The Asana API client instance used to interact with the Asana API.
-     * @return void
-     */
-    public function __construct(AsanaApiClient $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Get time tracking entries for a task
      * GET /tasks/{task_gid}/time_tracking_entries
@@ -196,7 +174,7 @@ class TimeTrackingEntriesApiService
      * - task: Object containing the associated task details
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid GID provided, insufficient permissions,
+     * @throws ApiException|ValidationException If invalid GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getTimeTrackingEntry(
@@ -206,12 +184,7 @@ class TimeTrackingEntriesApiService
     ): array {
         $this->validateGid($timeTrackingEntryGid, 'Time Tracking Entry GID');
 
-        return $this->client->request(
-            'GET',
-            "time_tracking_entries/$timeTrackingEntryGid",
-            ['query' => $options],
-            $responseType
-        );
+        return $this->getResource('time_tracking_entries', $timeTrackingEntryGid, $options, $responseType);
     }
 
     /**
@@ -251,7 +224,7 @@ class TimeTrackingEntriesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object containing the updated entry details
-     * @throws ApiException If invalid GID provided, malformed data,
+     * @throws ApiException|ValidationException If invalid GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
      */
     public function updateTimeTrackingEntry(
@@ -262,12 +235,7 @@ class TimeTrackingEntriesApiService
     ): array {
         $this->validateGid($timeTrackingEntryGid, 'Time Tracking Entry GID');
 
-        return $this->client->request(
-            'PUT',
-            "time_tracking_entries/$timeTrackingEntryGid",
-            ['json' => ['data' => $data], 'query' => $options],
-            $responseType
-        );
+        return $this->updateResource('time_tracking_entries', $timeTrackingEntryGid, $data, $options, $responseType);
     }
 
     /**
@@ -298,7 +266,7 @@ class TimeTrackingEntriesApiService
      *
      * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws ApiException If the API request fails due to:
+     * @throws ApiException|ValidationException If the API request fails due to:
      *
      * - Invalid time tracking entry GID
      * - Entry not found
@@ -312,12 +280,7 @@ class TimeTrackingEntriesApiService
     ): array {
         $this->validateGid($timeTrackingEntryGid, 'Time Tracking Entry GID');
 
-        return $this->client->request(
-            'DELETE',
-            "time_tracking_entries/$timeTrackingEntryGid",
-            [],
-            $responseType
-        );
+        return $this->deleteResource('time_tracking_entries', $timeTrackingEntryGid, $responseType);
     }
 
     /**
@@ -367,11 +330,6 @@ class TimeTrackingEntriesApiService
         array $options = [],
         int $responseType = AsanaApiClient::RESPONSE_DATA
     ): array {
-        return $this->client->request(
-            'GET',
-            'time_tracking_entries',
-            ['query' => $options],
-            $responseType
-        );
+        return $this->getResources('time_tracking_entries', $options, $responseType);
     }
 }
