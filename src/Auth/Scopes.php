@@ -108,6 +108,24 @@ class Scopes
      */
     public const PROJECTS_WRITE = 'projects:write';
 
+    // 🔹 Roles
+    /**
+     * - GET /roles
+     * - GET /roles/{role_gid}
+     */
+    public const ROLES_READ = 'roles:read';
+
+    /**
+     * - POST /roles
+     * - PUT /roles/{role_gid}
+     */
+    public const ROLES_WRITE = 'roles:write';
+
+    /**
+     * DELETE /roles/{role_gid}
+     */
+    public const ROLES_DELETE = 'roles:delete';
+
     // 🔹 Stories
     /**
      * - GET /stories/{story_gid}
