@@ -3,26 +3,22 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\UserApiService;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Exceptions\ValidationException;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class UserApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var UserApiService */
-    private $service;
+    private UserApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new UserApiService($this->mockClient);
     }
 
@@ -33,7 +29,7 @@ class UserApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'users', ['query' => ['workspace' => '12345']], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'users', ['query' => ['workspace' => '12345']], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getUsers('12345');
@@ -46,7 +42,7 @@ class UserApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'users', ['query' => ['team' => '67890']], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'users', ['query' => ['team' => '67890']], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getUsers(null, '67890');
@@ -60,7 +56,7 @@ class UserApiServiceTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('You must provide either a "workspace" or "team".');
 
-        $this->service->getUsers(null, null);
+        $this->service->getUsers();
     }
 
     /**
@@ -73,7 +69,7 @@ class UserApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'users', ['query' => $expectedQuery], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'users', ['query' => $expectedQuery], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getUsers('12345', null, $options);
@@ -86,7 +82,7 @@ class UserApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'users/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'users/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getUser('12345');
@@ -99,7 +95,7 @@ class UserApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'users/me', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'users/me', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getUser('me');
@@ -114,7 +110,7 @@ class UserApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'users/67890/favorites', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'users/67890/favorites', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getUserFavorites('67890', $options);
@@ -127,7 +123,7 @@ class UserApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'teams/12345/users', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'teams/12345/users', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getUsersForTeam('12345');
@@ -140,7 +136,7 @@ class UserApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/users', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces/12345/users', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getUsersForWorkspace('12345');
@@ -153,7 +149,7 @@ class UserApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'users/me', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'users/me', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getCurrentUser();
@@ -168,7 +164,7 @@ class UserApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'users/me', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'users/me', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getCurrentUser($options);
@@ -183,7 +179,7 @@ class UserApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'users/me/favorites', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'users/me/favorites', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getCurrentUserFavorites($options);
@@ -196,9 +192,9 @@ class UserApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'users/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'users/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getUser('12345', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getUser('12345', [], HttpClientInterface::RESPONSE_FULL);
     }
 }

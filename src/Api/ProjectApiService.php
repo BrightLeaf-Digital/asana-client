@@ -2,9 +2,8 @@
 
 namespace BrightleafDigital\Api;
 
+use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Exceptions\ApiException;
-use BrightleafDigital\Http\AsanaApiClient;
-use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
 class ProjectApiService extends BaseApiService
@@ -37,13 +36,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -51,10 +50,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of projects with fields including:
      *   - gid: Unique identifier of the project
      * - resource_type: Always "project"
@@ -77,7 +76,7 @@ class ProjectApiService extends BaseApiService
         ?string $workspace = null,
         ?string $team = null,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         // Ensure one of workspace or team is provided
         if (!$workspace && !$team) {
@@ -129,13 +128,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -143,10 +142,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the created project details including:
      *   - gid: Unique identifier of the created project
      * - resource_type: Always "project"
@@ -171,7 +170,7 @@ class ProjectApiService extends BaseApiService
     public function createProject(
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         return $this->createResource('projects', $data, $options, $responseType);
     }
@@ -195,13 +194,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -209,10 +208,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the project details including:
      *   - gid: Unique identifier of the project
      * - resource_type: Always "project"
@@ -237,7 +236,7 @@ class ProjectApiService extends BaseApiService
     public function getProject(
         string $projectGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -250,6 +249,7 @@ class ProjectApiService extends BaseApiService
      * Updates the properties of a project. Projects can be updated to change things like their name,
      * notes, due date, and other properties. Any unspecified fields will remain unchanged.
      * API Documentation: https://developers.asana.com/reference/updateproject
+     *
      * @param string $projectGid The unique global ID of the project to update.
      *                           This identifier can be found in the project URL or
      *                           returned from project-related API endpoints.
@@ -277,13 +277,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -291,10 +291,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the updated project details including:
      *   - gid: Unique identifier of the project
      * - resource_type: Always "project"
@@ -310,14 +310,14 @@ class ProjectApiService extends BaseApiService
      * - public: Updated public status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid project GID provided, malformed data,
+     * @throws ApiException|ValidationException If invalid project GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
      */
     public function updateProject(
         string $projectGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -331,19 +331,20 @@ class ProjectApiService extends BaseApiService
      * completely deleted. Also note that while you can delete a single-owner project, you must be an
      * admin in the workspace that contains the project to delete a multi-owned project.
      * API Documentation: https://developers.asana.com/reference/deleteproject
+     *
      * @param string $projectGid The unique global ID of the project to delete/trash.
      *                           This identifier can be found in the project URL or
      *                           returned from project-related API endpoints.
      *                           Example: "12345"
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -351,19 +352,19 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws ApiException If the API request fails due to:
+     * @throws ApiException|ValidationException If the API request fails due to:*@throws ValidationException
      *
      * - Invalid project GID
      * - Insufficient permissions to delete the project
      * - Network connectivity issues
      * - Rate limiting
      */
-    public function deleteProject(string $projectGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
+    public function deleteProject(string $projectGid, int $responseType = HttpClientInterface::RESPONSE_DATA): array
     {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -376,6 +377,7 @@ class ProjectApiService extends BaseApiService
      * Creates and returns a job that will duplicate a project, copying its tasks, sections, and structure.
      * The project must be in a premium workspace to use this capability.
      * API Documentation: https://developers.asana.com/reference/duplicateproject
+     *
      * @param string $projectGid The unique global ID of the project to duplicate.
      *                           This identifier can be found in the project URL or
      *                           returned from project-related API endpoints.
@@ -395,13 +397,13 @@ class ProjectApiService extends BaseApiService
      *                    Example: ["name" => "New Project Copy", "include" => ["members", "notes"]]
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -409,22 +411,22 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the job details including:
      *   - gid: Unique identifier of the duplication job
      * - resource_type: Always "job"
      * - status: Current status of the job ("not_started", "in_progress", "succeeded", "failed")
      * - new_project: Object containing the new project details once duplication is complete
-     * @throws ApiException If the API request fails due to invalid project GID, malformed data,
+     * @throws ApiException|ValidationException If the API request fails due to invalid project GID, malformed data,
      *                          insufficient permissions, network issues, or rate limiting
      */
     public function duplicateProject(
         string $projectGid,
         array $data,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -442,6 +444,7 @@ class ProjectApiService extends BaseApiService
      * Returns a list of projects that the specified task is a member of. A task can
      * be associated with multiple projects.
      * API Documentation: https://developers.asana.com/reference/getprojectsfortask
+     *
      * @param string $taskGid The unique global ID of the task to get projects for.
      *                        This identifier can be found in the task URL or
      *                        returned from task-related API endpoints.
@@ -459,13 +462,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -473,10 +476,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of projects with fields including:
      *   - gid: Unique identifier of the project
      * - resource_type: Always "project"
@@ -488,13 +491,13 @@ class ProjectApiService extends BaseApiService
      * - current_status: Object containing current project status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid task GID provided, permission errors,
+     * @throws ApiException|ValidationException If invalid task GID provided, permission errors,
      *                          network issues, or rate limiting occurs
      */
     public function getProjectsForTask(
         string $taskGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -508,6 +511,7 @@ class ProjectApiService extends BaseApiService
      * This endpoint requires the team to be public to the authenticated user or for the user to be an
      * admin of the team.
      * API Documentation: https://developers.asana.com/reference/getprojectsforteam
+     *
      * @param string $teamGid The unique global ID of the team to get projects from.
      *                        This identifier can be found in the team URL or
      *                        returned from team-related API endpoints.
@@ -526,13 +530,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -540,10 +544,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of projects with fields including:
      *   - gid: Unique identifier of the project
      * - resource_type: Always "project"
@@ -555,13 +559,13 @@ class ProjectApiService extends BaseApiService
      * - current_status: Object containing current project status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid team GID provided, permission errors,
+     * @throws ApiException|ValidationException If invalid team GID provided, permission errors,
      *                          network issues, or rate limiting occurs
      */
     public function getProjectsForTeam(
         string $teamGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($teamGid, 'Team GID');
 
@@ -574,6 +578,7 @@ class ProjectApiService extends BaseApiService
      * Creates a project and adds it to the specified team. This endpoint creates a project from
      * scratch, setting its workspace to be the same workspace containing the team.
      * API Documentation: https://developers.asana.com/reference/createprojectforteam
+     *
      * @param string $teamGid The unique global ID of the team in which to create the project.
      *                        This identifier can be found in the team URL or returned from
      *                        team-related API endpoints.
@@ -601,13 +606,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -615,10 +620,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the created project details including:
      *   - gid: Unique identifier of the created project
      * - resource_type: Always "project"
@@ -632,14 +637,14 @@ class ProjectApiService extends BaseApiService
      * - current_status: Object containing current project status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid team GID provided, missing required fields,
+     * @throws ApiException|ValidationException If invalid team GID provided, missing required fields,
      *                          insufficient permissions, or network issues occur
      */
     public function createProjectInTeam(
         string $teamGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($teamGid, 'Team GID');
 
@@ -656,6 +661,7 @@ class ProjectApiService extends BaseApiService
      * GET /workspaces/{workspace_gid}/projects
      * Returns the projects in a workspace. Includes archived projects by default.
      * API Documentation: https://developers.asana.com/reference/getprojectsforworkspace
+     *
      * @param string $workspaceGid The unique global ID of the workspace to get projects from.
      *                             This identifier can be found in the workspace URL or
      *                             returned from workspace-related API endpoints.
@@ -674,13 +680,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -688,10 +694,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of projects with fields including:
      *   - gid: Unique identifier of the project
      * - resource_type: Always "project"
@@ -703,13 +709,13 @@ class ProjectApiService extends BaseApiService
      * - current_status: Object containing current project status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid workspace GID provided, permission errors,
+     * @throws ApiException|ValidationException If invalid workspace GID provided, permission errors,
      *                          network issues, or rate limiting occurs
      */
     public function getProjectsForWorkspace(
         string $workspaceGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($workspaceGid, 'Workspace GID');
 
@@ -721,6 +727,7 @@ class ProjectApiService extends BaseApiService
      * POST /workspaces/{workspace_gid}/projects
      * Creates a project in the specified workspace.
      * API Documentation: https://developers.asana.com/reference/createproject
+     *
      * @param string $workspaceGid The unique global ID of the workspace to create the project in.
      *                             This identifier can be found in the workspace URL or
      *                             returned from workspace-related API endpoints.
@@ -748,13 +755,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -762,10 +769,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the created project details including:
      *   - gid: Unique identifier of the created project
      * - resource_type: Always "project"
@@ -778,14 +785,14 @@ class ProjectApiService extends BaseApiService
      * - current_status: Object containing current project status
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid workspace GID provided, missing required fields,
+     * @throws ApiException|ValidationException If invalid workspace GID provided, missing required fields,
      *                          insufficient permissions, or network issues occur
      */
     public function createProjectInWorkspace(
         string $workspaceGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($workspaceGid, 'Workspace GID');
 
@@ -804,6 +811,7 @@ class ProjectApiService extends BaseApiService
      * before they can be added to a project. By default, a custom field in a project may not be
      * associated with another project in the same organization, but this can be controlled by the project.
      * API Documentation: https://developers.asana.com/reference/addcustomfieldsettingforproject
+     *
      * @param string $projectGid The unique global ID of the project to add the custom field to.
      *                           This identifier can be found in the project URL or
      *                           returned from project-related API endpoints.
@@ -820,13 +828,13 @@ class ProjectApiService extends BaseApiService
      *   Example: ["custom_field" => "67890", "is_important" => true]
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -834,23 +842,23 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the custom field setting details including:
      *   - gid: Unique identifier of the custom field setting
      * - resource_type: Always "custom_field_setting"
      * - custom_field: Object containing custom field details
      * - is_important: Boolean indicating if the custom field is important
      * - project: Object containing project details
-     * @throws ApiException If invalid project GID provided, invalid custom field GID,
+     * @throws ApiException|ValidationException If invalid project GID provided, invalid custom field GID,
      *                          insufficient permissions, or network issues occur
      */
     public function addCustomFieldToProject(
         string $projectGid,
         array $data,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -868,6 +876,7 @@ class ProjectApiService extends BaseApiService
      * Removes a custom field from a project. Note that this does not delete the custom field,
      * it just removes the custom field from the specified project.
      * API Documentation: https://developers.asana.com/reference/removecustomfieldsettingforproject
+     *
      * @param string $projectGid The unique global ID of the project to remove the custom field from.
      *                           This identifier can be found in the project URL or
      *                           returned from project-related API endpoints.
@@ -879,13 +888,13 @@ class ProjectApiService extends BaseApiService
      *                    Example: ["custom_field" => "67890"]
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -893,18 +902,18 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal
-     * @throws ApiException If invalid project GID provided, invalid custom field GID,
+     * @throws ApiException|ValidationException If invalid project GID provided, invalid custom field GID,
      *                          insufficient permissions, or network issues occur
      */
     public function removeCustomFieldFromProject(
         string $projectGid,
         array $data,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -923,6 +932,7 @@ class ProjectApiService extends BaseApiService
      * These are custom fields that the project has direct access to and can be seen
      * in the project's details.
      * API Documentation: https://developers.asana.com/reference/getcustomfieldsettingsforproject
+     *
      * @param string $projectGid The unique global ID of the project to get custom field settings from.
      *                           This identifier can be found in the project URL or
      *                           returned from project-related API endpoints.
@@ -940,13 +950,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -954,10 +964,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of custom field settings with fields including:
      *   - gid: Unique identifier of the custom field setting
      * - resource_type: Always "custom_field_setting"
@@ -966,13 +976,13 @@ class ProjectApiService extends BaseApiService
      * - project: Object containing project details
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid project GID provided, permission errors,
+     * @throws ApiException|ValidationException If invalid project GID provided, permission errors,
      *                          network issues, or rate limiting occurs
      */
     public function getCustomFieldsForProject(
         string $projectGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -990,6 +1000,7 @@ class ProjectApiService extends BaseApiService
      * Returns the number of tasks within the specified project, grouped by completion status.
      * This is useful for understanding project progress and workload.
      * API Documentation: https://developers.asana.com/reference/gettaskcountsforproject
+     *
      * @param string $projectGid The unique global ID of the project to get task counts for.
      *                           This identifier can be found in the project URL or
      *                           returned from project-related API endpoints.
@@ -1003,13 +1014,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1017,10 +1028,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the task count details including:
      * - num_tasks: Total number of tasks in the project
      * - num_completed_tasks: Number of completed tasks in the project
@@ -1030,13 +1041,13 @@ class ProjectApiService extends BaseApiService
      * - num_incomplete_milestones: Number of incomplete milestones in the project
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid project GID provided, insufficient permissions,
+     * @throws ApiException|ValidationException If invalid project GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getTaskCountsForProject(
         string $projectGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -1050,6 +1061,7 @@ class ProjectApiService extends BaseApiService
      * immediately able to collaborate on the project, get notifications, and
      * gain access to the project based on their role.
      * API Documentation: https://developers.asana.com/reference/addmembersforproject
+     *
      * @param string $projectGid The unique global ID of the project to add members to.
      *                           This identifier can be found in the project URL or returned from
      *                           project-related API endpoints.
@@ -1064,13 +1076,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1078,10 +1090,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the updated project details including:
      *   - gid: Unique identifier of the project
      * - resource_type: Always "project"
@@ -1089,14 +1101,14 @@ class ProjectApiService extends BaseApiService
      * - members: Array of member objects including the newly added members
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid project GID provided, invalid user GIDs,
+     * @throws ApiException|ValidationException If invalid project GID provided, invalid user GIDs,
      *                          insufficient permissions, or network issues occur
      */
     public function addMembersToProject(
         string $projectGid,
         array $members,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -1115,6 +1127,7 @@ class ProjectApiService extends BaseApiService
      * immediately lose access to the project and will no longer receive notifications
      * unless they remain added as followers.
      * API Documentation: https://developers.asana.com/reference/removemembersforproject
+     *
      * @param string $projectGid The unique global ID of the project from which to remove members.
      *                           This identifier can be found in the project URL or returned from
      *                           project-related API endpoints.
@@ -1129,13 +1142,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1143,10 +1156,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the updated project details including:
      *   - gid: Unique identifier of the project
      * - resource_type: Always "project"
@@ -1154,14 +1167,14 @@ class ProjectApiService extends BaseApiService
      * - members: Array of member objects with the specified members removed
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid project GID provided, invalid user GIDs,
+     * @throws ApiException|ValidationException If invalid project GID provided, invalid user GIDs,
      *                          insufficient permissions, or network issues occur
      */
     public function removeMembersFromProject(
         string $projectGid,
         array $members,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -1179,6 +1192,7 @@ class ProjectApiService extends BaseApiService
      * Adds the specified list of users as followers of the project. Followers receive notifications
      * when the project is changed, but do not necessarily have permissions to modify the project.
      * API Documentation: https://developers.asana.com/reference/addfollowersforproject
+     *
      * @param string $projectGid The unique global ID of the project to add followers to.
      *                           This identifier can be found in the project URL or returned from
      *                           project-related API endpoints.
@@ -1193,13 +1207,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1207,10 +1221,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the updated project details including:
      *   - gid: Unique identifier of the project
      * - resource_type: Always "project"
@@ -1218,14 +1232,14 @@ class ProjectApiService extends BaseApiService
      * - followers: Array of follower objects including the newly added followers
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid project GID provided, invalid user GIDs,
+     * @throws ApiException|ValidationException If invalid project GID provided, invalid user GIDs,
      *                          insufficient permissions, or network issues occur
      */
     public function addFollowersToProject(
         string $projectGid,
         array $followers,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -1243,6 +1257,7 @@ class ProjectApiService extends BaseApiService
      * Removes the specified list of users from following the project. Followers receive notifications
      * when the project is changed, and removing them will stop these notifications.
      * API Documentation: https://developers.asana.com/reference/removefollowersforproject
+     *
      * @param string $projectGid The unique global ID of the project from which to remove followers.
      *                           This identifier can be found in the project URL or returned from
      *                           project-related API endpoints.
@@ -1257,13 +1272,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1271,10 +1286,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the updated project details including:
      *   - gid: Unique identifier of the project
      * - resource_type: Always "project"
@@ -1282,14 +1297,14 @@ class ProjectApiService extends BaseApiService
      * - followers: Array of follower objects with the specified followers removed
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid project GID provided, invalid user GIDs,
+     * @throws ApiException|ValidationException If invalid project GID provided, invalid user GIDs,
      *                          insufficient permissions, or network issues occur
      */
     public function removeFollowersFromProject(
         string $projectGid,
         array $followers,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -1308,6 +1323,7 @@ class ProjectApiService extends BaseApiService
      * workspace as the given project. Properties such as task names, descriptions, notes,
      * assignees, dependencies, and custom fields are preserved in the template.
      * API Documentation: https://developers.asana.com/reference/projectsaveastemplate
+     *
      * @param string $projectGid The unique global ID of the project to use as a basis for creating a template.
      *                           This identifier can be found in the project URL or
      *                           returned from project-related API endpoints.
@@ -1328,13 +1344,13 @@ class ProjectApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1342,10 +1358,10 @@ class ProjectApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the created project template details including:
      *   - gid: Unique identifier of the created project template
      * - resource_type: Always "project_template"
@@ -1355,14 +1371,14 @@ class ProjectApiService extends BaseApiService
      * - workspace: Object containing workspace details
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid project GID provided, insufficient permissions,
+     * @throws ApiException|ValidationException If invalid project GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function createProjectTemplateFromProject(
         string $projectGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 

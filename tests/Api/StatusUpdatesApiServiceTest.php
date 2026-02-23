@@ -3,26 +3,22 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\StatusUpdatesApiService;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Exceptions\ValidationException;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class StatusUpdatesApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var StatusUpdatesApiService */
-    private $service;
+    private StatusUpdatesApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new StatusUpdatesApiService($this->mockClient);
     }
 
@@ -47,7 +43,7 @@ class StatusUpdatesApiServiceTest extends TestCase
                 'GET',
                 'status_updates/12345',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -69,7 +65,7 @@ class StatusUpdatesApiServiceTest extends TestCase
                 'GET',
                 'status_updates/12345',
                 ['query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -87,14 +83,14 @@ class StatusUpdatesApiServiceTest extends TestCase
                 'GET',
                 'status_updates/12345',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
         $this->service->getStatusUpdate(
             '12345',
             [],
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 
@@ -137,7 +133,7 @@ class StatusUpdatesApiServiceTest extends TestCase
                 'DELETE',
                 'status_updates/12345',
                 [],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -157,13 +153,13 @@ class StatusUpdatesApiServiceTest extends TestCase
                 'DELETE',
                 'status_updates/12345',
                 [],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
         $this->service->deleteStatusUpdate(
             '12345',
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 
@@ -211,7 +207,7 @@ class StatusUpdatesApiServiceTest extends TestCase
                 'GET',
                 'status_updates',
                 ['query' => ['parent' => '12345']],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -236,7 +232,7 @@ class StatusUpdatesApiServiceTest extends TestCase
                     'opt_fields' => 'title,text,status_type',
                     'parent' => '12345',
                 ]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -259,7 +255,7 @@ class StatusUpdatesApiServiceTest extends TestCase
                     'created_since' => '2026-01-01T00:00:00.000Z',
                     'parent' => '12345',
                 ]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -277,14 +273,14 @@ class StatusUpdatesApiServiceTest extends TestCase
                 'GET',
                 'status_updates',
                 ['query' => ['parent' => '12345']],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
         $this->service->getStatusUpdatesForObject(
             '12345',
             [],
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 
@@ -339,7 +335,7 @@ class StatusUpdatesApiServiceTest extends TestCase
                 'POST',
                 'status_updates',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -366,7 +362,7 @@ class StatusUpdatesApiServiceTest extends TestCase
                 'POST',
                 'status_updates',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -391,7 +387,7 @@ class StatusUpdatesApiServiceTest extends TestCase
                 'POST',
                 'status_updates',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -415,14 +411,14 @@ class StatusUpdatesApiServiceTest extends TestCase
                 'POST',
                 'status_updates',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
         $this->service->createStatusUpdate(
             $data,
             [],
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 

@@ -12,6 +12,7 @@ class ValidationTraitTest extends TestCase
 
     /**
      * Test validateGid passes for valid GID.
+     * @throws ValidationException
      */
     public function testValidateGidPassesForValidGid(): void
     {
@@ -66,6 +67,7 @@ class ValidationTraitTest extends TestCase
 
     /**
      * Test validateRequiredFields passes when all fields present.
+     * @throws ValidationException
      */
     public function testValidateRequiredFieldsPassesWhenPresent(): void
     {
@@ -104,6 +106,7 @@ class ValidationTraitTest extends TestCase
 
     /**
      * Test validateAtLeastOneField passes when one field present.
+     * @throws ValidationException
      */
     public function testValidateAtLeastOneFieldPassesWhenOnePresent(): void
     {
@@ -131,6 +134,7 @@ class ValidationTraitTest extends TestCase
 
     /**
      * Test validateDateFormat passes for valid date.
+     * @throws ValidationException
      */
     public function testValidateDateFormatPassesForValidDate(): void
     {
@@ -152,6 +156,9 @@ class ValidationTraitTest extends TestCase
 
     /**
      * Test validateColor passes for valid color.
+     * @throws ValidationException
+     * @throws ValidationException
+     * @throws ValidationException
      */
     public function testValidateColorPassesForValidColor(): void
     {
@@ -175,6 +182,9 @@ class ValidationTraitTest extends TestCase
 
     /**
      * Test validateLimit passes for valid limit.
+     * @throws ValidationException
+     * @throws ValidationException
+     * @throws ValidationException
      */
     public function testValidateLimitPassesForValidLimit(): void
     {
@@ -209,6 +219,7 @@ class ValidationTraitTest extends TestCase
 
     /**
      * Test validateGidArray passes for valid array.
+     * @throws ValidationException
      */
     public function testValidateGidArrayPassesForValidArray(): void
     {

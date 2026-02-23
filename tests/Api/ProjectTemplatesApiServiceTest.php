@@ -3,26 +3,22 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\ProjectTemplatesApiService;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Exceptions\ValidationException;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ProjectTemplatesApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var ProjectTemplatesApiService */
-    private $service;
+    private ProjectTemplatesApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new ProjectTemplatesApiService($this->mockClient);
     }
 
@@ -45,7 +41,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'GET',
                 'project_templates/12345',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -67,7 +63,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'GET',
                 'project_templates/12345',
                 ['query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -85,14 +81,14 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'GET',
                 'project_templates/12345',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
         $this->service->getProjectTemplate(
             '12345',
             [],
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 
@@ -135,7 +131,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'DELETE',
                 'project_templates/12345',
                 [],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -155,13 +151,13 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'DELETE',
                 'project_templates/12345',
                 [],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
         $this->service->deleteProjectTemplate(
             '12345',
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 
@@ -209,7 +205,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'GET',
                 'project_templates',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -231,7 +227,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'GET',
                 'project_templates',
                 ['query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -251,7 +247,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'GET',
                 'project_templates',
                 ['query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -269,11 +265,11 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'GET',
                 'project_templates',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->getProjectTemplates([], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getProjectTemplates([], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -293,7 +289,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'GET',
                 'project_templates',
                 ['query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -317,7 +313,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'GET',
                 'teams/12345/project_templates',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -339,7 +335,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'GET',
                 'teams/12345/project_templates',
                 ['query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -357,14 +353,14 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'GET',
                 'teams/12345/project_templates',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
         $this->service->getProjectTemplatesForTeam(
             '12345',
             [],
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 
@@ -414,7 +410,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'POST',
                 'project_templates/12345/instantiateProject',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -437,7 +433,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'POST',
                 'project_templates/12345/instantiateProject',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -462,7 +458,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'POST',
                 'project_templates/12345/instantiateProject',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -482,7 +478,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
                 'POST',
                 'project_templates/12345/instantiateProject',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
@@ -490,7 +486,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
             '12345',
             $data,
             [],
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 

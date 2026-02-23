@@ -2,9 +2,9 @@
 
 namespace BrightleafDigital\Api;
 
+use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\RateLimitException;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
@@ -40,13 +40,13 @@ class CustomFieldApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -54,10 +54,10 @@ class CustomFieldApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the created custom field details including:
      *   - gid: Unique identifier of the created custom field
      *   - resource_type: Always "custom_field"
@@ -71,7 +71,7 @@ class CustomFieldApiService extends BaseApiService
     public function createCustomField(
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         return $this->createResource('custom_fields', $data, $options, $responseType);
     }
@@ -91,13 +91,13 @@ class CustomFieldApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -105,10 +105,10 @@ class CustomFieldApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the custom field details
      * @throws ApiException If invalid custom field GID provided, permission errors,
      *                          network issues, or rate limiting occurs
@@ -118,7 +118,7 @@ class CustomFieldApiService extends BaseApiService
     public function getCustomField(
         string $customFieldGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($customFieldGid, 'Custom field GID');
 
@@ -150,13 +150,13 @@ class CustomFieldApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -164,10 +164,10 @@ class CustomFieldApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the updated custom field details
      * @throws ApiException If invalid custom field GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
@@ -178,7 +178,7 @@ class CustomFieldApiService extends BaseApiService
         string $customFieldGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($customFieldGid, 'Custom field GID');
 
@@ -197,13 +197,13 @@ class CustomFieldApiService extends BaseApiService
      *                               Example: "12345"
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -211,18 +211,20 @@ class CustomFieldApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {})
      * @throws ApiException If the API request fails due to invalid custom field GID, insufficient permissions,
      *                          network connectivity issues, or rate limiting
      * @throws RateLimitException
      * @throws ValidationException
      */
-    public function deleteCustomField(string $customFieldGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
-    {
+    public function deleteCustomField(
+        string $customFieldGid,
+        int $responseType = HttpClientInterface::RESPONSE_DATA
+    ): array {
         $this->validateGid($customFieldGid, 'Custom field GID');
 
         return $this->deleteResource('custom_fields', $customFieldGid, $responseType);
@@ -244,13 +246,13 @@ class CustomFieldApiService extends BaseApiService
      * - offset (string): Pagination offset token
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -258,20 +260,19 @@ class CustomFieldApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of custom fields
-     * @throws ApiException If invalid workspace GID provided, permission errors,
-     *                          network issues, or rate limiting occurs
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function getCustomFieldsForWorkspace(
         string $workspaceGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($workspaceGid, 'Workspace GID');
 
@@ -307,13 +308,13 @@ class CustomFieldApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -321,14 +322,12 @@ class CustomFieldApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the created enum option
-     * @throws ApiException If invalid custom field GID provided, malformed data,
-     *                          custom field is not of type enum/multi_enum, insufficient permissions,
-     *                          or network issues occur
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
@@ -336,7 +335,7 @@ class CustomFieldApiService extends BaseApiService
         string $customFieldGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($customFieldGid, 'Custom field GID');
 
@@ -370,13 +369,13 @@ class CustomFieldApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -384,14 +383,12 @@ class CustomFieldApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the updated custom field with reordered enum options
-     * @throws ApiException If invalid custom field GID provided, malformed data,
-     *                          custom field is not of type enum, insufficient permissions,
-     *                          or network issues occur
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
@@ -399,7 +396,7 @@ class CustomFieldApiService extends BaseApiService
         string $customFieldGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($customFieldGid, 'Custom field GID');
 
@@ -433,13 +430,13 @@ class CustomFieldApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -447,14 +444,12 @@ class CustomFieldApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the updated enum option
-     * @throws ApiException If invalid custom field GID or enum option GID provided, malformed data,
-     *                          custom field is not of type enum/multi_enum, insufficient permissions,
-     *                          or network issues occur
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
@@ -463,7 +458,7 @@ class CustomFieldApiService extends BaseApiService
         string $enumOptionGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($customFieldGid, 'Custom field GID');
         $this->validateGid($enumOptionGid, 'Enum option GID');
@@ -495,13 +490,13 @@ class CustomFieldApiService extends BaseApiService
      * - offset (string): Pagination offset token
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -509,20 +504,19 @@ class CustomFieldApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of custom field settings
-     * @throws ApiException If invalid project GID provided, permission errors,
-     *                          network issues, or rate limiting occurs
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function getCustomFieldSettingsForProject(
         string $projectGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -553,13 +547,13 @@ class CustomFieldApiService extends BaseApiService
      * - offset (string): Pagination offset token
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -567,20 +561,19 @@ class CustomFieldApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of custom field settings
-     * @throws ApiException If invalid portfolio GID provided, permission errors,
-     *                          network issues, or rate limiting occurs
-     * @throws ValidationException
+     * @throws ApiException
      * @throws RateLimitException
+     * @throws ValidationException
      */
     public function getCustomFieldSettingsForPortfolio(
         string $portfolioGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($portfolioGid, 'Portfolio GID');
 

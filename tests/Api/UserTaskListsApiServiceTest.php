@@ -3,26 +3,22 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\UserTaskListsApiService;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Exceptions\ValidationException;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class UserTaskListsApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var UserTaskListsApiService */
     private UserTaskListsApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new UserTaskListsApiService($this->mockClient);
     }
 
@@ -45,7 +41,7 @@ class UserTaskListsApiServiceTest extends TestCase
                 'GET',
                 'user_task_lists/12345',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -67,7 +63,7 @@ class UserTaskListsApiServiceTest extends TestCase
                 'GET',
                 'user_task_lists/12345',
                 ['query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -85,14 +81,14 @@ class UserTaskListsApiServiceTest extends TestCase
                 'GET',
                 'user_task_lists/12345',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
         $this->service->getUserTaskList(
             '12345',
             [],
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 
@@ -141,7 +137,7 @@ class UserTaskListsApiServiceTest extends TestCase
                 'GET',
                 'users/12345/user_task_list',
                 ['query' => ['workspace' => '67890']],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -166,7 +162,7 @@ class UserTaskListsApiServiceTest extends TestCase
                     'opt_fields' => 'name,owner,workspace',
                     'workspace' => '67890',
                 ]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -184,7 +180,7 @@ class UserTaskListsApiServiceTest extends TestCase
                 'GET',
                 'users/12345/user_task_list',
                 ['query' => ['workspace' => '67890']],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
@@ -192,7 +188,7 @@ class UserTaskListsApiServiceTest extends TestCase
             '12345',
             '67890',
             [],
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 
@@ -239,7 +235,7 @@ class UserTaskListsApiServiceTest extends TestCase
                 'GET',
                 'users/me/user_task_list',
                 ['query' => ['workspace' => '67890']],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -265,7 +261,7 @@ class UserTaskListsApiServiceTest extends TestCase
                 'GET',
                 'users/user@example.com/user_task_list',
                 ['query' => ['workspace' => '67890']],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 

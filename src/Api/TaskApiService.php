@@ -2,9 +2,9 @@
 
 namespace BrightleafDigital\Api;
 
+use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\RateLimitException;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
@@ -41,13 +41,13 @@ class TaskApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -55,10 +55,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of tasks with fields including:
      *   - gid: Unique identifier of the task
      *   - resource_type: Always "task"
@@ -79,7 +79,7 @@ class TaskApiService extends BaseApiService
      * - Rate limiting
      * - Network connectivity issues
      */
-    public function getTasks(array $options, int $responseType = AsanaApiClient::RESPONSE_DATA): array
+    public function getTasks(array $options, int $responseType = HttpClientInterface::RESPONSE_DATA): array
     {
         return $this->getResources('tasks', $options, $responseType);
     }
@@ -115,13 +115,13 @@ class TaskApiService extends BaseApiService
      *   Example: ["opt_fields" => "name,assignee,completed"]
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -129,10 +129,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the created task details including:
      *   - gid: Unique identifier of the created task
      * - resource_type: Always "task"
@@ -158,7 +158,7 @@ class TaskApiService extends BaseApiService
     public function createTask(
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         return $this->createResource('tasks', $data, $options, $responseType);
     }
@@ -182,13 +182,13 @@ class TaskApiService extends BaseApiService
      *   Example: ["opt_fields" => "name,assignee,completed"]
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -196,10 +196,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the task details including:
      *   - gid: Unique identifier of the task
      * - resource_type: Always "task"
@@ -224,7 +224,7 @@ class TaskApiService extends BaseApiService
     public function getTask(
         string $taskGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -265,13 +265,13 @@ class TaskApiService extends BaseApiService
      *   Example: ["opt_fields" => "name,assignee,completed"]
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -279,10 +279,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the updated task details including:
      *   - gid: Unique identifier of the task
      * - resource_type: Always "task"
@@ -305,7 +305,7 @@ class TaskApiService extends BaseApiService
         string $taskGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -325,13 +325,13 @@ class TaskApiService extends BaseApiService
      *                         Example: "12345"
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -339,10 +339,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
      * @throws ApiException If the API request fails due to:
      *
@@ -352,7 +352,7 @@ class TaskApiService extends BaseApiService
      * - Rate limiting
      * @throws ValidationException If task GID is empty
      */
-    public function deleteTask(string $taskGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
+    public function deleteTask(string $taskGid, int $responseType = HttpClientInterface::RESPONSE_DATA): array
     {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -385,13 +385,13 @@ class TaskApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -399,10 +399,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the duplication job details including:
      *   - gid: Unique identifier of the duplication job
      * - resource_type: Always "job"
@@ -410,8 +410,7 @@ class TaskApiService extends BaseApiService
      * - new_task: Object containing the new duplicated task details once duplication is complete
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException For invalid task GIDs, malformed data,
-     *                          insufficient permissions, or network issues
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
@@ -419,7 +418,7 @@ class TaskApiService extends BaseApiService
         string $taskGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -457,13 +456,13 @@ class TaskApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -471,10 +470,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of tasks with fields including:
      *   - gid: Unique identifier of the task
      * - resource_type: Always "task"
@@ -488,15 +487,14 @@ class TaskApiService extends BaseApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid project GID provided, permission errors,
-     *                         network issues, or rate limiting occurs
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function getTasksByProject(
         string $projectGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -528,13 +526,13 @@ class TaskApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -542,10 +540,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of tasks with fields including:
      *   - gid: Unique identifier of the task
      * - resource_type: Always "task"
@@ -559,15 +557,14 @@ class TaskApiService extends BaseApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid section GID provided, permission errors,
-     *                         network issues, or rate limiting occurs
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function getTasksBySection(
         string $sectionGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($sectionGid, 'Section GID');
 
@@ -599,13 +596,13 @@ class TaskApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -613,10 +610,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of tasks with fields including:
      *   - gid: Unique identifier of the task
      * - resource_type: Always "task"
@@ -631,15 +628,14 @@ class TaskApiService extends BaseApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid tag GID is provided, permission errors,
-     *                          network issues, or rate limiting occurs
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function getTasksByTag(
         string $tagGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($tagGid, 'Tag GID');
 
@@ -666,13 +662,13 @@ class TaskApiService extends BaseApiService
      * - offset (string): Offset token for pagination
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -680,10 +676,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of tasks with fields including:
      *   - gid: Unique identifier of the task
      * - resource_type: Always "task"
@@ -697,19 +693,14 @@ class TaskApiService extends BaseApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If the API request fails due to:
-     *
-     * - Invalid user task list GID
-     * - Insufficient permissions
-     * - Network connectivity issues
-     * - Rate limiting
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function getTasksByUserTaskList(
         string $userTaskListGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($userTaskListGid, 'User Task List GID');
 
@@ -739,13 +730,13 @@ class TaskApiService extends BaseApiService
      * - offset: Used for pagination, marks the beginning of page
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -753,10 +744,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of subtasks with fields including:
      *   - gid: Unique identifier of the subtask
      * - resource_type: Always "task"
@@ -771,19 +762,14 @@ class TaskApiService extends BaseApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If the API request fails due to:
-     *
-     * - Invalid task GID
-     * - Insufficient permissions to access the task
-     * - Network connectivity issues
-     * - Rate limiting
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function getSubtasksFromTask(
         string $taskGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -821,13 +807,13 @@ class TaskApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -835,10 +821,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the created subtask details including:
      *   - gid: Unique identifier of the created subtask
      * - resource_type: Always "task"
@@ -853,8 +839,7 @@ class TaskApiService extends BaseApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If the API request fails due to invalid task GID, malformed data,
-     *                          insufficient permissions, or network issues
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
@@ -862,7 +847,7 @@ class TaskApiService extends BaseApiService
         string $taskGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -900,13 +885,13 @@ class TaskApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -914,10 +899,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the updated task details including:
      *   - gid: Unique identifier of the task
      * - resource_type: Always "task"
@@ -931,8 +916,7 @@ class TaskApiService extends BaseApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid task GIDs provided, insufficient permissions,
-     *                          network issues, or if attempting to create circular dependencies
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
@@ -940,7 +924,7 @@ class TaskApiService extends BaseApiService
         string $taskGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -971,13 +955,13 @@ class TaskApiService extends BaseApiService
      * - offset: Used for pagination, marks the beginning of page
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -985,10 +969,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of dependency tasks with fields including:
      *   - gid: Unique identifier of the dependency task
      * - resource_type: Always "task"
@@ -1002,19 +986,14 @@ class TaskApiService extends BaseApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If the API request fails due to:
-     *
-     * - Invalid task GID
-     * - Insufficient permissions to access the task
-     * - Network connectivity issues
-     * - Rate limiting
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function getDependenciesFromTask(
         string $taskGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -1040,13 +1019,13 @@ class TaskApiService extends BaseApiService
      *                    Note: There is a limit of 30 total dependencies and dependents combined per task.
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1054,26 +1033,19 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful addition of dependencies
-     * @throws ApiException If the API request fails due to:
-     *
-     * - Invalid task GID
-     * - Invalid dependency task GIDs
-     * - Insufficient permissions
-     * - Network connectivity issues
-     * - Circular dependencies
-     * - Exceeding the 30 total dependencies/dependents limit
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function setDependenciesForTask(
         string $taskGid,
         array $data,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -1103,13 +1075,13 @@ class TaskApiService extends BaseApiService
      *                      Example: ['1234', '5678']
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1117,24 +1089,19 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal of dependencies
-     * @throws ApiException If the API request fails due to:
-     *
-     * - Invalid task GID
-     * - Invalid dependency task GIDs
-     * - Insufficient permissions
-     * - Network connectivity issues
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function unlinkDependenciesFromTask(
         string $taskGid,
         array $data,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -1166,13 +1133,13 @@ class TaskApiService extends BaseApiService
      * - offset: Used for pagination, marks the beginning of page
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1180,10 +1147,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of dependent tasks with fields including:
      *   - gid: Unique identifier of the dependent task
      * - resource_type: Always "task"
@@ -1197,19 +1164,14 @@ class TaskApiService extends BaseApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If the API request fails due to:
-     *
-     * - Invalid task GID
-     * - Insufficient permissions to access the task
-     * - Network connectivity issues
-     * - Rate limiting
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function getDependentsFromTask(
         string $taskGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -1236,13 +1198,13 @@ class TaskApiService extends BaseApiService
      *                    Note: There is a limit of 30 total dependencies and dependents combined per task.
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1250,26 +1212,19 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful addition of dependents
-     * @throws ApiException If the API request fails due to:
-     *
-     * - Invalid task GID
-     * - Invalid dependent task GIDs
-     * - Insufficient permissions
-     * - Network connectivity issues
-     * - Circular dependencies
-     * - Exceeding the 30 total dependencies/dependents limit
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function setDependentsForTask(
         string $taskGid,
         array $data,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -1299,13 +1254,13 @@ class TaskApiService extends BaseApiService
      *                      Example: ['1234', '5678']
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1313,24 +1268,19 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal of dependents
-     * @throws ApiException If the API request fails due to:
-     *
-     * - Invalid task GID
-     * - Invalid dependent task GIDs
-     * - Insufficient permissions
-     * - Network connectivity issues
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function unlinkDependentsFromTask(
         string $taskGid,
         array $data,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -1363,13 +1313,13 @@ class TaskApiService extends BaseApiService
      * - section (string): A section gid in the project to add the task to
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1377,13 +1327,12 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful addition of project to task
-     * @throws ApiException If the API request fails due to invalid task GID, invalid project GID,
-     *                          insufficient permissions, or network issues
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
@@ -1391,7 +1340,7 @@ class TaskApiService extends BaseApiService
         string $taskGid,
         string $projectGid,
         array $data = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
         $this->validateGid($projectGid, 'Project GID');
@@ -1418,13 +1367,13 @@ class TaskApiService extends BaseApiService
      *                          can be found in the project URL or returned from project-related API endpoints.
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1432,20 +1381,19 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal of project from task
-     * @throws ApiException If the API request fails due to invalid task GID, invalid project GID,
-     *                         insufficient permissions, or network issues
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function removeProjectFromTask(
         string $taskGid,
         string $projectGid,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
         $this->validateGid($projectGid, 'Project GID');
@@ -1473,13 +1421,13 @@ class TaskApiService extends BaseApiService
      *                       tag-related API endpoints.
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1487,20 +1435,19 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful addition of tag to task
-     * @throws ApiException If the API request fails due to invalid task GID, invalid tag GID,
-     *                          insufficient permissions, or network issues
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function addTagToTask(
         string $taskGid,
         string $tagGid,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
         $this->validateGid($tagGid, 'Tag GID');
@@ -1528,13 +1475,13 @@ class TaskApiService extends BaseApiService
      *                       tag-related API endpoints.
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1542,20 +1489,19 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal of tag from task
-     * @throws ApiException If the API request fails due to invalid task GID, invalid tag GID,
-     *                          insufficient permissions, or network issues
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function removeTagFromTask(
         string $taskGid,
         string $tagGid,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
         $this->validateGid($tagGid, 'Tag GID');
@@ -1587,13 +1533,13 @@ class TaskApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1601,13 +1547,12 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful addition of followers to task
-     * @throws ApiException If the API request fails due to invalid task GID, invalid user GIDs,
-     *                          insufficient permissions, or network issues
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
@@ -1615,7 +1560,7 @@ class TaskApiService extends BaseApiService
         string $taskGid,
         array $followers,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -1647,13 +1592,13 @@ class TaskApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1661,13 +1606,12 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful removal of followers from task
-     * @throws ApiException If the API request fails due to invalid task GID, invalid user GIDs,
-     *                          insufficient permissions, or network issues
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
@@ -1675,7 +1619,7 @@ class TaskApiService extends BaseApiService
         string $taskGid,
         array $followers,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
 
@@ -1700,13 +1644,13 @@ class TaskApiService extends BaseApiService
      * @param string $customId The custom task ID to retrieve.
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1714,10 +1658,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the task details including:
      *   - gid: Unique identifier of the task
      * - resource_type: Always "task"
@@ -1735,14 +1679,14 @@ class TaskApiService extends BaseApiService
      * - followers: Array of follower objects
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If the API request fails or no task with the provided custom ID is found.
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function getTaskByCustomId(
         string $workspaceGid,
         string $customId,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($workspaceGid, 'Workspace GID');
 
@@ -1795,13 +1739,13 @@ class TaskApiService extends BaseApiService
      * ```
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1809,10 +1753,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of matching tasks with fields including:
      *   - gid: Unique identifier of the task
      * - resource_type: Always "task"
@@ -1827,14 +1771,14 @@ class TaskApiService extends BaseApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If the API request fails due to connectivity issues or invalid query parameters.
-     * @throws ValidationException
+     * @throws ApiException
      * @throws RateLimitException
+     * @throws ValidationException
      */
     public function searchTasks(
         string $workspaceGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($workspaceGid, 'Workspace GID');
 
@@ -1855,13 +1799,13 @@ class TaskApiService extends BaseApiService
      * @param string $assigneeGid The unique global ID of the user to whom the task should be reassigned.
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1869,10 +1813,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the updated task details including:
      *   - gid: Unique identifier of the task
      * - resource_type: Always "task"
@@ -1893,7 +1837,7 @@ class TaskApiService extends BaseApiService
     public function reassignTask(
         string $taskGid,
         string $assigneeGid,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($taskGid, 'Task GID');
         $this->validateGid($assigneeGid, 'Assignee GID');
@@ -1916,13 +1860,13 @@ class TaskApiService extends BaseApiService
      *   - `opt_fields` (string): A comma-separated list of fields to include in the result (e.g., `name,due_on`).
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -1930,10 +1874,10 @@ class TaskApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of overdue tasks with fields including:
      *   - gid: Unique identifier of the task
      * - resource_type: Always "task"
@@ -1955,7 +1899,7 @@ class TaskApiService extends BaseApiService
         string $workspaceGid,
         ?array $assigneeGids = null,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($workspaceGid, 'Workspace GID');
 

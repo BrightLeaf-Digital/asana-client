@@ -3,24 +3,21 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\TagsApiService;
-use BrightleafDigital\Http\AsanaApiClient;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TagsApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var TagsApiService */
-    private $service;
+    private TagsApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new TagsApiService($this->mockClient);
     }
 
@@ -31,7 +28,7 @@ class TagsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tags', ['query' => ['workspace' => '12345']], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'tags', ['query' => ['workspace' => '12345']], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getTags('12345');
@@ -47,7 +44,7 @@ class TagsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tags', ['query' => $expectedQuery], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'tags', ['query' => $expectedQuery], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getTags('12345', $options);
@@ -66,7 +63,7 @@ class TagsApiServiceTest extends TestCase
                 'POST',
                 'tags',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -86,7 +83,7 @@ class TagsApiServiceTest extends TestCase
                 'POST',
                 'tags',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -100,7 +97,7 @@ class TagsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tags/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'tags/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getTag('12345');
@@ -115,7 +112,7 @@ class TagsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tags/12345', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'tags/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getTag('12345', $options);
@@ -134,7 +131,7 @@ class TagsApiServiceTest extends TestCase
                 'PUT',
                 'tags/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -148,7 +145,7 @@ class TagsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('DELETE', 'tags/12345', [], AsanaApiClient::RESPONSE_DATA)
+            ->with('DELETE', 'tags/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->deleteTag('12345');
@@ -161,7 +158,7 @@ class TagsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tags/12345/tasks', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'tags/12345/tasks', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getTasksForTag('12345');
@@ -176,7 +173,7 @@ class TagsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tags/12345/tasks', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'tags/12345/tasks', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getTasksForTag('12345', $options);
@@ -189,7 +186,7 @@ class TagsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/tags', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces/12345/tags', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getTagsForWorkspace('12345');
@@ -208,7 +205,7 @@ class TagsApiServiceTest extends TestCase
                 'POST',
                 'workspaces/12345/tags',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -222,9 +219,9 @@ class TagsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tags/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'tags/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getTag('12345', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getTag('12345', [], HttpClientInterface::RESPONSE_FULL);
     }
 }

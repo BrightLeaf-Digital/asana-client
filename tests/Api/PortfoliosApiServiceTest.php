@@ -3,26 +3,22 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\PortfoliosApiService;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Exceptions\ValidationException;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class PortfoliosApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var PortfoliosApiService */
-    private $service;
+    private PortfoliosApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new PortfoliosApiService($this->mockClient);
     }
 
@@ -44,7 +40,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'GET',
                 'portfolios',
                 ['query' => ['workspace' => '12345', 'owner' => '67890']],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -66,7 +62,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'GET',
                 'portfolios',
                 ['query' => ['opt_fields' => 'name,owner', 'workspace' => '12345', 'owner' => '67890']],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -84,11 +80,11 @@ class PortfoliosApiServiceTest extends TestCase
                 'GET',
                 'portfolios',
                 ['query' => ['workspace' => '12345', 'owner' => '67890']],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->getPortfolios('12345', '67890', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getPortfolios('12345', '67890', [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -150,7 +146,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'GET',
                 'portfolios',
                 ['query' => ['workspace' => '12345', 'owner' => 'me']],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -174,7 +170,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'GET',
                 'portfolios',
                 ['query' => ['workspace' => '12345', 'owner' => 'user@example.com']],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -199,7 +195,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'POST',
                 'portfolios',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -222,7 +218,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'POST',
                 'portfolios',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -247,7 +243,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'POST',
                 'portfolios',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -298,7 +294,7 @@ class PortfoliosApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'portfolios/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'portfolios/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
 
         $result = $this->service->getPortfolio('12345');
@@ -315,7 +311,7 @@ class PortfoliosApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'portfolios/12345', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'portfolios/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getPortfolio('12345', $options);
@@ -328,10 +324,10 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'portfolios/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'portfolios/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getPortfolio('12345', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getPortfolio('12345', [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -372,7 +368,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'PUT',
                 'portfolios/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -395,7 +391,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'PUT',
                 'portfolios/12345',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -415,11 +411,11 @@ class PortfoliosApiServiceTest extends TestCase
                 'PUT',
                 'portfolios/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->updatePortfolio('12345', $data, [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->updatePortfolio('12345', $data, [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -453,7 +449,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('DELETE', 'portfolios/12345', [], AsanaApiClient::RESPONSE_DATA)
+            ->with('DELETE', 'portfolios/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $result = $this->service->deletePortfolio('12345');
@@ -468,10 +464,10 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('DELETE', 'portfolios/12345', [], AsanaApiClient::RESPONSE_FULL)
+            ->with('DELETE', 'portfolios/12345', [], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->deletePortfolio('12345', AsanaApiClient::RESPONSE_FULL);
+        $this->service->deletePortfolio('12345', HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -507,7 +503,7 @@ class PortfoliosApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'portfolios/12345/items', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'portfolios/12345/items', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
 
         $result = $this->service->getPortfolioItems('12345');
@@ -524,7 +520,7 @@ class PortfoliosApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'portfolios/12345/items', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'portfolios/12345/items', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getPortfolioItems('12345', $options);
@@ -567,7 +563,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'POST',
                 'portfolios/12345/addItem',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -587,7 +583,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'POST',
                 'portfolios/12345/addItem',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -642,7 +638,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'POST',
                 'portfolios/12345/removeItem',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -704,7 +700,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'POST',
                 'portfolios/12345/addCustomFieldSetting',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -726,11 +722,11 @@ class PortfoliosApiServiceTest extends TestCase
                 'POST',
                 'portfolios/12345/addCustomFieldSetting',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->addCustomFieldSettingForPortfolio('12345', $data, AsanaApiClient::RESPONSE_FULL);
+        $this->service->addCustomFieldSettingForPortfolio('12345', $data, HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -770,7 +766,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'POST',
                 'portfolios/12345/removeCustomFieldSetting',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -792,11 +788,11 @@ class PortfoliosApiServiceTest extends TestCase
                 'POST',
                 'portfolios/12345/removeCustomFieldSetting',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->removeCustomFieldSettingForPortfolio('12345', $data, AsanaApiClient::RESPONSE_FULL);
+        $this->service->removeCustomFieldSettingForPortfolio('12345', $data, HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -836,7 +832,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'POST',
                 'portfolios/12345/addMembers',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -857,7 +853,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'POST',
                 'portfolios/12345/addMembers',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -912,7 +908,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'POST',
                 'portfolios/12345/removeMembers',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -935,7 +931,7 @@ class PortfoliosApiServiceTest extends TestCase
                 'POST',
                 'portfolios/12345/removeMembers',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 

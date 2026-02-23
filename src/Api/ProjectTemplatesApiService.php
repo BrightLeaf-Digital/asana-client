@@ -2,9 +2,10 @@
 
 namespace BrightleafDigital\Api;
 
-use BrightleafDigital\Exceptions\ApiException;
-use BrightleafDigital\Http\AsanaApiClient;
+use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Exceptions\ValidationException;
+use BrightleafDigital\Http\HttpClientInterface;
+use BrightleafDigital\Exceptions\ApiException;
 
 class ProjectTemplatesApiService extends BaseApiService
 {
@@ -22,13 +23,13 @@ class ProjectTemplatesApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -36,10 +37,10 @@ class ProjectTemplatesApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the template details including:
      *   - gid: Unique identifier of the project template
      * - resource_type: Always "project_template"
@@ -56,7 +57,7 @@ class ProjectTemplatesApiService extends BaseApiService
     public function getProjectTemplate(
         string $projectTemplateGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectTemplateGid, 'Project Template GID');
 
@@ -73,13 +74,13 @@ class ProjectTemplatesApiService extends BaseApiService
      *                                   Example: "12345"
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -87,10 +88,10 @@ class ProjectTemplatesApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
      * @throws ApiException|ValidationException If the API request fails due to:
      *
@@ -102,7 +103,7 @@ class ProjectTemplatesApiService extends BaseApiService
      */
     public function deleteProjectTemplate(
         string $projectTemplateGid,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectTemplateGid, 'Project Template GID');
 
@@ -130,13 +131,13 @@ class ProjectTemplatesApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -144,16 +145,16 @@ class ProjectTemplatesApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of project templates
      * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
      */
     public function getProjectTemplates(
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         return $this->getResources('project_templates', $options, $responseType);
     }
@@ -164,6 +165,7 @@ class ProjectTemplatesApiService extends BaseApiService
      * Returns the compact project template records for all project templates
      * in the given team.
      * API Documentation: https://developers.asana.com/reference/getprojecttemplatesforteam
+     *
      * @param string $teamGid The unique global ID of the team.
      *                        Example: "12345"
      * @param array $options Optional parameters to customize the request:
@@ -179,13 +181,13 @@ class ProjectTemplatesApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -193,18 +195,18 @@ class ProjectTemplatesApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of project templates for the team
-     * @throws ApiException If invalid team GID provided, insufficient permissions,
+     * @throws ApiException|ValidationException If invalid team GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getProjectTemplatesForTeam(
         string $teamGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($teamGid, 'Team GID');
 
@@ -222,6 +224,7 @@ class ProjectTemplatesApiService extends BaseApiService
      * Creates and returns a job that will asynchronously handle the project instantiation.
      * The job will create a new project based on the specified template.
      * API Documentation: https://developers.asana.com/reference/instantiateproject
+     *
      * @param string $projectTemplateGid The unique global ID of the project template.
      *                                   Example: "12345"
      * @param array $data Data for instantiating the project. Supported fields include:
@@ -240,13 +243,13 @@ class ProjectTemplatesApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -254,24 +257,24 @@ class ProjectTemplatesApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the job details including:
      *   - gid: Unique identifier of the job
      * - resource_type: Always "job"
      * - status: Status of the job
      * - new_project: Object containing the new project details
+     * @throws ApiException
      * @throws ValidationException If the project template GID is invalid or name is missing
-     * @throws ApiException If the template doesn't exist, insufficient permissions,
-     *                          or network issues occur
+     * @throws RateLimitException
      */
     public function instantiateProject(
         string $projectTemplateGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectTemplateGid, 'Project Template GID');
         $this->validateRequiredFields($data, ['name'], 'project instantiation');

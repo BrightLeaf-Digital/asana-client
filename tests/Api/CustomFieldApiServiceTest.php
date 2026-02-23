@@ -3,24 +3,21 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\CustomFieldApiService;
-use BrightleafDigital\Http\AsanaApiClient;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class CustomFieldApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var CustomFieldApiService */
-    private $service;
+    private CustomFieldApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new CustomFieldApiService($this->mockClient);
     }
 
@@ -41,7 +38,7 @@ class CustomFieldApiServiceTest extends TestCase
                 'POST',
                 'custom_fields',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -70,7 +67,7 @@ class CustomFieldApiServiceTest extends TestCase
                 'POST',
                 'custom_fields',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -84,7 +81,7 @@ class CustomFieldApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'custom_fields/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'custom_fields/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getCustomField('12345');
@@ -99,7 +96,7 @@ class CustomFieldApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'custom_fields/12345', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'custom_fields/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getCustomField('12345', $options);
@@ -118,7 +115,7 @@ class CustomFieldApiServiceTest extends TestCase
                 'PUT',
                 'custom_fields/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -132,7 +129,7 @@ class CustomFieldApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('DELETE', 'custom_fields/12345', [], AsanaApiClient::RESPONSE_DATA)
+            ->with('DELETE', 'custom_fields/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->deleteCustomField('12345');
@@ -145,7 +142,7 @@ class CustomFieldApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/custom_fields', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces/12345/custom_fields', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getCustomFieldsForWorkspace('12345');
@@ -160,7 +157,7 @@ class CustomFieldApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/custom_fields', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces/12345/custom_fields', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getCustomFieldsForWorkspace('12345', $options);
@@ -179,7 +176,7 @@ class CustomFieldApiServiceTest extends TestCase
                 'POST',
                 'custom_fields/12345/enum_options',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -199,7 +196,7 @@ class CustomFieldApiServiceTest extends TestCase
                 'POST',
                 'custom_fields/12345/enum_options',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -219,7 +216,7 @@ class CustomFieldApiServiceTest extends TestCase
                 'POST',
                 'custom_fields/12345/enum_options/insert',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -239,7 +236,7 @@ class CustomFieldApiServiceTest extends TestCase
                 'POST',
                 'custom_fields/12345/enum_options/insert',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -259,7 +256,7 @@ class CustomFieldApiServiceTest extends TestCase
                 'PUT',
                 'custom_fields/12345/enum_options/67890',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -279,7 +276,7 @@ class CustomFieldApiServiceTest extends TestCase
                 'PUT',
                 'custom_fields/12345/enum_options/67890',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -293,7 +290,7 @@ class CustomFieldApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'projects/12345/custom_field_settings', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'projects/12345/custom_field_settings', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getCustomFieldSettingsForProject('12345');
@@ -306,7 +303,7 @@ class CustomFieldApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'portfolios/12345/custom_field_settings', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'portfolios/12345/custom_field_settings', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getCustomFieldSettingsForPortfolio('12345');
@@ -319,9 +316,9 @@ class CustomFieldApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'custom_fields/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'custom_fields/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getCustomField('12345', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getCustomField('12345', [], HttpClientInterface::RESPONSE_FULL);
     }
 }

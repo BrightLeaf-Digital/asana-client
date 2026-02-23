@@ -2,10 +2,10 @@
 
 namespace BrightleafDigital\Api;
 
+use BrightleafDigital\Exceptions\ValidationException;
+use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\RateLimitException;
-use BrightleafDigital\Http\AsanaApiClient;
-use BrightleafDigital\Exceptions\ValidationException;
 
 class SectionApiService extends BaseApiService
 {
@@ -27,13 +27,13 @@ class SectionApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -41,10 +41,10 @@ class SectionApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the section details including:
      *   - gid: Unique identifier of the section
      * - resource_type: Always "section"
@@ -62,7 +62,7 @@ class SectionApiService extends BaseApiService
     public function getSection(
         string $sectionGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($sectionGid, 'Section GID');
 
@@ -91,13 +91,13 @@ class SectionApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -105,10 +105,10 @@ class SectionApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the updated section details including:
      *   - gid: Unique identifier of the section
      * - resource_type: Always "section"
@@ -127,7 +127,7 @@ class SectionApiService extends BaseApiService
         string $sectionGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($sectionGid, 'Section GID');
 
@@ -149,13 +149,13 @@ class SectionApiService extends BaseApiService
      *                           Example: "12345"
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -163,10 +163,10 @@ class SectionApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
      * @throws ApiException If the API request fails due to:
      *
@@ -178,7 +178,7 @@ class SectionApiService extends BaseApiService
      * @throws RateLimitException
      * @throws ValidationException
      */
-    public function deleteSection(string $sectionGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
+    public function deleteSection(string $sectionGid, int $responseType = HttpClientInterface::RESPONSE_DATA): array
     {
         $this->validateGid($sectionGid, 'Section GID');
 
@@ -209,13 +209,13 @@ class SectionApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -223,10 +223,10 @@ class SectionApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of sections with fields including:
      *   - gid: Unique identifier of the section
      * - resource_type: Always "section"
@@ -236,15 +236,14 @@ class SectionApiService extends BaseApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid project GID provided, insufficient permissions,
-     *                          network issues, or rate limiting occurs
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function getSectionsForProject(
         string $projectGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -279,13 +278,13 @@ class SectionApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -293,10 +292,10 @@ class SectionApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the created section details including:
      *   - gid: Unique identifier of the created section
      * - resource_type: Always "section"
@@ -306,8 +305,7 @@ class SectionApiService extends BaseApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid project GID provided, project doesn't support sections,
-     *                          malformed data, insufficient permissions, or network issues occur
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
@@ -315,7 +313,7 @@ class SectionApiService extends BaseApiService
         string $projectGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 
@@ -350,13 +348,13 @@ class SectionApiService extends BaseApiService
      *                    Example: ["task" => "67890", "insert_after" => "11111"]
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -364,20 +362,19 @@ class SectionApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful addition
-     * @throws ApiException If the task doesn't exist, section doesn't exist, insufficient permissions,
-     *                          task already in section, or network issues occur
+     * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException
      */
     public function addTaskToSection(
         string $sectionGid,
         array $data,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($sectionGid, 'Section GID');
 
@@ -412,13 +409,13 @@ class SectionApiService extends BaseApiService
      *                    Example: ["section" => "67890", "after_section" => "11111"]
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -426,20 +423,19 @@ class SectionApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful reordering
-     * @throws ApiException If the project doesn't exist, sections don't exist, invalid positioning,
-     *                          insufficient permissions, or network issues occur
-     * @throws ValidationException
+     * @throws ApiException
      * @throws RateLimitException
+     * @throws ValidationException
      */
     public function insertSectionForProject(
         string $projectGid,
         array $data,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($projectGid, 'Project GID');
 

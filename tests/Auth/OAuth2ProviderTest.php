@@ -5,12 +5,11 @@ namespace BrightleafDigital\Tests\Auth;
 use BrightleafDigital\Auth\OAuth2Provider;
 use League\OAuth2\Client\Token\AccessToken;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class OAuth2ProviderTest extends TestCase
 {
     /** @var OAuth2Provider */
-    private $provider;
+    private OAuth2Provider $provider;
 
     protected function setUp(): void
     {
@@ -72,9 +71,7 @@ class OAuth2ProviderTest extends TestCase
     public function testGetSecureAuthorizationUrlWithStateAndPkce(): void
     {
         $result = $this->provider->getSecureAuthorizationUrl(
-            ['scope' => 'tasks:read projects:read'],
-            true,
-            true
+            ['scope' => 'tasks:read projects:read']
         );
 
         $this->assertArrayHasKey('url', $result);
@@ -124,8 +121,7 @@ class OAuth2ProviderTest extends TestCase
     {
         $result = $this->provider->getSecureAuthorizationUrl(
             ['scope' => 'tasks:read'],
-            false,
-            true
+            false
         );
 
         $this->assertArrayHasKey('url', $result);
@@ -165,8 +161,7 @@ class OAuth2ProviderTest extends TestCase
     {
         $result = $this->provider->getSecureAuthorizationUrl(
             ['scope' => 'tasks:read'],
-            false,
-            true
+            false
         );
 
         // Manually calculate what the code challenge should be
@@ -207,8 +202,7 @@ class OAuth2ProviderTest extends TestCase
         for ($i = 0; $i < 10; $i++) {
             $result = $this->provider->getSecureAuthorizationUrl(
                 ['scope' => 'tasks:read'],
-                false,
-                true
+                false
             );
             $verifiers[] = $result['codeVerifier'];
         }
@@ -223,9 +217,7 @@ class OAuth2ProviderTest extends TestCase
     public function testAuthorizationUrlContainsRequiredParams(): void
     {
         $result = $this->provider->getSecureAuthorizationUrl(
-            ['scope' => 'openid email profile'],
-            true,
-            true
+            ['scope' => 'openid email profile']
         );
 
         $parsedUrl = parse_url($result['url']);

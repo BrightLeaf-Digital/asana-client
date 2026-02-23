@@ -2,8 +2,9 @@
 
 namespace BrightleafDigital\Api;
 
+use BrightleafDigital\Exceptions\RateLimitException;
+use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Exceptions\ApiException;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
@@ -36,14 +37,14 @@ class EventsApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body (default)
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body (default)
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset
      *   Note: The default response type is RESPONSE_NORMAL (not RESPONSE_DATA) to ensure
      *                              the sync token is included in the response for subsequent requests.
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -51,13 +52,13 @@ class EventsApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including:
      * - data: Array of event objects
      * - sync: The new sync token to use for the next request
      * - has_more: Whether there are more events to fetch
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA:
+     * If $responseType is HttpClientInterface::RESPONSE_DATA:
      * - Just the data array containing the list of events with fields including:
      * - user: The user who triggered the event
      * - resource: The resource that was affected
@@ -76,7 +77,7 @@ class EventsApiService extends BaseApiService
         string $resourceGid,
         ?string $syncToken = null,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_NORMAL
+        int $responseType = HttpClientInterface::RESPONSE_NORMAL
     ): array {
         $this->validateGid($resourceGid, 'Resource GID');
 
@@ -104,6 +105,7 @@ class EventsApiService extends BaseApiService
      * If more than 1000 events exist for a given workspace, has_more: true will be returned in the
      * response, indicating that there are more events to pull.
      * API Documentation: https://developers.asana.com/reference/getworkspaceevents
+     *
      * @param string $workspaceGid The unique global ID of the workspace or organization.
      *                             This identifier can be found in the admin console or
      *                             returned from workspace-related API endpoints.
@@ -124,14 +126,15 @@ class EventsApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body (default)
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body (default)
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset
      *   Note: The default response type is RESPONSE_NORMAL (not RESPONSE_DATA) to ensure
      *                              the sync token is included in the response for subsequent requests.
+     *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -139,13 +142,13 @@ class EventsApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including:
      * - data: Array of event objects
      * - sync: The new sync token to use for the next request
      * - has_more: Whether there are more events to fetch
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA:
+     * If $responseType is HttpClientInterface::RESPONSE_DATA:
      * - Just the data array containing the list of events with fields including:
      * - user: The user who triggered the event
      * - resource: The resource that was affected
@@ -156,16 +159,15 @@ class EventsApiService extends BaseApiService
      * - change: Object describing what changed (field, action, new_value, added_value, removed_value)
      *                 Additional fields as specified in opt_fields
      *
+     * @throws ApiException
      * @throws ValidationException If the workspace GID is empty or not numeric
-     * @throws ApiException If the sync token is invalid/expired (412 Precondition Failed),
-     *                          insufficient permissions (requires Enterprise+ service account),
-     *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getWorkspaceEvents(
         string $workspaceGid,
         ?string $syncToken = null,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_NORMAL
+        int $responseType = HttpClientInterface::RESPONSE_NORMAL
     ): array {
         $this->validateGid($workspaceGid, 'Workspace GID');
 

@@ -4,14 +4,12 @@ namespace BrightleafDigital\Auth;
 
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use UnexpectedValueException;
 use BrightleafDigital\Exceptions\AuthException;
 
-class AsanaOAuthHandler
+class AsanaOAuthHandler implements AuthHandlerInterface
 {
     /**
      * @property OAuth2Provider $provider The OAuth2 provider instance for Asana authentication
@@ -52,7 +50,9 @@ class AsanaOAuthHandler
      * @param array $options
      * @param bool $enableState
      * @param bool $enablePKCE
+     *
      * @return array ['url' => string, 'state' => string|null, 'codeVerifier' => string|null]
+     * @throws Exception If random_bytes() fails.
      */
     public function getSecureAuthorizationUrl(array $options, bool $enableState = true, bool $enablePKCE = true): array
     {
@@ -74,10 +74,8 @@ class AsanaOAuthHandler
      *
      * @return AccessToken
      *
-     * @throws GuzzleException
-     * @throws IdentityProviderException
-     * @throws UnexpectedValueException
      * @throws AuthException
+     * @throws GuzzleException
      */
     public function handleCallback(string $authorizationCode, ?string $codeVerifier = null): AccessToken
     {
@@ -122,9 +120,8 @@ class AsanaOAuthHandler
      * @param string $authorizationCode The authorization code received from the authorization server.
      *
      * @return AccessToken The access token details, typically including token type, expiry, and other information.
-     * @throws GuzzleException
-     * @throws IdentityProviderException
      * @throws AuthException
+     * @throws GuzzleException
      */
     public function getAccessToken(string $authorizationCode): AccessToken
     {
@@ -154,9 +151,8 @@ class AsanaOAuthHandler
      * @param AccessToken $token The current access token that contains the refresh token needed for renewal.
      *
      * @return AccessToken The newly refreshed access token.
-     * @throws GuzzleException
-     * @throws IdentityProviderException
      * @throws AuthException
+     * @throws GuzzleException
      */
     public function refreshToken(AccessToken $token): AccessToken
     {

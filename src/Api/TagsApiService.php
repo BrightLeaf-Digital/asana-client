@@ -2,8 +2,9 @@
 
 namespace BrightleafDigital\Api;
 
+use BrightleafDigital\Exceptions\RateLimitException;
+use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Exceptions\ApiException;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
@@ -15,6 +16,7 @@ class TagsApiService extends BaseApiService
      * Returns a list of tags in the specified workspace or organization. Tags are used to help
      * categorize and sort tasks, making them easier to find and manage.
      * API Documentation: https://developers.asana.com/reference/gettags
+     *
      * @param string $workspace The unique identifier (GID) of the workspace to get tags from.
      *                          Example: "12345"
      * @param array $options Query parameters to filter and format results:
@@ -30,13 +32,13 @@ class TagsApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -44,10 +46,10 @@ class TagsApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of tags with fields including:
      *   - gid: Unique identifier of the tag
      * - resource_type: Always "tag"
@@ -58,7 +60,7 @@ class TagsApiService extends BaseApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If the API request fails due to:
+     * @throws ApiException|ValidationException If the API request fails due to:*@throws ValidationException
      *
      * - Invalid parameter values
      * - Insufficient permissions
@@ -68,7 +70,7 @@ class TagsApiService extends BaseApiService
     public function getTags(
         string $workspace,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($workspace, 'Workspace GID');
 
@@ -101,13 +103,13 @@ class TagsApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -115,10 +117,10 @@ class TagsApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the created tag details including:
      *   - gid: Unique identifier of the created tag
      * - resource_type: Always "tag"
@@ -135,7 +137,7 @@ class TagsApiService extends BaseApiService
     public function createTag(
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         return $this->createResource('tags', $data, $options, $responseType);
     }
@@ -145,6 +147,7 @@ class TagsApiService extends BaseApiService
      * GET /tags/{tag_gid}
      * Returns the complete tag record for a single tag.
      * API Documentation: https://developers.asana.com/reference/gettag
+     *
      * @param string $tagGid The unique global ID of the tag to retrieve. This identifier
      *                       can be found in the tag URL or returned from tag-related API endpoints.
      *                       Example: "12345"
@@ -154,13 +157,13 @@ class TagsApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -168,10 +171,10 @@ class TagsApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the tag details including:
      *   - gid: Unique identifier of the tag
      * - resource_type: Always "tag"
@@ -182,13 +185,15 @@ class TagsApiService extends BaseApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid tag GID provided, insufficient permissions,
+     * @throws ApiException
+     * @throws ValidationException If invalid tag GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getTag(
         string $tagGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($tagGid, 'Tag GID');
 
@@ -215,13 +220,13 @@ class TagsApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -229,10 +234,10 @@ class TagsApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the updated tag details including:
      *   - gid: Unique identifier of the tag
      * - resource_type: Always "tag"
@@ -250,7 +255,7 @@ class TagsApiService extends BaseApiService
         string $tagGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($tagGid, 'Tag GID');
 
@@ -262,19 +267,20 @@ class TagsApiService extends BaseApiService
      * DELETE /tags/{tag_gid}
      * Deletes a tag. This does not remove the tag from any tasks; it only deletes the tag resource itself.
      * API Documentation: https://developers.asana.com/reference/deletetag
+     *
      * @param string $tagGid The unique global ID of the tag to delete.
      *                       This identifier can be found in the tag URL
      *                       or returned from tag-related API endpoints.
      *                       Example: "12345"
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -282,15 +288,17 @@ class TagsApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including empty data object
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws ApiException|ValidationException If invalid tag GID provided, insufficient permissions,
+     * @throws ApiException
+     * @throws RateLimitException
+     * @throws ValidationException If invalid tag GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
-    public function deleteTag(string $tagGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
+    public function deleteTag(string $tagGid, int $responseType = HttpClientInterface::RESPONSE_DATA): array
     {
         $this->validateGid($tagGid, 'Tag GID');
 
@@ -303,6 +311,7 @@ class TagsApiService extends BaseApiService
      * Returns the tasks that have this tag. Tasks can have multiple tags, and
      * this endpoint allows retrieving all tasks with a specific tag.
      * API Documentation: https://developers.asana.com/reference/gettasksfortag
+     *
      * @param string $tagGid The unique global ID of the tag for which to get tasks.
      *                       This identifier can be found in the tag URL or
      *                       returned from tag-related API endpoints.
@@ -320,13 +329,13 @@ class TagsApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -334,10 +343,10 @@ class TagsApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of tasks with fields including:
      *   - gid: Unique identifier of the task
      * - resource_type: Always "task"
@@ -351,13 +360,15 @@ class TagsApiService extends BaseApiService
      * - modified_at: Last modification timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid tag GID provided, insufficient permissions,
+     * @throws ApiException
+     * @throws RateLimitException
+     * @throws ValidationException If invalid tag GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getTasksForTag(
         string $tagGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($tagGid, 'Tag GID');
 
@@ -370,6 +381,7 @@ class TagsApiService extends BaseApiService
      * Returns the tags available in the specified workspace. Tags are used to categorize
      * and label tasks within a workspace.
      * API Documentation: https://developers.asana.com/reference/gettagsforworkspace
+     *
      * @param string $workspaceGid The unique global ID of the workspace to get tags from.
      *                             This identifier can be found in the workspace URL or
      *                             returned from workspace-related API endpoints.
@@ -387,13 +399,13 @@ class TagsApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -401,10 +413,10 @@ class TagsApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of tags with fields including:
      *   - gid: Unique identifier of the tag
      * - resource_type: Always "tag"
@@ -415,13 +427,15 @@ class TagsApiService extends BaseApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid workspace GID provided, insufficient permissions,
+     * @throws ApiException
+     * @throws RateLimitException
+     * @throws ValidationException If invalid workspace GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      */
     public function getTagsForWorkspace(
         string $workspaceGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($workspaceGid, 'Workspace GID');
 
@@ -434,6 +448,7 @@ class TagsApiService extends BaseApiService
      * Creates a new tag in a workspace. This is a shortcut for creating a tag in a specific workspace
      * rather than specifying the workspace in the data.
      * API Documentation: https://developers.asana.com/reference/createtagforworkspace
+     *
      * @param string $workspaceGid The unique global ID of the workspace to create the tag in.
      *                             This identifier can be found in the workspace URL or
      *                             returned from workspace-related API endpoints.
@@ -457,13 +472,13 @@ class TagsApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -471,10 +486,10 @@ class TagsApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the created tag details including:
      *   - gid: Unique identifier of the created tag
      * - resource_type: Always "tag"
@@ -485,14 +500,16 @@ class TagsApiService extends BaseApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If invalid workspace GID provided, malformed data,
+     * @throws ApiException
+     * @throws RateLimitException
+     * @throws ValidationException If invalid workspace GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
      */
     public function createTagInWorkspace(
         string $workspaceGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($workspaceGid, 'Workspace GID');
 

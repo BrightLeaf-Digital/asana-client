@@ -3,24 +3,21 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\TaskApiService;
-use BrightleafDigital\Http\AsanaApiClient;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TaskApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var TaskApiService */
-    private $service;
+    private TaskApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new TaskApiService($this->mockClient);
     }
 
@@ -34,7 +31,7 @@ class TaskApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tasks', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'tasks', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
 
         $result = $this->service->getTasks($options);
@@ -51,10 +48,10 @@ class TaskApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tasks', ['query' => $options], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'tasks', ['query' => $options], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getTasks($options, AsanaApiClient::RESPONSE_FULL);
+        $this->service->getTasks($options, HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -71,7 +68,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks',
                 ['json' => ['data' => $taskData], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -94,7 +91,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks',
                 ['json' => ['data' => $taskData], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -111,7 +108,7 @@ class TaskApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tasks/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'tasks/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
 
         $result = $this->service->getTask($taskGid);
@@ -128,7 +125,7 @@ class TaskApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tasks/12345', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'tasks/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getTask('12345', $options);
@@ -149,7 +146,7 @@ class TaskApiServiceTest extends TestCase
                 'PUT',
                 'tasks/12345',
                 ['json' => ['data' => $updateData], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -167,7 +164,7 @@ class TaskApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('DELETE', 'tasks/12345', [], AsanaApiClient::RESPONSE_DATA)
+            ->with('DELETE', 'tasks/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $result = $this->service->deleteTask($taskGid);
@@ -185,7 +182,7 @@ class TaskApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tasks/12345/subtasks', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'tasks/12345/subtasks', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
 
         $result = $this->service->getSubtasksFromTask($taskGid);
@@ -207,7 +204,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/subtasks',
                 ['json' => ['data' => $subtaskData], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -224,7 +221,7 @@ class TaskApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'projects/67890/tasks', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'projects/67890/tasks', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
 
         $result = $this->service->getTasksByProject($projectGid);
@@ -241,7 +238,7 @@ class TaskApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'sections/99999/tasks', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'sections/99999/tasks', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getTasksBySection($sectionGid);
@@ -256,7 +253,7 @@ class TaskApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tags/55555/tasks', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'tags/55555/tasks', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getTasksByTag($tagGid);
@@ -276,7 +273,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/addProject',
                 ['json' => ['data' => ['project' => $projectGid]]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -297,7 +294,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/removeProject',
                 ['json' => ['data' => ['project' => $projectGid]]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -318,7 +315,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/addTag',
                 ['json' => ['data' => ['tag' => $tagGid]]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -339,7 +336,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/removeTag',
                 ['json' => ['data' => ['tag' => $tagGid]]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -360,7 +357,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/setParent',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -381,7 +378,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/addFollowers',
                 ['json' => ['data' => ['followers' => $followers]], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -402,7 +399,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/removeFollowers',
                 ['json' => ['data' => ['followers' => $followers]], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -423,7 +420,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/duplicate',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -439,7 +436,7 @@ class TaskApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tasks/12345/dependencies', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'tasks/12345/dependencies', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getDependenciesFromTask($taskGid);
@@ -459,7 +456,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/addDependencies',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -480,7 +477,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/removeDependencies',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -496,7 +493,7 @@ class TaskApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'tasks/12345/dependents', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'tasks/12345/dependents', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getDependentsFromTask($taskGid);
@@ -516,7 +513,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/addDependents',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -537,7 +534,7 @@ class TaskApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/removeDependents',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 

@@ -4,6 +4,7 @@ use BrightleafDigital\AsanaClient;
 use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\TokenInvalidException;
 use BrightleafDigital\Exceptions\ValidationException;
+use BrightleafDigital\Storage\TokenStorageInterface;
 use Dotenv\Dotenv;
 
 require '../vendor/autoload.php';
@@ -13,18 +14,15 @@ $dotenv->load();
 
 $clientId     = $_ENV['ASANA_CLIENT_ID'];
 $clientSecret = $_ENV['ASANA_CLIENT_SECRET'];
-$password     = $_ENV['PASSWORD'];
+$redirectUri  = $_ENV['ASANA_REDIRECT_URI'] ?? null;
+$salt         = $_ENV['SALT'] ?? ($_ENV['PASSWORD'] ?? null);
 
-try {
-    $tokenData = AsanaClient::retrieveToken($password);
-} catch (JsonException | Exception $e) {
-    echo 'Error: ' . $e->getMessage();
-    exit;
-}
+$asanaClient = AsanaClient::OAuth($clientId, $clientSecret, $redirectUri, __DIR__ . '/token.json', null, $salt);
 
-$asanaClient = AsanaClient::withAccessToken($clientId, $clientSecret, $tokenData);
-$asanaClient->onTokenRefresh(function ($token) use ($asanaClient, $password) {
-    $asanaClient->saveToken($password);
+$asanaClient->subscribeToTokenRefresh(function ($token) use ($asanaClient) {
+    $asanaClient->getContainer()
+        ->get(TokenStorageInterface::class)
+        ->save($token->jsonSerialize());
 });
 
 
@@ -142,6 +140,6 @@ try {
         <button type="submit">Create Task</button>
     </form>
     <?php
-} catch (ApiException | TokenInvalidException | ValidationException $e) {
+} catch (ApiException | ValidationException $e) {
     echo 'Error: ' . $e->getMessage();
 }

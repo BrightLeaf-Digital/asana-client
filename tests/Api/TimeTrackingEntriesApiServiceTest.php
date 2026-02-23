@@ -3,26 +3,22 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\TimeTrackingEntriesApiService;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Exceptions\ValidationException;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TimeTrackingEntriesApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var TimeTrackingEntriesApiService */
-    private $service;
+    private TimeTrackingEntriesApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new TimeTrackingEntriesApiService($this->mockClient);
     }
 
@@ -44,7 +40,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'GET',
                 'tasks/12345/time_tracking_entries',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -69,7 +65,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'GET',
                 'tasks/12345/time_tracking_entries',
                 ['query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -87,14 +83,14 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'GET',
                 'tasks/12345/time_tracking_entries',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
         $this->service->getTimeTrackingEntriesForTask(
             '12345',
             [],
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 
@@ -145,7 +141,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/time_tracking_entries',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -168,7 +164,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/time_tracking_entries',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -192,7 +188,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/time_tracking_entries',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -212,7 +208,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'POST',
                 'tasks/12345/time_tracking_entries',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
@@ -220,7 +216,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
             '12345',
             $data,
             [],
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 
@@ -322,7 +318,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'GET',
                 'time_tracking_entries/12345',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -344,7 +340,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'GET',
                 'time_tracking_entries/12345',
                 ['query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -362,14 +358,14 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'GET',
                 'time_tracking_entries/12345',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
         $this->service->getTimeTrackingEntry(
             '12345',
             [],
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 
@@ -418,7 +414,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'PUT',
                 'time_tracking_entries/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -441,7 +437,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'PUT',
                 'time_tracking_entries/12345',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -461,7 +457,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'PUT',
                 'time_tracking_entries/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
@@ -469,7 +465,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
             '12345',
             $data,
             [],
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 
@@ -518,7 +514,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'DELETE',
                 'time_tracking_entries/12345',
                 [],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -538,13 +534,13 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'DELETE',
                 'time_tracking_entries/12345',
                 [],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
         $this->service->deleteTimeTrackingEntry(
             '12345',
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 
@@ -592,7 +588,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'GET',
                 'time_tracking_entries',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -619,7 +615,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'GET',
                 'time_tracking_entries',
                 ['query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -637,10 +633,10 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 'GET',
                 'time_tracking_entries',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->getTimeTrackingEntries([], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getTimeTrackingEntries([], HttpClientInterface::RESPONSE_FULL);
     }
 }

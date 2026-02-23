@@ -3,26 +3,22 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\TeamsApiService;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Exceptions\ValidationException;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TeamsApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var TeamsApiService */
-    private $service;
+    private TeamsApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new TeamsApiService($this->mockClient);
     }
 
@@ -42,7 +38,7 @@ class TeamsApiServiceTest extends TestCase
                 'POST',
                 'teams',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -65,7 +61,7 @@ class TeamsApiServiceTest extends TestCase
                 'POST',
                 'teams',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -90,7 +86,7 @@ class TeamsApiServiceTest extends TestCase
                 'POST',
                 'teams',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -141,7 +137,7 @@ class TeamsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'teams/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'teams/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
 
         $result = $this->service->getTeam('12345');
@@ -158,7 +154,7 @@ class TeamsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'teams/12345', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'teams/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getTeam('12345', $options);
@@ -171,10 +167,10 @@ class TeamsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'teams/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'teams/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getTeam('12345', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getTeam('12345', [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -215,7 +211,7 @@ class TeamsApiServiceTest extends TestCase
                 'PUT',
                 'teams/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -238,7 +234,7 @@ class TeamsApiServiceTest extends TestCase
                 'PUT',
                 'teams/12345',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -258,11 +254,11 @@ class TeamsApiServiceTest extends TestCase
                 'PUT',
                 'teams/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->updateTeam('12345', $data, [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->updateTeam('12345', $data, [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -300,7 +296,7 @@ class TeamsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/teams', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces/12345/teams', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
 
         $result = $this->service->getTeamsForWorkspace('12345');
@@ -317,7 +313,7 @@ class TeamsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/teams', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces/12345/teams', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getTeamsForWorkspace('12345', $options);
@@ -363,7 +359,7 @@ class TeamsApiServiceTest extends TestCase
                 'GET',
                 'users/12345/teams',
                 ['query' => ['organization' => '67890']],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -385,7 +381,7 @@ class TeamsApiServiceTest extends TestCase
                 'GET',
                 'users/12345/teams',
                 ['query' => ['opt_fields' => 'name,description', 'organization' => '67890']],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -403,11 +399,11 @@ class TeamsApiServiceTest extends TestCase
                 'GET',
                 'users/12345/teams',
                 ['query' => ['organization' => '67890']],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->getTeamsForUser('12345', '67890', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getTeamsForUser('12345', '67890', [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -447,7 +443,7 @@ class TeamsApiServiceTest extends TestCase
                 'GET',
                 'users/me/teams',
                 ['query' => ['organization' => '67890']],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -471,7 +467,7 @@ class TeamsApiServiceTest extends TestCase
                 'GET',
                 'users/user@example.com/teams',
                 ['query' => ['organization' => '67890']],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -517,7 +513,7 @@ class TeamsApiServiceTest extends TestCase
                 'POST',
                 'teams/12345/addUser',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -538,7 +534,7 @@ class TeamsApiServiceTest extends TestCase
                 'POST',
                 'teams/12345/addUser',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -593,7 +589,7 @@ class TeamsApiServiceTest extends TestCase
                 'POST',
                 'teams/12345/removeUser',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -616,7 +612,7 @@ class TeamsApiServiceTest extends TestCase
                 'POST',
                 'teams/12345/removeUser',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 

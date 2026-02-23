@@ -19,8 +19,8 @@ class ScopesTest extends TestCase
         $this->assertNotEmpty($constants, 'Scopes class should have constants defined');
 
         foreach ($constants as $name => $value) {
-            $this->assertIsString($value, "Constant {$name} should be a string");
-            $this->assertNotEmpty($value, "Constant {$name} should not be empty");
+            $this->assertIsString($value, "Constant $name should be a string");
+            $this->assertNotEmpty($value, "Constant $name should not be empty");
         }
     }
 
@@ -210,7 +210,7 @@ class ScopesTest extends TestCase
             $this->assertMatchesRegularExpression(
                 '/^[\w.]+:(read|write|delete)$/',
                 $value,
-                "Scope {$name} ({$value}) should match pattern resource:action"
+                "Scope $name ($value) should match pattern resource:action"
             );
         }
     }
@@ -230,15 +230,15 @@ class ScopesTest extends TestCase
 
             $this->assertTrue(
                 defined(Scopes::class . '::' . $readConst),
-                "Scope constant {$readConst} should exist"
+                "Scope constant $readConst should exist"
             );
             $this->assertTrue(
                 defined(Scopes::class . '::' . $writeConst),
-                "Scope constant {$writeConst} should exist"
+                "Scope constant $writeConst should exist"
             );
             $this->assertTrue(
                 defined(Scopes::class . '::' . $deleteConst),
-                "Scope constant {$deleteConst} should exist"
+                "Scope constant $deleteConst should exist"
             );
         }
     }

@@ -6,19 +6,14 @@ use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\RateLimitException;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\HandlerStack;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-class AsanaApiClient
+class AsanaApiClient implements HttpClientInterface
 {
-    /**
-     * Response type constants
-     */
-    public const RESPONSE_FULL = 1;     // Return full response with status, headers, etc.
-    public const RESPONSE_NORMAL = 2;   // Return the complete decoded JSON body
-    public const RESPONSE_DATA = 3;     // Return only the data subset (default)
-
     /**
      * Default maximum number of retry attempts for rate-limited requests.
      */
@@ -42,6 +37,12 @@ class AsanaApiClient
     private LoggerInterface $logger;
 
     /**
+     * Callable that returns the current access token.
+     * @var callable
+     */
+    private $tokenProvider;
+
+    /**
      * Maximum number of retry attempts for rate-limited requests.
      * @var int
      */
@@ -61,47 +62,45 @@ class AsanaApiClient
 
     /**
      * Creates a new Asana API client instance.
-     * @param string $accessToken OAuth2 access token for authentication
+     * @param callable $tokenProvider Callable that returns the current access token
      * @param LoggerInterface|null $logger PSR-3 compatible logger instance
      * @param int $maxRetries Maximum number of retry attempts for rate-limited requests
      * @param int $initialBackoff Initial backoff time in seconds for exponential backoff
      * @param int $maxLogBodyLength Maximum length for truncated response body in logs
      */
     public function __construct(
-        string $accessToken,
+        callable $tokenProvider,
         ?LoggerInterface $logger = null,
         int $maxRetries = self::DEFAULT_MAX_RETRIES,
         int $initialBackoff = self::DEFAULT_INITIAL_BACKOFF,
         int $maxLogBodyLength = 1000
     ) {
+        $this->tokenProvider = $tokenProvider;
+        $this->logger = $logger ?? new NullLogger();
+
+        $stack = HandlerStack::create();
+        $stack->push(function (callable $handler) {
+            return function (RequestInterface $request, array $options) use ($handler) {
+                $token = ($this->tokenProvider)();
+                $request = $request->withHeader('Authorization', 'Bearer ' . $token);
+                return $handler($request, $options);
+            };
+        }, 'asana_auth');
+
         $this->httpClient = new GuzzleClient([
             'base_uri' => 'https://app.asana.com/api/1.0/',
-            'headers' => [
-                'Authorization' => 'Bearer ' . $accessToken,
-                'Accept'        => 'application/json',
+            'handler'  => $stack,
+            'headers'  => [
+                'Accept' => 'application/json',
             ],
         ]);
-        $this->logger = $logger ?? new NullLogger();
         $this->maxRetries = $maxRetries;
         $this->initialBackoff = $initialBackoff;
         $this->maxLogBodyLength = $maxLogBodyLength;
     }
 
     /**
-     * Sends an HTTP request with the specified method, URI, and options.
-     * This method includes automatic retry logic with exponential backoff for rate-limited
-     * requests (HTTP 429). It will retry up to the configured maximum number of times,
-     * respecting the Retry-After header if provided by the API.
-     * @param string $method The HTTP method to use (e.g., 'GET', 'POST', etc.).
-     * @param string $uri The URI to make the request to.
-     * @param array $options Additional options for the request, such as headers, body, and query parameters.
-     * @param int $responseType The type of response to return:
-     * - RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - RESPONSE_DATA (3): Only the data subset (default)
-     * @return array The response data based on the specified response type.
-     * @throws ApiException If the response indicates an error or if the request fails.
-     * @throws RateLimitException If rate limit is exceeded and all retries are exhausted.
+     * @inheritDoc
      */
     public function request(
         string $method,

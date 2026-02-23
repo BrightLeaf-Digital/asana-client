@@ -10,6 +10,10 @@ class CryptoUtilsTest extends TestCase
 {
     /**
      * Test that encrypt/decrypt round trip returns the original data.
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     public function testEncryptDecryptRoundTrip(): void
     {
@@ -24,6 +28,10 @@ class CryptoUtilsTest extends TestCase
 
     /**
      * Test encryption produces different outputs with different passwords.
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     public function testDifferentPasswordsDifferentOutput(): void
     {
@@ -39,6 +47,14 @@ class CryptoUtilsTest extends TestCase
 
     /**
      * Test encryption produces different outputs even with same password (due to random IV/salt).
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     public function testSamePasswordDifferentOutput(): void
     {
@@ -58,6 +74,8 @@ class CryptoUtilsTest extends TestCase
 
     /**
      * Test decryption fails with wrong password.
+     * @throws Exception
+     * @throws Exception
      */
     public function testDecryptWithWrongPasswordFails(): void
     {
@@ -104,6 +122,10 @@ class CryptoUtilsTest extends TestCase
 
     /**
      * Test encryption works with empty string.
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     public function testEncryptEmptyString(): void
     {
@@ -118,6 +140,10 @@ class CryptoUtilsTest extends TestCase
 
     /**
      * Test encryption works with long string.
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     public function testEncryptLongString(): void
     {
@@ -132,6 +158,10 @@ class CryptoUtilsTest extends TestCase
 
     /**
      * Test encryption works with special characters.
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     public function testEncryptSpecialCharacters(): void
     {
@@ -146,6 +176,10 @@ class CryptoUtilsTest extends TestCase
 
     /**
      * Test encryption works with Unicode characters.
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     public function testEncryptUnicodeCharacters(): void
     {
@@ -160,6 +194,8 @@ class CryptoUtilsTest extends TestCase
 
     /**
      * Test encryption output is base64 encoded.
+     * @throws Exception
+     * @throws Exception
      */
     public function testEncryptOutputIsBase64(): void
     {
@@ -184,6 +220,8 @@ class CryptoUtilsTest extends TestCase
 
     /**
      * Test decryption fails when data is tampered with.
+     * @throws Exception
+     * @throws Exception
      */
     public function testDecryptionFailsWithTamperedData(): void
     {
@@ -206,6 +244,10 @@ class CryptoUtilsTest extends TestCase
 
     /**
      * Test with various password lengths.
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     public function testVariousPasswordLengths(): void
     {
@@ -229,6 +271,10 @@ class CryptoUtilsTest extends TestCase
 
     /**
      * Test with empty password.
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     public function testEmptyPassword(): void
     {
@@ -243,6 +289,10 @@ class CryptoUtilsTest extends TestCase
 
     /**
      * Test with password containing special characters.
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
+     * @throws Exception
      */
     public function testPasswordWithSpecialCharacters(): void
     {

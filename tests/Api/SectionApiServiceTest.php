@@ -3,24 +3,21 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\SectionApiService;
-use BrightleafDigital\Http\AsanaApiClient;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class SectionApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var SectionApiService */
-    private $service;
+    private SectionApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new SectionApiService($this->mockClient);
     }
 
@@ -31,7 +28,7 @@ class SectionApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'sections/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'sections/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getSection('12345');
@@ -46,7 +43,7 @@ class SectionApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'sections/12345', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'sections/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getSection('12345', $options);
@@ -65,7 +62,7 @@ class SectionApiServiceTest extends TestCase
                 'PUT',
                 'sections/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -79,7 +76,7 @@ class SectionApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('DELETE', 'sections/12345', [], AsanaApiClient::RESPONSE_DATA)
+            ->with('DELETE', 'sections/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->deleteSection('12345');
@@ -92,7 +89,7 @@ class SectionApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'projects/67890/sections', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'projects/67890/sections', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getSectionsForProject('67890');
@@ -111,7 +108,7 @@ class SectionApiServiceTest extends TestCase
                 'POST',
                 'projects/67890/sections',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -131,7 +128,7 @@ class SectionApiServiceTest extends TestCase
                 'POST',
                 'projects/67890/sections',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -151,7 +148,7 @@ class SectionApiServiceTest extends TestCase
                 'POST',
                 'sections/12345/addTask',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -171,7 +168,7 @@ class SectionApiServiceTest extends TestCase
                 'POST',
                 'sections/12345/addTask',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -191,7 +188,7 @@ class SectionApiServiceTest extends TestCase
                 'POST',
                 'projects/99999/sections/insert',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -211,7 +208,7 @@ class SectionApiServiceTest extends TestCase
                 'POST',
                 'projects/99999/sections/insert',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -225,9 +222,9 @@ class SectionApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'sections/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'sections/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getSection('12345', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getSection('12345', [], HttpClientInterface::RESPONSE_FULL);
     }
 }

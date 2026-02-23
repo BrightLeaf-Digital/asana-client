@@ -3,26 +3,22 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\EventsApiService;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Exceptions\ValidationException;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class EventsApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var EventsApiService */
     private EventsApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new EventsApiService($this->mockClient);
     }
 
@@ -38,7 +34,7 @@ class EventsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'events', ['query' => ['resource' => '12345']], AsanaApiClient::RESPONSE_NORMAL)
+            ->with('GET', 'events', ['query' => ['resource' => '12345']], HttpClientInterface::RESPONSE_NORMAL)
             ->willReturn($expectedResponse);
 
         $result = $this->service->getEvents($resourceGid);
@@ -63,7 +59,7 @@ class EventsApiServiceTest extends TestCase
                 'GET',
                 'events',
                 ['query' => ['resource' => '12345', 'sync' => $syncToken]],
-                AsanaApiClient::RESPONSE_NORMAL
+                HttpClientInterface::RESPONSE_NORMAL
             )
             ->willReturn($expectedResponse);
 
@@ -79,10 +75,10 @@ class EventsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'events', ['query' => ['resource' => '12345']], AsanaApiClient::RESPONSE_NORMAL)
+            ->with('GET', 'events', ['query' => ['resource' => '12345']], HttpClientInterface::RESPONSE_NORMAL)
             ->willReturn([]);
 
-        $this->service->getEvents('12345', null);
+        $this->service->getEvents('12345');
     }
 
     /**
@@ -99,7 +95,7 @@ class EventsApiServiceTest extends TestCase
                 'GET',
                 'events',
                 ['query' => ['opt_fields' => 'user,resource,type,action,created_at', 'resource' => '12345']],
-                AsanaApiClient::RESPONSE_NORMAL
+                HttpClientInterface::RESPONSE_NORMAL
             )
             ->willReturn([]);
 
@@ -121,7 +117,7 @@ class EventsApiServiceTest extends TestCase
                 'GET',
                 'events',
                 ['query' => ['opt_fields' => 'user,resource,type', 'resource' => '12345', 'sync' => $syncToken]],
-                AsanaApiClient::RESPONSE_NORMAL
+                HttpClientInterface::RESPONSE_NORMAL
             )
             ->willReturn([]);
 
@@ -135,10 +131,10 @@ class EventsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'events', ['query' => ['resource' => '12345']], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'events', ['query' => ['resource' => '12345']], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getEvents('12345', null, [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getEvents('12345', null, [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -154,10 +150,10 @@ class EventsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'events', ['query' => ['resource' => '12345']], AsanaApiClient::RESPONSE_NORMAL)
+            ->with('GET', 'events', ['query' => ['resource' => '12345']], HttpClientInterface::RESPONSE_NORMAL)
             ->willReturn($expectedResponse);
 
-        $result = $this->service->getEvents('12345', null, [], AsanaApiClient::RESPONSE_NORMAL);
+        $result = $this->service->getEvents('12345');
 
         $this->assertSame($expectedResponse, $result);
         $this->assertArrayHasKey('sync', $result);
@@ -213,7 +209,7 @@ class EventsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/events', ['query' => []], AsanaApiClient::RESPONSE_NORMAL)
+            ->with('GET', 'workspaces/12345/events', ['query' => []], HttpClientInterface::RESPONSE_NORMAL)
             ->willReturn($expectedResponse);
 
         $result = $this->service->getWorkspaceEvents($workspaceGid);
@@ -242,7 +238,7 @@ class EventsApiServiceTest extends TestCase
                 'GET',
                 'workspaces/12345/events',
                 ['query' => ['sync' => $syncToken]],
-                AsanaApiClient::RESPONSE_NORMAL
+                HttpClientInterface::RESPONSE_NORMAL
             )
             ->willReturn($expectedResponse);
 
@@ -258,10 +254,10 @@ class EventsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/events', ['query' => []], AsanaApiClient::RESPONSE_NORMAL)
+            ->with('GET', 'workspaces/12345/events', ['query' => []], HttpClientInterface::RESPONSE_NORMAL)
             ->willReturn([]);
 
-        $this->service->getWorkspaceEvents('12345', null);
+        $this->service->getWorkspaceEvents('12345');
     }
 
     /**
@@ -278,7 +274,7 @@ class EventsApiServiceTest extends TestCase
                 'GET',
                 'workspaces/12345/events',
                 ['query' => ['opt_fields' => 'user,resource,type,action,created_at']],
-                AsanaApiClient::RESPONSE_NORMAL
+                HttpClientInterface::RESPONSE_NORMAL
             )
             ->willReturn([]);
 
@@ -300,7 +296,7 @@ class EventsApiServiceTest extends TestCase
                 'GET',
                 'workspaces/12345/events',
                 ['query' => ['opt_fields' => 'user,resource,type', 'sync' => $syncToken]],
-                AsanaApiClient::RESPONSE_NORMAL
+                HttpClientInterface::RESPONSE_NORMAL
             )
             ->willReturn([]);
 
@@ -314,10 +310,10 @@ class EventsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/events', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'workspaces/12345/events', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getWorkspaceEvents('12345', null, [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getWorkspaceEvents('12345', null, [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -333,10 +329,10 @@ class EventsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/events', ['query' => []], AsanaApiClient::RESPONSE_NORMAL)
+            ->with('GET', 'workspaces/12345/events', ['query' => []], HttpClientInterface::RESPONSE_NORMAL)
             ->willReturn($expectedResponse);
 
-        $result = $this->service->getWorkspaceEvents('12345', null, [], AsanaApiClient::RESPONSE_NORMAL);
+        $result = $this->service->getWorkspaceEvents('12345');
 
         $this->assertSame($expectedResponse, $result);
         $this->assertArrayHasKey('sync', $result);

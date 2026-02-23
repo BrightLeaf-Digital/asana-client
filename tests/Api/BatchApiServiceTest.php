@@ -3,26 +3,22 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\BatchApiService;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Exceptions\ValidationException;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class BatchApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var BatchApiService */
     private BatchApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new BatchApiService($this->mockClient);
     }
 
@@ -57,7 +53,7 @@ class BatchApiServiceTest extends TestCase
                     'json' => ['data' => ['actions' => $actions]],
                     'query' => [],
                 ],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -97,7 +93,7 @@ class BatchApiServiceTest extends TestCase
                     'json' => ['data' => ['actions' => $actions]],
                     'query' => [],
                 ],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -126,7 +122,7 @@ class BatchApiServiceTest extends TestCase
                     'json' => ['data' => ['actions' => $actions]],
                     'query' => $options,
                 ],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -154,14 +150,14 @@ class BatchApiServiceTest extends TestCase
                     'json' => ['data' => ['actions' => $actions]],
                     'query' => [],
                 ],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
         $this->service->createBatchRequest(
             $actions,
             [],
-            AsanaApiClient::RESPONSE_FULL
+            HttpClientInterface::RESPONSE_FULL
         );
     }
 
@@ -189,7 +185,7 @@ class BatchApiServiceTest extends TestCase
                     'json' => ['data' => ['actions' => $actions]],
                     'query' => [],
                 ],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -217,7 +213,7 @@ class BatchApiServiceTest extends TestCase
                     'json' => ['data' => ['actions' => $actions]],
                     'query' => [],
                 ],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 

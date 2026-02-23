@@ -297,7 +297,6 @@ class ExceptionsTest extends TestCase
         ];
 
         foreach ($exceptions as $exception) {
-            $caught = false;
             try {
                 throw $exception;
             } catch (Exception $e) {
@@ -314,7 +313,7 @@ class ExceptionsTest extends TestCase
     {
         $context = 'Refresh token';
         $originalMessage = 'Network timeout';
-        $message = "Error during {$context}: {$originalMessage}";
+        $message = "Error during $context: $originalMessage";
 
         $exception = new TokenInvalidException($message, 0, ['context' => $context]);
 

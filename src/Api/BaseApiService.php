@@ -4,7 +4,7 @@ namespace BrightleafDigital\Api;
 
 use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\RateLimitException;
-use BrightleafDigital\Http\AsanaApiClient;
+use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Utils\ValidationTrait;
 
 /**
@@ -23,16 +23,16 @@ abstract class BaseApiService
      * Handles HTTP requests to the Asana API endpoints with proper authentication
      * and request formatting.
      *
-     * @var AsanaApiClient
+     * @var HttpClientInterface
      */
-    protected AsanaApiClient $client;
+    protected HttpClientInterface $client;
 
     /**
      * BaseApiService constructor.
      *
-     * @param AsanaApiClient $client An instance of the AsanaApiClient responsible for handling API requests.
+     * @param HttpClientInterface $client An instance of the HttpClientInterface responsible for handling API requests.
      */
-    public function __construct(AsanaApiClient $client)
+    public function __construct(HttpClientInterface $client)
     {
         $this->client = $client;
     }
@@ -51,7 +51,7 @@ abstract class BaseApiService
     protected function getResources(
         string $endpoint,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         return $this->client->request('GET', $endpoint, ['query' => $options], $responseType);
     }
@@ -72,7 +72,7 @@ abstract class BaseApiService
         string $endpoint,
         string $resourceGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         return $this->client->request('GET', "$endpoint/$resourceGid", ['query' => $options], $responseType);
     }
@@ -93,7 +93,7 @@ abstract class BaseApiService
         string $endpoint,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         return $this->client->request(
             'POST',
@@ -121,7 +121,7 @@ abstract class BaseApiService
         string $resourceGid,
         array $data,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         return $this->client->request(
             'PUT',
@@ -145,7 +145,7 @@ abstract class BaseApiService
     protected function deleteResource(
         string $endpoint,
         string $resourceGid,
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         return $this->client->request('DELETE', "$endpoint/$resourceGid", [], $responseType);
     }

@@ -10,13 +10,14 @@ use Dotenv\Dotenv;
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-$clientId = $_ENV['ASANA_CLIENT_ID'];
+$clientId    = $_ENV['ASANA_CLIENT_ID'];
 $clientSecret = $_ENV['ASANA_CLIENT_SECRET'];
-$redirectUri = $_ENV['ASANA_REDIRECT_URI'];
-$password     = $_ENV['PASSWORD'];
-$asanaClient = new AsanaClient($clientId, $clientSecret, $redirectUri);
+$redirectUri  = $_ENV['ASANA_REDIRECT_URI'] ?? null;
+$salt         = $_ENV['SALT'] ?? ($_ENV['PASSWORD'] ?? null);
 
-if ($asanaClient->loadToken($password)) {
+$asanaClient = AsanaClient::OAuth($clientId, $clientSecret, $redirectUri, __DIR__ . '/token.json', null, $salt);
+
+if ($asanaClient->getAccessToken()) {
     header('Location: workspaces.php');
     exit;
 }
@@ -34,12 +35,12 @@ $scopes = [
     Scopes::USERS_READ,
     Scopes::WORKSPACES_READ
 ];
-$authUrl = $asanaClient->getSecureAuthorizationUrl([]); //using default for now
+$authData = $asanaClient->getSecureAuthorizationUrl([]);
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-$_SESSION['oauth2state'] = $authUrl['state'];
-$_SESSION['oauth2code_verifier'] = $authUrl['codeVerifier'];
+$_SESSION['oauth2_state'] = $authData['state'];
+$_SESSION['oauth2_pkce_verifier'] = $authData['codeVerifier'];
 
-header('Location: ' . $authUrl['url']);
+header('Location: ' . $authData['url']);
 exit;

@@ -6,6 +6,7 @@ use BrightleafDigital\Auth\AsanaOAuthHandler;
 use BrightleafDigital\Auth\OAuth2Provider;
 use League\OAuth2\Client\Token\AccessToken;
 use PHPUnit\Framework\MockObject\Exception as MockException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
@@ -13,14 +14,11 @@ use ReflectionClass;
 class AsanaOAuthHandlerTest extends TestCase
 {
     /** @var AsanaOAuthHandler */
-    private $handler;
+    private AsanaOAuthHandler $handler;
 
-    /** @var OAuth2Provider&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var OAuth2Provider&MockObject */
     private $mockProvider;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
         $this->mockProvider = $this->createMock(OAuth2Provider::class);
@@ -75,7 +73,7 @@ class AsanaOAuthHandlerTest extends TestCase
             ->with($options, true, true)
             ->willReturn($expectedResult);
 
-        $result = $this->handler->getSecureAuthorizationUrl($options, true, true);
+        $result = $this->handler->getSecureAuthorizationUrl($options);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -97,7 +95,7 @@ class AsanaOAuthHandlerTest extends TestCase
             ->with($options, false, true)
             ->willReturn($expectedResult);
 
-        $result = $this->handler->getSecureAuthorizationUrl($options, false, true);
+        $result = $this->handler->getSecureAuthorizationUrl($options, false);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -168,7 +166,7 @@ class AsanaOAuthHandlerTest extends TestCase
             ])
             ->willReturn($mockToken);
 
-        $result = $this->handler->handleCallback('auth-code-123', null);
+        $result = $this->handler->handleCallback('auth-code-123');
 
         $this->assertInstanceOf(AccessToken::class, $result);
     }

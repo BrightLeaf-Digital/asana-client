@@ -2,9 +2,9 @@
 
 namespace BrightleafDigital\Api;
 
+use BrightleafDigital\Exceptions\RateLimitException;
+use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Exceptions\ApiException;
-use BrightleafDigital\Http\AsanaApiClient;
-use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 use RuntimeException;
 
@@ -25,13 +25,13 @@ class AttachmentApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -39,10 +39,10 @@ class AttachmentApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the attachment details
      * @throws ApiException If the API request fails due to invalid attachment GID,
      *                          insufficient permissions, network issues, or rate limiting
@@ -51,7 +51,7 @@ class AttachmentApiService extends BaseApiService
     public function getAttachment(
         string $attachmentGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($attachmentGid, 'Attachment GID');
 
@@ -69,13 +69,13 @@ class AttachmentApiService extends BaseApiService
      *                              returned from attachment-related API endpoints.
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -83,10 +83,10 @@ class AttachmentApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {})
      * @throws ApiException If the API request fails due to:
      *
@@ -96,8 +96,10 @@ class AttachmentApiService extends BaseApiService
      * - Rate limiting
      * @throws ValidationException If attachment GID is empty or not numeric
      */
-    public function deleteAttachment(string $attachmentGid, int $responseType = AsanaApiClient::RESPONSE_DATA): array
-    {
+    public function deleteAttachment(
+        string $attachmentGid,
+        int $responseType = HttpClientInterface::RESPONSE_DATA
+    ): array {
         $this->validateGid($attachmentGid, 'Attachment GID');
 
         return $this->deleteResource('attachments', $attachmentGid, $responseType);
@@ -108,6 +110,7 @@ class AttachmentApiService extends BaseApiService
      * GET /attachments
      * Returns the compact records for all attachments on the object.
      * API Documentation: https://developers.asana.com/reference/getattachmentsforobject
+     *
      * @param string $parentGid The unique global ID of the parent object
      *                          for which to get attachments.
      * @param array $options Optional parameters to customize the request:
@@ -118,13 +121,13 @@ class AttachmentApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -132,19 +135,19 @@ class AttachmentApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of attachments
-     * @throws ApiException If invalid parent GID provided, insufficient permissions,
-     *                          network issues, or rate limiting occurs
+     * @throws ApiException
      * @throws ValidationException If parent GID is empty or not numeric
+     * @throws RateLimitException
      */
     public function getAttachmentsForObject(
         string $parentGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($parentGid, 'Parent GID');
 
@@ -159,6 +162,7 @@ class AttachmentApiService extends BaseApiService
      * a file on disk and can provide the file path. If you have the file contents in memory,
      * consider using `uploadAttachmentFromContents` instead.
      * API Documentation: https://developers.asana.com/reference/createattachmentforobject
+     *
      * @param string $parentGid The GID of the parent object (task, project, or story) to attach the file to.
      * @param string $filePath The local file path of the file to upload.
      * @param array $options Optional parameters to customize the request:
@@ -167,13 +171,13 @@ class AttachmentApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -181,21 +185,20 @@ class AttachmentApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the created attachment
-     * @throws ApiException If the file doesn't exist, is too large, invalid parent GID,
-     *                          insufficient permissions, or network issues occur
-     * @throws RuntimeException If the file does not exist or is not readable
+     * @throws ApiException
+     * @throws RateLimitException
      * @throws ValidationException If parent GID is empty or not numeric
      */
     public function uploadAttachment(
         string $parentGid,
         string $filePath,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($parentGid, 'Parent GID');
 
@@ -226,12 +229,14 @@ class AttachmentApiService extends BaseApiService
 
         return $this->client->request('POST', 'attachments', $multipartOptions, $responseType);
     }
+
     /**
      * Upload an attachment from file contents
      * POST /attachments
      * Upload an attachment to a task, project, or story using file contents.
      * This method is useful when you have the file content in memory rather than on disk.
      * API Documentation: https://developers.asana.com/reference/createattachmentforobject
+     *
      * @param string $parentGid The GID of the parent object (task, project, or story) to attach the file to.
      * @param string $fileContents The contents of the file to upload.
      * @param string $fileName The name to give to the uploaded file.
@@ -241,13 +246,13 @@ class AttachmentApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -255,13 +260,13 @@ class AttachmentApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the created attachment
-     * @throws ApiException If the file is too large, invalid parent GID, or network issues occur, etc.
-     * @throws RuntimeException If the stream cannot be created or written to or if the stream is not writable
+     * @throws ApiException
+     * @throws RateLimitException
      * @throws ValidationException If parent GID is empty or not numeric
      */
     public function uploadAttachmentFromContents(
@@ -269,7 +274,7 @@ class AttachmentApiService extends BaseApiService
         string $fileContents,
         string $fileName,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($parentGid, 'Parent GID');
 
@@ -313,7 +318,12 @@ class AttachmentApiService extends BaseApiService
         }
 
         // Make the request to upload the attachment
-        return $this->client->request('POST', 'attachments', $multipartOptions, $responseType);
+        return $this->client->request(
+            'POST',
+            'attachments',
+            $multipartOptions,
+            $responseType
+        );
         // Don't have to close the stream b/c Guzzle does it.
     }
 }

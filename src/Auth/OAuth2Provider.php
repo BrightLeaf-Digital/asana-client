@@ -2,6 +2,7 @@
 
 namespace BrightleafDigital\Auth;
 
+use Exception;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\GenericResourceOwner;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
@@ -89,6 +90,7 @@ class OAuth2Provider extends AbstractProvider
      * @param bool $enablePKCE
      *
      * @return array ['url' => string, 'state' => string|null, 'codeVerifier' => string|null]
+     * @throws Exception If random_bytes() fails.
      */
     public function getSecureAuthorizationUrl(array $options, bool $enableState = true, bool $enablePKCE = true): array
     {

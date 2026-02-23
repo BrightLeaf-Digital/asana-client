@@ -2,27 +2,23 @@
 
 namespace BrightleafDigital\Tests\Api;
 
+use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Api\WebhooksApiService;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Exceptions\ValidationException;
-use PHPUnit\Framework\MockObject\Exception as MockException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class WebhooksApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var WebhooksApiService */
-    private $service;
+    private WebhooksApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new WebhooksApiService($this->mockClient);
     }
 
@@ -39,7 +35,7 @@ class WebhooksApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'webhooks', ['query' => ['workspace' => '12345']], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'webhooks', ['query' => ['workspace' => '12345']], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
 
         $result = $this->service->getWebhooks($workspaceGid);
@@ -61,7 +57,7 @@ class WebhooksApiServiceTest extends TestCase
                 'GET',
                 'webhooks',
                 ['query' => ['resource' => '67890', 'workspace' => '12345']],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -75,10 +71,10 @@ class WebhooksApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'webhooks', ['query' => ['workspace' => '12345']], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'webhooks', ['query' => ['workspace' => '12345']], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getWebhooks('12345', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getWebhooks('12345', [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -123,7 +119,7 @@ class WebhooksApiServiceTest extends TestCase
                 'POST',
                 'webhooks',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -146,7 +142,7 @@ class WebhooksApiServiceTest extends TestCase
                 'POST',
                 'webhooks',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -172,7 +168,7 @@ class WebhooksApiServiceTest extends TestCase
                 'POST',
                 'webhooks',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -227,7 +223,7 @@ class WebhooksApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'webhooks/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'webhooks/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
 
         $result = $this->service->getWebhook($webhookGid);
@@ -244,7 +240,7 @@ class WebhooksApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'webhooks/12345', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'webhooks/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getWebhook('12345', $options);
@@ -257,10 +253,10 @@ class WebhooksApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'webhooks/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'webhooks/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getWebhook('12345', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getWebhook('12345', [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -304,7 +300,7 @@ class WebhooksApiServiceTest extends TestCase
                 'PUT',
                 'webhooks/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -327,7 +323,7 @@ class WebhooksApiServiceTest extends TestCase
                 'PUT',
                 'webhooks/12345',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -347,11 +343,11 @@ class WebhooksApiServiceTest extends TestCase
                 'PUT',
                 'webhooks/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->updateWebhook('12345', $data, [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->updateWebhook('12345', $data, [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -385,7 +381,7 @@ class WebhooksApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('DELETE', 'webhooks/12345', [], AsanaApiClient::RESPONSE_DATA)
+            ->with('DELETE', 'webhooks/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $result = $this->service->deleteWebhook($webhookGid);
@@ -400,10 +396,10 @@ class WebhooksApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('DELETE', 'webhooks/12345', [], AsanaApiClient::RESPONSE_FULL)
+            ->with('DELETE', 'webhooks/12345', [], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->deleteWebhook('12345', AsanaApiClient::RESPONSE_FULL);
+        $this->service->deleteWebhook('12345', HttpClientInterface::RESPONSE_FULL);
     }
 
     /**

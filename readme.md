@@ -18,6 +18,20 @@ This library was created because the official Asana PHP library is no longer mai
 
 ## Status
 
+This library is currently pre‑v1. Breaking changes may occur between releases while we finalize the public API and internal architecture.
+
+### Breaking Changes (v0.x → v0.y)
+
+As we approach v1.0, several foundational changes have been made:
+
+- **Constructor Changes**: `AsanaClient` now requires a `Psr\Container\ContainerInterface`. Use the static factories (`withPAT`, `OAuth`, `withAccessToken`) for the simplest setup.
+- **Dependency Injection**: The library now uses a service container. You can replace core components (HTTP client, Auth handler, Token storage) by providing your own container.
+- **Token Management**: Direct methods like `saveToken`, `loadToken`, and `onTokenRefresh` have been removed. Use `TokenManager` (available via the container) or `subscribeToTokenRefresh()` on the client.
+- **Response Constants**: `AsanaApiClient::RESPONSE_*` constants have moved to `HttpClientInterface::RESPONSE_*`.
+- **Exceptions**: `AsanaApiException` has been renamed to `ApiException`.
+- **Static Factories**: `withPersonalAccessToken` has been renamed to `withPAT`.
+- **Webhook Handshake**: `WebhooksApiService::handleHandshake` (and `AsanaClient::handleHandshake`) signature changed to remove redundant arguments.
+
 This is my first library of this kind, and I am still developing my skills as a junior developer. Any reviews, comments, contributions, or suggestions are highly welcome - especially since my only peer review so far has been from AI. I would particularly appreciate help with:
 
 - Writing tests
@@ -164,10 +178,10 @@ Please read the [official documentation](https://developers.asana.com/docs/overv
 use BrightleafDigital\AsanaClient;
 
 $personalAccessToken = 'your-personal-access-token';
-$asanaClient = AsanaClient::withPersonalAccessToken($personalAccessToken);
+$client = AsanaClient::withPAT($personalAccessToken);
 
 // Get user information
-$me = $asanaClient->users()->me();
+$me = $client->users()->getCurrentUser();
 
 // Create a task
 $taskData = [
@@ -175,7 +189,7 @@ $taskData = [
     'notes' => 'Task description',
     'projects' => ['12345678901234'] // Project GID
 ];
-$task = $asanaClient->tasks()->createTask($taskData);
+$task = $client->tasks()->createTask($taskData);
 ```
 
 ### Using OAuth 2.0
@@ -188,29 +202,25 @@ $clientId = 'your-client-id';
 $clientSecret = 'your-client-secret';
 $redirectUri = 'https://your-app.com/callback';
 
-// Create a client and get the authorization URL
-$asanaClient = new AsanaClient($clientId, $clientSecret, $redirectUri);
+// Bootstrap with defaults (uses an internal container and file token storage)
+$client = AsanaClient::OAuth($clientId, $clientSecret, $redirectUri, __DIR__ . '/token.json');
 
-// Option 1: Request specific scopes
-$authUrl = $asanaClient->getAuthorizationUrl([
+// Request specific scopes and get URL + state + PKCE verifier
+$auth = $client->getSecureAuthorizationUrl([
     Scopes::TASKS_READ,
     Scopes::PROJECTS_READ,
     Scopes::USERS_READ
 ]);
 
-// Option 2: Use default/full access (pass an empty array). May not be supported after July 2025.
-// $authUrl = $asanaClient->getAuthorizationUrl([]);
-
-// Redirect the user to $authUrl
-// After authorization, Asana will redirect back to your callback URL
+// Store $auth['state'] and $auth['codeVerifier'] in the session, then redirect to $auth['url']
 
 // In your callback handler:
 $code = $_GET['code'];
-$tokenData = $asanaClient->handleCallback($code);
+$pkceVerifier = $_SESSION['oauth2_pkce_verifier'] ?? null;
+$client->handleCallback($code, $pkceVerifier); // Token is saved automatically via TokenManager
 
-// Save $tokenData for future use
 // Then use the client
-$workspaces = $asanaClient->users()->getCurrentUser();
+$me = $client->users()->getCurrentUser();
 ```
 
 ### Token Management and Storage Options
@@ -355,14 +365,9 @@ For example, creating a task in a specific section isn't documented in the API r
 This library is actively developed with long-term maintainability in mind.  
 For design decisions, planned features, and deferred items, see the following documentation:
 
-- [Deferred Improvements](./docs/tasks/deferred.md) – Items considered but intentionally postponed
-- [Build & Deployment Improvements](./docs/tasks/build-deployment-improvements.md)
 - [Code Architecture Improvements](./docs/tasks/code-architecture-improvements.md)
-- [Code Quality Improvements](./docs/tasks/code-quality-improvements.md)
-- [Documentation Improvements](./docs/tasks/documentation-improvements.md)
 - [Feature Additions](./docs/tasks/feature-additions.md)
 - [Performance Improvements](./docs/tasks/performance-improvements.md)
-- [Security Improvements](./docs/tasks/security-improvements.md)
 - [Testing Improvements](./docs/tasks/testing-improvements.md)
 - See [Task Summary & Prioritization](docs/tasks/roadmap.md) for a categorized and ranked view of all planned improvements.
 

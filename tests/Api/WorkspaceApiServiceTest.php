@@ -2,25 +2,22 @@
 
 namespace BrightleafDigital\Tests\Api;
 
+use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Api\WorkspaceApiService;
-use BrightleafDigital\Http\AsanaApiClient;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class WorkspaceApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var WorkspaceApiService */
-    private $service;
+    private WorkspaceApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new WorkspaceApiService($this->mockClient);
     }
 
@@ -31,7 +28,7 @@ class WorkspaceApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getWorkspaces();
@@ -46,7 +43,7 @@ class WorkspaceApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getWorkspaces($options);
@@ -59,7 +56,7 @@ class WorkspaceApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getWorkspace('12345');
@@ -78,7 +75,7 @@ class WorkspaceApiServiceTest extends TestCase
                 'PUT',
                 'workspaces/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -98,7 +95,7 @@ class WorkspaceApiServiceTest extends TestCase
                 'POST',
                 'workspaces/12345/addUser',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -118,7 +115,7 @@ class WorkspaceApiServiceTest extends TestCase
                 'POST',
                 'workspaces/12345/addUser',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -138,7 +135,7 @@ class WorkspaceApiServiceTest extends TestCase
                 'POST',
                 'workspaces/12345/removeUser',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -152,7 +149,7 @@ class WorkspaceApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/users', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces/12345/users', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getUsersInWorkspace('12345');
@@ -165,7 +162,7 @@ class WorkspaceApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/teams', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces/12345/teams', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getTeamsInWorkspace('12345');
@@ -178,7 +175,7 @@ class WorkspaceApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/projects', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces/12345/projects', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getProjectsInWorkspace('12345');
@@ -193,7 +190,7 @@ class WorkspaceApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/tasks/search', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces/12345/tasks/search', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->searchTasksInWorkspace('12345', $options);
@@ -215,7 +212,7 @@ class WorkspaceApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/tasks/search', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces/12345/tasks/search', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->searchTasksInWorkspace('12345', $options);
@@ -228,7 +225,7 @@ class WorkspaceApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/events', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces/12345/events', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getWorkspaceEvents('12345');
@@ -243,7 +240,7 @@ class WorkspaceApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345/events', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'workspaces/12345/events', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getWorkspaceEvents('12345', $options);
@@ -256,9 +253,9 @@ class WorkspaceApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'workspaces/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'workspaces/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getWorkspace('12345', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getWorkspace('12345', [], HttpClientInterface::RESPONSE_FULL);
     }
 }

@@ -3,24 +3,21 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\MembershipApiService;
-use BrightleafDigital\Http\AsanaApiClient;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class MembershipApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var MembershipApiService */
-    private $service;
+    private MembershipApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new MembershipApiService($this->mockClient);
     }
 
@@ -33,7 +30,7 @@ class MembershipApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'memberships', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'memberships', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getMemberships($options);
@@ -48,7 +45,7 @@ class MembershipApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'memberships', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'memberships', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getMemberships($options);
@@ -63,7 +60,7 @@ class MembershipApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'memberships', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'memberships', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getMemberships($options);
@@ -82,7 +79,7 @@ class MembershipApiServiceTest extends TestCase
                 'POST',
                 'memberships',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -102,7 +99,7 @@ class MembershipApiServiceTest extends TestCase
                 'POST',
                 'memberships',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -116,7 +113,7 @@ class MembershipApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'memberships/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'memberships/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getMembership('12345');
@@ -131,7 +128,7 @@ class MembershipApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'memberships/12345', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'memberships/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getMembership('12345', $options);
@@ -150,7 +147,7 @@ class MembershipApiServiceTest extends TestCase
                 'PUT',
                 'memberships/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -164,7 +161,7 @@ class MembershipApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('DELETE', 'memberships/12345', [], AsanaApiClient::RESPONSE_DATA)
+            ->with('DELETE', 'memberships/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->deleteMembership('12345');
@@ -177,9 +174,9 @@ class MembershipApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'memberships/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'memberships/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getMembership('12345', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getMembership('12345', [], HttpClientInterface::RESPONSE_FULL);
     }
 }

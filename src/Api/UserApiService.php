@@ -2,8 +2,9 @@
 
 namespace BrightleafDigital\Api;
 
+use BrightleafDigital\Exceptions\RateLimitException;
+use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Exceptions\ApiException;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
@@ -34,13 +35,13 @@ class UserApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -48,10 +49,10 @@ class UserApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of users with fields including:
      *   - gid: Unique identifier of the user
      * - resource_type: Always "user"
@@ -69,7 +70,7 @@ class UserApiService extends BaseApiService
         ?string $workspace = null,
         ?string $team = null,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         if (!$workspace && !$team) {
             throw new ValidationException('You must provide either a "workspace" or "team".');
@@ -103,13 +104,13 @@ class UserApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -117,10 +118,10 @@ class UserApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the user details including:
      *   - gid: Unique identifier of the user
      * - resource_type: Always "user"
@@ -137,7 +138,7 @@ class UserApiService extends BaseApiService
     public function getUser(
         string $userGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         return $this->getResource('users', $userGid, $options, $responseType);
     }
@@ -148,6 +149,7 @@ class UserApiService extends BaseApiService
      * Returns all of a user's favorites in the order they appear in Asana's sidebar.
      * Results are paginated and include projects, tasks, tags, users, portfolios, and goals.
      * API Documentation: https://developers.asana.com/reference/getfavoritesforuser
+     *
      * @param string $userGid The unique global ID of the user to retrieve favorites for.
      *                        This identifier can be found in the user URL or returned from user-related API endpoints.
      *                        Use "me" to refer to the current user.
@@ -168,13 +170,13 @@ class UserApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -182,24 +184,23 @@ class UserApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of favorites with fields including:
      *   - gid: Unique identifier of the favorite resource
      * - resource_type: Type of the favorite resource (project, task, tag, user, portfolio, etc.)
      * - resource_subtype: Subtype of the resource if applicable
      * - name: Name of the favorite resource
      *                 Additional fields as specified in opt_fields and depending on resource type
-     *
-     * @throws ApiException If the API request fails due to authentication, validation,
-     *                          network issues, or other API-related errors
+     * @throws ApiException
+     * @throws RateLimitException
      */
     public function getUserFavorites(
         string $userGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         return $this->client->request('GET', "users/$userGid/favorites", ['query' => $options], $responseType);
     }
@@ -210,6 +211,7 @@ class UserApiService extends BaseApiService
      * Returns the users that are members of the team specified.
      * Team members can view and interact with each other in the team.
      * API Documentation: https://developers.asana.com/reference/getusersforteam
+     *
      * @param string $teamGid The unique global ID of the team to get users from.
      *                       This identifier can be found in the team URL or returned from
      *                       team-related API endpoints.
@@ -223,13 +225,13 @@ class UserApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -237,10 +239,10 @@ class UserApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of team users with fields including:
      *   - gid: Unique identifier of the user
      * - resource_type: Always "user"
@@ -250,13 +252,13 @@ class UserApiService extends BaseApiService
      * - workspaces: Array of workspace objects the user belongs to
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If the API request fails due to authentication, validation,
+     * @throws ApiException|ValidationException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
      */
     public function getUsersForTeam(
         string $teamGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($teamGid, 'Team GID');
 
@@ -270,6 +272,7 @@ class UserApiService extends BaseApiService
      * Each user's ability to interact with tasks and other resources depends on their role
      * and permissions within the workspace.
      * API Documentation: https://developers.asana.com/reference/getusersforworkspace
+     *
      * @param string $workspaceGid The unique global ID of the workspace to get users from.
      *                          This identifier can be found in the workspace URL or returned from
      *                          workspace-related API endpoints.
@@ -283,13 +286,13 @@ class UserApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -297,10 +300,10 @@ class UserApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of workspace users with fields including:
      *   - gid: Unique identifier of the user
      * - resource_type: Always "user"
@@ -310,13 +313,13 @@ class UserApiService extends BaseApiService
      * - workspaces: Array of workspace objects the user belongs to
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException If the API request fails due to authentication, validation,
+     * @throws ApiException|ValidationException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
      */
     public function getUsersForWorkspace(
         string $workspaceGid,
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($workspaceGid, 'Workspace GID');
 
@@ -336,13 +339,13 @@ class UserApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -350,10 +353,10 @@ class UserApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data object and other metadata
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object containing the current user details including:
      *   - gid: Unique identifier of the current user
      * - resource_type: Always "user"
@@ -367,7 +370,7 @@ class UserApiService extends BaseApiService
      * @throws ApiException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
      */
-    public function getCurrentUser(array $options = [], int $responseType = AsanaApiClient::RESPONSE_DATA): array
+    public function getCurrentUser(array $options = [], int $responseType = HttpClientInterface::RESPONSE_DATA): array
     {
         return $this->getUser('me', $options, $responseType);
     }
@@ -394,13 +397,13 @@ class UserApiService extends BaseApiService
      *
      * @param int $responseType The type of response to return:
      *
-     * - AsanaApiClient::RESPONSE_FULL (1): Full response with status, headers, etc.
-     * - AsanaApiClient::RESPONSE_NORMAL (2): Complete decoded JSON body
-     * - AsanaApiClient::RESPONSE_DATA (3): Only the data subset (default)
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
      *
      * @return array The response data based on the specified response type:
      *
-     * If $responseType is AsanaApiClient::RESPONSE_FULL:
+     * If $responseType is HttpClientInterface::RESPONSE_FULL:
      * - status: HTTP status code
      * - reason: Response status message
      * - headers: Response headers
@@ -408,10 +411,10 @@ class UserApiService extends BaseApiService
      * - raw_body: Raw response body
      * - request: Original request details
      *
-     * If $responseType is AsanaApiClient::RESPONSE_NORMAL:
+     * If $responseType is HttpClientInterface::RESPONSE_NORMAL:
      * - Complete decoded JSON response including data array and pagination info
      *
-     * If $responseType is AsanaApiClient::RESPONSE_DATA (default):
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of current user's favorites with fields including:
      *   - gid: Unique identifier of the favorite resource
      * - resource_type: Type of the favorite resource (project, task, tag, user, portfolio, etc.)
@@ -424,7 +427,7 @@ class UserApiService extends BaseApiService
      */
     public function getCurrentUserFavorites(
         array $options = [],
-        int $responseType = AsanaApiClient::RESPONSE_DATA
+        int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         return $this->getUserFavorites('me', $options, $responseType);
     }

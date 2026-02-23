@@ -6,8 +6,8 @@ use BrightleafDigital\Api\AttachmentApiService;
 use BrightleafDigital\Api\BatchApiService;
 use BrightleafDigital\Api\CustomFieldApiService;
 use BrightleafDigital\Api\EventsApiService;
-use BrightleafDigital\Api\MembershipApiService;
 use BrightleafDigital\Api\GoalsApiService;
+use BrightleafDigital\Api\MembershipApiService;
 use BrightleafDigital\Api\PortfoliosApiService;
 use BrightleafDigital\Api\ProjectApiService;
 use BrightleafDigital\Api\ProjectTemplatesApiService;
@@ -22,1028 +22,468 @@ use BrightleafDigital\Api\UserTaskListsApiService;
 use BrightleafDigital\Api\WebhooksApiService;
 use BrightleafDigital\Api\WorkspaceApiService;
 use BrightleafDigital\Auth\AsanaOAuthHandler;
-use BrightleafDigital\Exceptions\AuthException;
-use BrightleafDigital\Exceptions\TokenInvalidException;
+use BrightleafDigital\Auth\AuthHandlerInterface;
+use BrightleafDigital\Auth\TokenManager;
+use BrightleafDigital\Container\ServiceContainer;
 use BrightleafDigital\Http\AsanaApiClient;
-use BrightleafDigital\Exceptions\OAuthCallbackException;
-use BrightleafDigital\Utils\CryptoUtils;
-use Exception;
-use GuzzleHttp\Exception\GuzzleException;
-use JsonException;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use BrightleafDigital\Http\HttpClientInterface;
+use BrightleafDigital\Storage\FileTokenStorage;
+use BrightleafDigital\Storage\TokenStorageInterface;
 use League\OAuth2\Client\Token\AccessToken;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Throwable;
 
-class AsanaClient
+/**
+ * The main client for interacting with the Asana API.
+ * This class acts as a facade for all Asana API services and handles authentication and configuration.
+ */
+class AsanaClient implements AsanaClientInterface
 {
-    /**
-     * OAuth handler for authentication with Asana API
-     * @var ?AsanaOAuthHandler
-     */
-    private ?AsanaOAuthHandler $authHandler = null;
+    private ContainerInterface $container;
 
     /**
-     * HTTP client for making API requests to Asana
-     * @var AsanaApiClient|null
-     */
-    private ?AsanaApiClient $apiClient = null;
-
-    /**
-     * Current access token for authentication
-     * @var AccessToken|null
-     */
-    private ?AccessToken $accessToken = null;
-
-    /**
-     * File path for token storage
-     * @var string
-     */
-    private string $tokenStoragePath;
-
-    /**
-     * PSR-3 compatible logger instance
-     * @var LoggerInterface
-     */
-    private LoggerInterface $logger;
-
-    /**
-     * Tasks API service instance
-     * @var TaskApiService|null
-     */
-    private ?TaskApiService $tasks = null;
-
-    /**
-     * Projects API service instance
-     * @var ProjectApiService|null
-     */
-    private ?ProjectApiService $projects = null;
-
-    /**
-     * Users API service instance
-     * @var UserApiService|null
-     */
-    private ?UserApiService $users = null;
-
-    /**
-     * Tags API service instance
-     * @var TagsApiService|null
-     */
-    private ?TagsApiService $tags = null;
-
-    /**
-     * Sections API service instance
-     * @var SectionApiService|null
-     */
-    private ?SectionApiService $sections = null;
-
-    /**
-     * Memberships API service instance
-     * @var MembershipApiService|null
-     */
-    private ?MembershipApiService $memberships = null;
-
-    /**
-     * Attachments API service instance
-     * @var AttachmentApiService|null
-     */
-    private ?AttachmentApiService $attachments = null;
-    /**
-     * Workspaces API service instance
-     * @var WorkspaceApiService|null
-     */
-    private ?WorkspaceApiService $workspaces = null;
-    /**
-     * Custom Fields API service instance
-     * @var CustomFieldApiService|null
-     */
-    private ?CustomFieldApiService $customFields = null;
-    /**
-     * Webhooks API service instance
-     * @var WebhooksApiService|null
-     */
-    private ?WebhooksApiService $webhooks = null;
-    /**
-     * Events API service instance
-     * @var EventsApiService|null
-     */
-    private ?EventsApiService $events = null;
-    /**
-     * Teams API service instance
-     * @var TeamsApiService|null
-     */
-    private ?TeamsApiService $teams = null;
-    /**
-     * Portfolios API service instance
-     * @var PortfoliosApiService|null
-     */
-    private ?PortfoliosApiService $portfolios = null;
-    /**
-     * Goals API service instance
-     * @var GoalsApiService|null
-     */
-    private ?GoalsApiService $goals = null;
-    /**
-     * Time Tracking Entries API service instance
-     * @var TimeTrackingEntriesApiService|null
-     */
-    private ?TimeTrackingEntriesApiService $timeTrackingEntries = null;
-    /**
-     * Project Templates API service instance
-     * @var ProjectTemplatesApiService|null
-     */
-    private ?ProjectTemplatesApiService $projectTemplates = null;
-    /**
-     * Batch API service instance
-     * @var BatchApiService|null
-     */
-    private ?BatchApiService $batch = null;
-    /**
-     * Status Updates API service instance
-     * @var StatusUpdatesApiService|null
-     */
-    private ?StatusUpdatesApiService $statusUpdates = null;
-    /**
-     * User Task Lists API service instance
-     * @var UserTaskListsApiService|null
-     */
-    private ?UserTaskListsApiService $userTaskLists = null;
-    /**
-    * List of callbacks to be triggered when the access token is refreshed.
-    * The array can have numeric or string keys, which are used to identify the callbacks.
-    * Each callback should accept one parameter: the refreshed access token.
-    * @var array<string|int, callable>
-    */
-    private array $tokenRefreshSubscribers = [];
-
-    /**
-     * Constructor method for initializing the AsanaOAuthHandler and setting the token storage path.
+     * Initializes the Asana client with a dependency injection container.
      *
-     * @param string|null $clientId Optional client ID for authentication.
-     * @param string|null $clientSecret Optional client secret for authentication.
-     * @param string|null $redirectUri Optional redirect URI for OAuth flow.
-     * @param string|null $tokenStoragePath Path to token storage file. Defaults to token.json in working dir.
-     * @param LoggerInterface|null $logger PSR-3 compatible logger instance.
+     * @param ContainerInterface $container
      */
-    public function __construct(
-        ?string $clientId = null,
-        ?string $clientSecret = null,
-        ?string $redirectUri = null,
-        ?string $tokenStoragePath = null,
-        ?LoggerInterface $logger = null
-    ) {
-        $this->logger = $logger ?? new NullLogger();
-
-        if ($clientId && $clientSecret) {
-            $this->authHandler = new AsanaOAuthHandler($clientId, $clientSecret, $redirectUri, $this->logger);
-        }
-
-        $this->tokenStoragePath = $tokenStoragePath ?? getcwd() . '/token.json';
-
-        $this->logger->info('AsanaClient initialized', [
-            'client_id' => $clientId,
-            'redirect_uri' => $redirectUri,
-            'token_storage_path' => $this->tokenStoragePath,
-        ]);
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
     }
 
     /**
-     * Constructor method for initializing the AsanaOAuthHandler and setting the token storage path.
+     * Bootstraps a default AsanaClient with OAuth configuration.
      *
-     * @param string|null $clientId Optional client ID for authentication.
-     * @param string|null $clientSecret Optional client secret for authentication.
-     * @param string|null $redirectUri Optional redirect URI for OAuth flow.
-     * @param string|null $tokenStoragePath Path to token storage file. Defaults to token.json in working dir.
-     * @param LoggerInterface|null $logger PSR-3 compatible logger instance.
+     * @param string|null $clientId
+     * @param string|null $clientSecret
+     * @param string|null $redirectUri
+     * @param string|null $tokenStoragePath
+     * @param LoggerInterface|null $logger
+     * @param string|null $salt Optional salt/password for encrypting tokens.
+     *
+     * @return AsanaClient
      */
     public static function OAuth(
         ?string $clientId = null,
         ?string $clientSecret = null,
         ?string $redirectUri = null,
         ?string $tokenStoragePath = null,
-        ?LoggerInterface $logger = null
+        ?LoggerInterface $logger = null,
+        ?string $salt = null
     ): self {
-        return new self($clientId, $clientSecret, $redirectUri, $tokenStoragePath, $logger);
+        $container = new ServiceContainer();
+        $logger = $logger ?? new NullLogger();
+        $container->set(LoggerInterface::class, $logger);
+
+        $path = $tokenStoragePath ?? getcwd() . '/token.json';
+        $container->set(TokenStorageInterface::class, new FileTokenStorage($path, $salt));
+
+        if ($clientId && $clientSecret) {
+            $container->set(
+                AuthHandlerInterface::class,
+                new AsanaOAuthHandler($clientId, $clientSecret, (string)$redirectUri, $logger)
+            );
+        }
+
+        $container->set(TokenManager::class, function ($c) {
+            return new TokenManager(
+                $c->get(TokenStorageInterface::class),
+                $c->has(AuthHandlerInterface::class) ? $c->get(AuthHandlerInterface::class) : null,
+                $c->get(LoggerInterface::class)
+            );
+        });
+
+        $container->set(HttpClientInterface::class, function ($c) {
+            return new AsanaApiClient(
+                [$c->get(TokenManager::class), 'getAccessTokenString'],
+                $c->get(LoggerInterface::class)
+            );
+        });
+
+        // Register all services
+        self::registerServices($container);
+
+        return new self($container);
     }
 
     /**
-     * Initialize the Asana client with an access token
+     * Bootstraps a default AsanaClient with a Personal Access Token (PAT).
      *
-     * @param string $clientId OAuth client ID
-     * @param string $clientSecret OAuth client secret
-     * @param array $token The user's preexisting access token
-     * @param string|null $tokenStoragePath Path to token storage file. Defaults to token.json in working dir.
-     * @param LoggerInterface|null $logger PSR-3 compatible logger instance.
-     * @return self
+     * @param string $personalAccessToken The Personal Access Token (PAT) to use for authentication.
+     * @param string|null $tokenStoragePath Optional path to store the token securely.
+     * @param LoggerInterface|null $logger Optional logger instance for logging.
+     * @param string|null $salt Optional salt for token storage encryption.
+     *
+     * @return self The configured AsanaClient instance.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public static function withPAT(
+        string $personalAccessToken,
+        ?string $tokenStoragePath = null,
+        ?LoggerInterface $logger = null,
+        ?string $salt = null
+    ): self {
+        $client = self::OAuth(null, null, null, $tokenStoragePath, $logger, $salt);
+        $tokenManager = $client->getContainer()->get(TokenManager::class);
+        $tokenManager->setAccessToken(new AccessToken(['access_token' => $personalAccessToken]));
+        return $client;
+    }
+
+    /**
+     * Bootstraps a default AsanaClient with an existing access token.
+     *
+     * @param string $clientId The client ID for the OAuth application.
+     * @param string $clientSecret The client secret for the OAuth application.
+     * @param array $token The access token to use for authentication.
+     * @param string|null $tokenStoragePath Optional path to store the token securely.
+     * @param LoggerInterface|null $logger Optional logger instance for logging.
+     * @param string|null $salt Optional salt for token storage encryption.
+     *
+     * @return self The configured AsanaClient instance.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function withAccessToken(
         string $clientId,
         string $clientSecret,
         array $token,
         ?string $tokenStoragePath = null,
-        ?LoggerInterface $logger = null
+        ?LoggerInterface $logger = null,
+        ?string $salt = null
     ): self {
-        $instance = new self(
-            $clientId,
-            $clientSecret,
-            '', // No redirect URI required when preloading a token
-            $tokenStoragePath,
-            $logger
-        );
-        $instance->accessToken = new AccessToken($token);
-        return $instance;
+        $client = self::OAuth($clientId, $clientSecret, '', $tokenStoragePath, $logger, $salt);
+        $tokenManager = $client->getContainer()->get(TokenManager::class);
+        $tokenManager->setAccessToken(new AccessToken($token));
+        return $client;
+    }
+
+    private static function registerServices(ServiceContainer $container): void
+    {
+        $services = [
+            TaskApiService::class,
+            ProjectApiService::class,
+            UserApiService::class,
+            TagsApiService::class,
+            SectionApiService::class,
+            MembershipApiService::class,
+            AttachmentApiService::class,
+            BatchApiService::class,
+            CustomFieldApiService::class,
+            EventsApiService::class,
+            GoalsApiService::class,
+            PortfoliosApiService::class,
+            ProjectTemplatesApiService::class,
+            StatusUpdatesApiService::class,
+            TeamsApiService::class,
+            TimeTrackingEntriesApiService::class,
+            UserTaskListsApiService::class,
+            WebhooksApiService::class,
+            WorkspaceApiService::class,
+        ];
+
+        foreach ($services as $service) {
+            $container->set($service, function ($c) use ($service) {
+                return new $service($c->get(HttpClientInterface::class));
+            });
+        }
     }
 
     /**
-     * Initialize the Asana client with a Personal Access Token (PAT)
-     *
-     * @param string $personalAccessToken The user's PAT from Asana
-     * @param string|null $tokenStoragePath Path to token storage file. Defaults to token.json in working dir.
-     * @param LoggerInterface|null $logger PSR-3 compatible logger instance.
-     *
-     * @return self
+     * Returns the underlying container.
      */
-    public static function withPAT(
-        string $personalAccessToken,
-        ?string $tokenStoragePath = null,
-        ?LoggerInterface $logger = null
-    ): self {
-        // clientId, clientSecret, & redirectUri not needed for PAT
-        $instance = new self('', '', '', $tokenStoragePath, $logger);
-        $instance->accessToken = new AccessToken(['access_token' => $personalAccessToken]);
-        return $instance;
+    public function getContainer(): ContainerInterface
+    {
+        return $this->container;
     }
 
+    // --- Service Accessors ---
+
     /**
-     * Retrieve the Task API service instance.
-     *
-     * Initializes the Task API service if it is not already set, ensuring
-     * the API client is configured, and validates the current token.
-     *
-     * @return TaskApiService The instance of TaskApiService.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function tasks(): TaskApiService
     {
-        if ($this->tasks === null) {
-            $this->tasks = new TaskApiService($this->getApiClient());
-            return $this->tasks;
-        }
-
-        $this->ensureValidToken();
-
-        return $this->tasks;
+        return $this->container->get(TaskApiService::class);
     }
 
     /**
-     * Retrieve the ProjectApiService instance. If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return ProjectApiService The initialized ProjectApiService instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function projects(): ProjectApiService
     {
-        if ($this->projects === null) {
-            $this->projects = new ProjectApiService($this->getApiClient());
-            return $this->projects;
-        }
-
-        $this->ensureValidToken();
-
-        return $this->projects;
+        return $this->container->get(ProjectApiService::class);
     }
 
     /**
-     * Retrieve the UserApiService instance. If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return UserApiService The initialized UserApiService instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function users(): UserApiService
     {
-        if ($this->users === null) {
-            $this->users = new UserApiService($this->getApiClient());
-            return $this->users;
-        }
-
-        $this->ensureValidToken();
-
-        return $this->users;
+        return $this->container->get(UserApiService::class);
     }
 
     /**
-     * Retrieve the TagsApiService instance. If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return TagsApiService The initialized TagsApiService instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function tags(): TagsApiService
     {
-        if ($this->tags === null) {
-            $this->tags = new TagsApiService($this->getApiClient());
-            return $this->tags;
-        }
-
-        $this->ensureValidToken();
-
-        return $this->tags;
+        return $this->container->get(TagsApiService::class);
     }
 
     /**
-     * Retrieve the SectionApiService instance. If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return SectionApiService The initialized SectionApiService instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function sections(): SectionApiService
     {
-        if ($this->sections === null) {
-            $this->sections = new SectionApiService($this->getApiClient());
-            return $this->sections;
-        }
-
-        $this->ensureValidToken();
-
-        return $this->sections;
+        return $this->container->get(SectionApiService::class);
     }
 
     /**
-     * Retrieve the Membership API service instance. If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return MembershipApiService The initialized MembershipApiService instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function memberships(): MembershipApiService
     {
-        if ($this->memberships === null) {
-            $this->memberships = new MembershipApiService($this->getApiClient());
-            return $this->memberships;
-        }
-
-        $this->ensureValidToken();
-
-        return $this->memberships;
+        return $this->container->get(MembershipApiService::class);
     }
 
     /**
-     * Retrieve the AttachmentApiService instance. If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return AttachmentApiService The initialized AttachmentApiService instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function attachments(): AttachmentApiService
     {
-        if ($this->attachments === null) {
-            $this->attachments = new AttachmentApiService($this->getApiClient());
-            return $this->attachments;
-        }
-
-        $this->ensureValidToken();
-
-        return $this->attachments;
+        return $this->container->get(AttachmentApiService::class);
     }
 
     /**
-     * Retrieves the Workspace API service instance.
-     *
-     * @return WorkspaceApiService Returns the Workspace API service instance.
-     * @throws TokenInvalidException If the access token is invalid.
-     */
-    public function workspaces(): WorkspaceApiService
-    {
-        if ($this->workspaces === null) {
-            $this->workspaces = new WorkspaceApiService($this->getApiClient());
-            return $this->workspaces;
-        }
-        $this->ensureValidToken();
-        return $this->workspaces;
-    }
-
-    /**
-     * Provides access to the custom fields API service.
-     *
-     * @return CustomFieldApiService Returns the instance of the custom fields API service.
-     * @throws TokenInvalidException If the token is invalid or cannot be refreshed.
-     */
-    public function customFields(): CustomFieldApiService
-    {
-        if ($this->customFields === null) {
-            $this->customFields = new CustomFieldApiService($this->getApiClient());
-            return $this->customFields;
-        }
-        $this->ensureValidToken();
-        return $this->customFields;
-    }
-
-    /**
-     * Retrieve the Webhooks API service instance. If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return WebhooksApiService The initialized WebhooksApiService instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
-     */
-    public function webhooks(): WebhooksApiService
-    {
-        if ($this->webhooks === null) {
-            $this->webhooks = new WebhooksApiService($this->getApiClient());
-            return $this->webhooks;
-        }
-        $this->ensureValidToken();
-        return $this->webhooks;
-    }
-
-    /**
-     * Retrieve the Events API service instance. If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return EventsApiService The initialized EventsApiService instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
-     */
-    public function events(): EventsApiService
-    {
-        if ($this->events === null) {
-            $this->events = new EventsApiService($this->getApiClient());
-            return $this->events;
-        }
-        $this->ensureValidToken();
-        return $this->events;
-    }
-
-    /**
-     * Retrieve the Teams API service instance. If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return TeamsApiService The initialized TeamsApiService instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
-     */
-    public function teams(): TeamsApiService
-    {
-        if ($this->teams === null) {
-            $this->teams = new TeamsApiService($this->getApiClient());
-            return $this->teams;
-        }
-        $this->ensureValidToken();
-        return $this->teams;
-    }
-
-    /**
-     * Retrieve the Portfolios API service instance. If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return PortfoliosApiService The initialized PortfoliosApiService instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
-     */
-    public function portfolios(): PortfoliosApiService
-    {
-        if ($this->portfolios === null) {
-            $this->portfolios = new PortfoliosApiService($this->getApiClient());
-            return $this->portfolios;
-        }
-        $this->ensureValidToken();
-        return $this->portfolios;
-    }
-
-    /**
-     * Retrieve the Goals API service instance. If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return GoalsApiService The initialized GoalsApiService instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
-     */
-    public function goals(): GoalsApiService
-    {
-        if ($this->goals === null) {
-            $this->goals = new GoalsApiService($this->getApiClient());
-            return $this->goals;
-        }
-        $this->ensureValidToken();
-        return $this->goals;
-    }
-
-    /**
-     * Retrieve the Time Tracking Entries API service instance.
-     * If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return TimeTrackingEntriesApiService The initialized instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
-     */
-    public function timeTrackingEntries(): TimeTrackingEntriesApiService
-    {
-        if ($this->timeTrackingEntries === null) {
-            $this->timeTrackingEntries = new TimeTrackingEntriesApiService(
-                $this->getApiClient()
-            );
-            return $this->timeTrackingEntries;
-        }
-        $this->ensureValidToken();
-        return $this->timeTrackingEntries;
-    }
-
-    /**
-     * Retrieve the Project Templates API service instance.
-     * If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return ProjectTemplatesApiService The initialized instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
-     */
-    public function projectTemplates(): ProjectTemplatesApiService
-    {
-        if ($this->projectTemplates === null) {
-            $this->projectTemplates = new ProjectTemplatesApiService(
-                $this->getApiClient()
-            );
-            return $this->projectTemplates;
-        }
-        $this->ensureValidToken();
-        return $this->projectTemplates;
-    }
-
-    /**
-     * Retrieve the Batch API service instance.
-     * If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return BatchApiService The initialized BatchApiService instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function batch(): BatchApiService
     {
-        if ($this->batch === null) {
-            $this->batch = new BatchApiService($this->getApiClient());
-            return $this->batch;
-        }
-        $this->ensureValidToken();
-        return $this->batch;
+        return $this->container->get(BatchApiService::class);
     }
 
     /**
-     * Retrieve the Status Updates API service instance.
-     * If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return StatusUpdatesApiService The initialized instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function customFields(): CustomFieldApiService
+    {
+        return $this->container->get(CustomFieldApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function events(): EventsApiService
+    {
+        return $this->container->get(EventsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function goals(): GoalsApiService
+    {
+        return $this->container->get(GoalsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function portfolios(): PortfoliosApiService
+    {
+        return $this->container->get(PortfoliosApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function projectTemplates(): ProjectTemplatesApiService
+    {
+        return $this->container->get(ProjectTemplatesApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function statusUpdates(): StatusUpdatesApiService
     {
-        if ($this->statusUpdates === null) {
-            $this->statusUpdates = new StatusUpdatesApiService(
-                $this->getApiClient()
-            );
-            return $this->statusUpdates;
-        }
-        $this->ensureValidToken();
-        return $this->statusUpdates;
+        return $this->container->get(StatusUpdatesApiService::class);
     }
 
     /**
-     * Retrieve the User Task Lists API service instance.
-     * If it does not exist, it creates and initializes it.
-     * Ensures the token validity before returning the instance.
-     *
-     * @return UserTaskListsApiService The initialized instance.
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function teams(): TeamsApiService
+    {
+        return $this->container->get(TeamsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function timeTrackingEntries(): TimeTrackingEntriesApiService
+    {
+        return $this->container->get(TimeTrackingEntriesApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function userTaskLists(): UserTaskListsApiService
     {
-        if ($this->userTaskLists === null) {
-            $this->userTaskLists = new UserTaskListsApiService(
-                $this->getApiClient()
-            );
-            return $this->userTaskLists;
-        }
-        $this->ensureValidToken();
-        return $this->userTaskLists;
+        return $this->container->get(UserTaskListsApiService::class);
     }
 
     /**
-     * Get the authorization URL for OAuth flow
-     *
-     * @param array $scopes An array of requested scopes
-     *
-     * @return string
-     * @throws TokenInvalidException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function getAuthorizationUrl(array $scopes): string
+    public function webhooks(): WebhooksApiService
     {
-        if ($this->authHandler === null) {
-            throw new TokenInvalidException('OAuth handler is not configured.');
-        }
-
-        $options = ['scope' => implode(' ', $scopes)];
-        return $this->authHandler->getAuthorizationUrl($options);
+        return $this->container->get(WebhooksApiService::class);
     }
 
     /**
-     * Get authorization URL, state, and PKCE verifier
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function workspaces(): WorkspaceApiService
+    {
+        return $this->container->get(WorkspaceApiService::class);
+    }
+
+    // --- Authentication & Helper Methods ---
+
+    /**
+     * Generates and returns the authorization URL.
      *
-     * @param array $scopes An array of requested scopes
-     * @param bool $enableState A bool to indicate if you are using state
-     * @param bool $enablePKCE A bool to indicate if you are using PKCE
+     * @param array $options Optional parameters for generating the authorization URL.
+     *
+     * @return string The generated authorization URL.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getAuthorizationUrl(array $options = []): string
+    {
+        return $this->container->get(AuthHandlerInterface::class)->getAuthorizationUrl($options);
+    }
+
+    /**
+     * Returns authorization data like URL, state, and PKCE verifier (if enabled).
+     *
+     * @param array $options Optional parameters for generating the authorization URL.
+     * @param bool $enableState Whether to enable CSRF protection using the state parameter.
+     * @param bool $enablePKCE Whether to enable PKCE for enhanced security.
      *
      * @return array ['url' => string, 'state' => string|null, 'codeVerifier' => string|null]
-     * @throws TokenInvalidException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function getSecureAuthorizationUrl(array $scopes, bool $enableState = true, bool $enablePKCE = true): array
+    public function getSecureAuthorizationUrl(array $options, bool $enableState = true, bool $enablePKCE = true): array
     {
-        if ($this->authHandler === null) {
-            throw new TokenInvalidException('OAuth handler is not configured.');
-        }
-
-        $options = ['scope' => implode(' ', $scopes)];
-        return $this->authHandler->getSecureAuthorizationUrl($options, $enableState, $enablePKCE);
+        return $this->container->get(AuthHandlerInterface::class)
+            ->getSecureAuthorizationUrl($options, $enableState, $enablePKCE);
     }
 
-
     /**
-     * Handle callback and retrieve an access token.
+     * Handles the callback process to retrieve and store an access token.
      *
-     * @param string $authorizationCode The code returned by the OAuth callback.
-     * @param string|null $codeVerifier The PKCE code verifier (optional).
+     * @param string $code The authorization code received from the authentication flow.
+     * @param string|null $codeVerifier An optional code verifier for PKCE (Proof Key for Code Exchange).
      *
-     * @return array Access Token data as array.
-     *
-     * @throws OAuthCallbackException If the callback handling process fails.
-     * @throws TokenInvalidException
+     * @return AccessToken The retrieved access token.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function handleCallback(string $authorizationCode, ?string $codeVerifier = null): ?array
+    public function handleCallback(string $code, ?string $codeVerifier = null): AccessToken
     {
-        if ($this->authHandler === null) {
-            throw new OAuthCallbackException('OAuth handler is not configured.');
-        }
-
-        try {
-            $this->accessToken = $this->authHandler->handleCallback($authorizationCode, $codeVerifier);
-            return $this->accessToken->jsonSerialize();
-        } catch (GuzzleException $e) {
-            $data = [
-                'authorization_code' => substr($authorizationCode, 0, 5) . '***' . substr($authorizationCode, - 5),
-                'code_verifier'      => isset($codeVerifier) ? 'Provided' : 'Not Provided',
-                'context'            => 'OAuth callback'
-            ];
-            $this->handleGuzzleException($e, OAuthCallbackException::class, $data);
-        } catch (Exception $e) {
-            $data = [
-                'authorization_code' => substr($authorizationCode, 0, 5) . '***' . substr($authorizationCode, - 5),
-                'code_verifier'      => isset($codeVerifier) ? 'Provided' : 'Not Provided',
-                'context'            => 'OAuth callback'
-            ];
-            $this->handleGeneralException($e, OAuthCallbackException::class, $data);
-        }
-        // @codeCoverageIgnoreStart
-        // Unreachable code. Just to satisfy return type.
-        return null;
-        // @codeCoverageIgnoreEnd
-    }
-
-    /**
-     * Handles exceptions raised by Guzzle HTTP client and extracts relevant response data.
-     *
-     * @param GuzzleException $exceptionThrown The exception thrown by the Guzzle HTTP client.
-     * @param string $exceptionToThrow
-     * @param array $data Additional contextual data related to the request.
-     *
-     * @return void
-     * @throws TokenInvalidException
-     * @throws OAuthCallbackException
-     */
-    private function handleGuzzleException(
-        GuzzleException $exceptionThrown,
-        string $exceptionToThrow,
-        array $data
-    ): void {
-        if (method_exists($exceptionThrown, 'getResponse')) {
-            $response = $exceptionThrown->getResponse();
-            if ($response) {
-                $data['response_data'] = [
-                    'http_status'      => $response->getStatusCode(),
-                    'http_reason'      => $response->getReasonPhrase(),
-                    'response_body'    => (string) $response->getBody(),
-                    'response_headers' => $response->getHeaders(),
-                ];
-            }
-        }
-
-        $this->handleGeneralException($exceptionThrown, $exceptionToThrow, $data);
-    }
-
-    /**
-     * Handles general exceptions by throwing specific exceptions based on the context provided in the data.
-     *
-     * @param Throwable $exceptionThrown The exception that occurred.
-     * @param string $exceptionToThrow The exception to throw.
-     * @param array $data An associative array containing information about the exception context.
-     * @return void
-     * @throws TokenInvalidException
-     * @throws OAuthCallbackException
-     */
-    private function handleGeneralException(
-        Throwable $exceptionThrown,
-        string $exceptionToThrow,
-        array $data
-    ): void {
-        $message = "Error during {$data['context']}: {$exceptionThrown->getMessage()}";
-        $code = $exceptionThrown->getCode();
-
-        throw new $exceptionToThrow($message, $code, $data, $exceptionThrown);
-    }
-
-
-    /**
-     * Check if the client is authenticated
-     *
-     * @return bool
-     */
-    public function hasToken(): bool
-    {
-        return $this->accessToken !== null;
-    }
-
-    /**
-     * Check if access token is valid (PATs are always valid unless null).
-     *
-     * @return bool True if token is valid (either a valid OAuth token or PAT)
-     * @throws OAuthCallbackException
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
-     */
-    public function ensureValidToken(): bool
-    {
-        if (!$this->hasToken()) {
-            throw new TokenInvalidException('No access token is available.');
-        }
-
-        if ($this->accessToken === null) {
-            throw new TokenInvalidException('No access token is available.');
-        }
-
-        // If token has no expiration (e.g., PAT), it is considered valid
-        if (!$this->accessToken->getExpires()) {
-            return true;
-        }
-
-        // Handle OAuth tokens that may need refreshing
-        if ($this->accessToken->hasExpired()) {
-            if ($this->authHandler === null) {
-                throw new TokenInvalidException('OAuth handler is not configured.');
-            }
-
-            try {
-                $this->accessToken = $this->authHandler->refreshToken($this->accessToken);
-                $this->notifyTokenRefreshSubscribers($this->accessToken);
-                return true;
-            } catch (GuzzleException $e) {
-                $this->handleGuzzleException($e, TokenInvalidException::class, ['context' => 'Refresh token']);
-            } catch (Exception $e) {
-                $this->handleGeneralException($e, TokenInvalidException::class, ['context' => 'Refresh token']);
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Retrieves the current access token.
-     *
-     * @return array|null The current access token, or null if not set.
-     */
-    public function getAccessToken(): ?array
-    {
-        if ($this->accessToken === null) {
-            return null;
-        }
-
-        return $this->accessToken->jsonSerialize();
-    }
-
-    /**
-     * Refreshes the expired access token.
-     *
-     * @return array|null Returns the current access token, after refreshing it if necessary.
-     *
-     * @throws AuthException
-     * @throws OAuthCallbackException
-     * @throws TokenInvalidException If no token or it's expired and error refreshing it.
-     */
-    public function refreshToken(): ?array
-    {
-        if (!$this->hasToken()) {
-            throw new TokenInvalidException('No access token is available.');
-        }
-
-        if ($this->accessToken === null) {
-            throw new TokenInvalidException('No access token is available.');
-        }
-
-        if ($this->authHandler === null) {
-            throw new TokenInvalidException('OAuth handler is not configured.');
-        }
-
-        try {
-            $this->accessToken = $this->authHandler->refreshToken($this->accessToken);
-        } catch (GuzzleException $e) {
-            $this->handleGuzzleException($e, TokenInvalidException::class, ['context' => 'Refresh token']);
-        } catch (IdentityProviderException $e) {
-            $this->handleGeneralException($e, TokenInvalidException::class, ['context' => 'Refresh token']);
-        }
-
-        $this->notifyTokenRefreshSubscribers($this->accessToken);
-        return $this->accessToken->jsonSerialize();
-    }
-    /**
-     * Register a callback to be invoked when the access token is refreshed.
-     * Can also be used to modify existing callbacks by passing in the key of the callback to modify.
-     *
-     * @param callable $callback The callback function to register.
-     *                           It should accept one parameter: the refreshed access token.
-     * @param string|int|null $key ID for the callback. If absent, next numeric index will be used.
-     *
-     * @return string|int The key of the registered callback.
-     */
-    public function onTokenRefresh(callable $callback, $key = null)
-    {
-        if (is_null($key)) {
-            // Use the next numeric index if no key is provided
-            $this->tokenRefreshSubscribers[] = $callback;
-            return array_key_last($this->tokenRefreshSubscribers);
-        }
-
-        // Use the provided key
-        $this->tokenRefreshSubscribers[$key] = $callback;
-        return $key;
-    }
-
-    /**
-     * Unregister a callback from the token refresh event using its index.
-     *
-     * @param string|int $key The index of the callback to unregister.
-     * @return bool True if the callback was removed, false if the index was invalid.
-     */
-    public function removeTokenRefreshSubscriber($key): bool
-    {
-        if (isset($this->tokenRefreshSubscribers[$key])) {
-            unset($this->tokenRefreshSubscribers[$key]);
-            return true;
-        }
-        return false;
-    }
-
-
-    /**
-     * Notify all registered subscribers about the refreshed token.
-     *
-     * @param AccessToken $token The refreshed access token.
-     */
-    private function notifyTokenRefreshSubscribers(AccessToken $token): void
-    {
-        foreach ($this->tokenRefreshSubscribers as $callback) {
-            $callback($token->jsonSerialize());
-        }
-    }
-
-    /**
-     * Get API client with valid token
-     *
-     * @return AsanaApiClient
-     * @throws TokenInvalidException If not authenticated
-     */
-    private function getApiClient(): AsanaApiClient
-    {
-        $this->ensureValidToken();
-
-        if ($this->accessToken === null) {
-            throw new TokenInvalidException('No access token is available.');
-        }
-
-        if ($this->apiClient === null) {
-            $this->apiClient = new AsanaApiClient($this->accessToken->getToken(), $this->logger);
-        }
-
-        return $this->apiClient;
-    }
-
-    /**
-     * Loads and decrypts the token stored in the specified path, initializing it for further use.
-     * If the token file does not exist or an error occurs during the loading process, the method fails gracefully.
-     *
-     * @param string $password
-     *
-     * @return bool True if the token was successfully loaded and decrypted, false otherwise.
-     */
-    public function loadToken(string $password): bool
-    {
-        if (file_exists($this->tokenStoragePath)) {
-            try {
-                $tokenFile = file_get_contents($this->tokenStoragePath);
-                if ($tokenFile === false) {
-                    throw new Exception('Unable to read token storage file.');
-                }
-
-                $tokenData = json_decode($tokenFile, true, 512, JSON_THROW_ON_ERROR);
-                if (!is_array($tokenData)) {
-                    throw new Exception('Invalid token data structure.');
-                }
-
-                // Decrypt sensitive fields
-                $tokenData['access_token'] = CryptoUtils::decrypt($tokenData['access_token'], $password);
-                if (isset($tokenData['refresh_token'])) {
-                    $tokenData['refresh_token'] = CryptoUtils::decrypt($tokenData['refresh_token'], $password);
-                }
-
-                $this->accessToken = new AccessToken($tokenData);
-                return true;
-            } catch (Exception $e) {
-                $this->accessToken = null;
-                return false;
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * Retrieves and decrypts a token from the specified storage path.
-     * If no storage path is provided, it defaults to a file named 'token.json' in the current working directory.
-     *
-     * @param string $password
-     * @param string|null $tokenStoragePath The path to the file where the token is stored. Optional.
-     *
-     * @return array The decrypted token data, including 'access_token' and optionally 'refresh_token'.
-     * @throws JsonException If there is an error decoding the JSON from the token storage file.
-     * @throws Exception If required OpenSSL functions are unavailable, data is invalid, or decryption fails.
-     */
-    public static function retrieveToken(string $password, ?string $tokenStoragePath = null): array
-    {
-        if (is_null($tokenStoragePath)) {
-            $tokenStoragePath = getcwd() . '/token.json';
-        }
-
-        $tokenFile = file_get_contents($tokenStoragePath);
-        if ($tokenFile === false) {
-            throw new Exception('Unable to read token storage file.');
-        }
-
-        $token = json_decode($tokenFile, true, 512, JSON_THROW_ON_ERROR);
-        if (!is_array($token)) {
-            throw new Exception('Invalid token data structure.');
-        }
-        $token['access_token'] = CryptoUtils::decrypt($token['access_token'], $password);
-        if (isset($token['refresh_token'])) {
-            $token['refresh_token'] = CryptoUtils::decrypt($token['refresh_token'], $password);
-        }
-
+        $token = $this->container->get(AuthHandlerInterface::class)->handleCallback($code, $codeVerifier);
+        $this->container->get(TokenManager::class)->setAccessToken($token);
         return $token;
     }
 
-
     /**
-     * Encrypts the current access token using the provided salt/key and saves it to the defined storage path.
-     * If no access token is available, the method does nothing.
+     * Sets the access token in the token manager.
      *
-     * @param string $password
+     * @param AccessToken $token The access token to be set.
      *
      * @return void
-     * @throws Exception If the OpenSSL extension is unavailable or encryption fails.
+     * @throws ContainerExceptionInterface
      */
-    public function saveToken(string $password): void
+    public function setAccessToken(AccessToken $token): void
     {
-        if ($this->accessToken) {
-            $token = $this->accessToken->jsonSerialize();
-
-            // Encrypt sensitive fields
-            $token['access_token'] = CryptoUtils::encrypt($token['access_token'], $password);
-            if (isset($token['refresh_token'])) {
-                $token['refresh_token'] = CryptoUtils::encrypt($token['refresh_token'], $password);
-            }
-
-            $encodedToken = json_encode($token);
-            if ($encodedToken === false) {
-                throw new Exception('Failed to encode token for storage.');
-            }
-
-            file_put_contents($this->tokenStoragePath, $encodedToken);
-        }
+        $this->container->get(TokenManager::class)->setAccessToken($token);
     }
 
+    /**
+     * Retrieves the access token.
+     *
+     * @return AccessToken|null The access token or null if not available.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getAccessToken(): ?AccessToken
+    {
+        return $this->container->get(TokenManager::class)->getAccessToken();
+    }
 
     /**
-     * Clear stored token (logout)
+     * Refreshes the authentication token by delegating the operation to the TokenManager.
+     *
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function logout(): void
+    public function refreshToken(): void
     {
-        $this->accessToken = null;
-        $this->apiClient = null;
+        $this->container->get(TokenManager::class)->refreshToken();
+    }
 
-        if (file_exists($this->tokenStoragePath)) {
-            unlink($this->tokenStoragePath);
-        }
+    /**
+     * Subscribe to token refresh events.
+     *
+     * @param callable $callback
+     * @param string|int|null $id
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function subscribeToTokenRefresh(callable $callback, $id = null): void
+    {
+        $this->container->get(TokenManager::class)->subscribeToRefresh($callback, $id);
+    }
+
+    /**
+     * Webhook Handshake Helpers
+     */
+    public function isHandshake(array $headers): bool
+    {
+        return isset($headers['X-Hook-Secret']) || isset($headers['x-hook-secret']);
+    }
+
+    public function handleHandshake(array $headers): string
+    {
+        return $headers['X-Hook-Secret'] ?? $headers['x-hook-secret'] ?? '';
     }
 }

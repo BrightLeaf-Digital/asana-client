@@ -3,28 +3,25 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\AttachmentApiService;
-use BrightleafDigital\Http\AsanaApiClient;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class AttachmentApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var AttachmentApiService */
-    private $service;
+    private AttachmentApiService $service;
 
-    /** @var string|null */
-    private $tempDir;
+    /** @var string */
+    private string $tempDir;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new AttachmentApiService($this->mockClient);
         $this->tempDir = sys_get_temp_dir() . '/attachment_tests_' . uniqid('', true);
         if (!is_dir($this->tempDir)) {
@@ -66,7 +63,7 @@ class AttachmentApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'attachments/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'attachments/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getAttachment('12345');
@@ -81,7 +78,7 @@ class AttachmentApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'attachments/12345', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'attachments/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getAttachment('12345', $options);
@@ -94,7 +91,7 @@ class AttachmentApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('DELETE', 'attachments/12345', [], AsanaApiClient::RESPONSE_DATA)
+            ->with('DELETE', 'attachments/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->deleteAttachment('12345');
@@ -107,7 +104,7 @@ class AttachmentApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'attachments', ['query' => ['parent' => '12345']], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'attachments', ['query' => ['parent' => '12345']], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getAttachmentsForObject('12345');
@@ -123,7 +120,7 @@ class AttachmentApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'attachments', ['query' => $expectedQuery], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'attachments', ['query' => $expectedQuery], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getAttachmentsForObject('12345', $options);
@@ -151,7 +148,7 @@ class AttachmentApiServiceTest extends TestCase
                         && $options['multipart'][1]['name'] === 'parent'
                         && $options['multipart'][1]['contents'] === '12345';
                 }),
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -175,7 +172,7 @@ class AttachmentApiServiceTest extends TestCase
                 $this->callback(function ($opt) use ($options) {
                     return isset($opt['multipart']) && isset($opt['query']) && $opt['query'] === $options;
                 }),
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -228,9 +225,9 @@ class AttachmentApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'attachments/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'attachments/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getAttachment('12345', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getAttachment('12345', [], HttpClientInterface::RESPONSE_FULL);
     }
 }

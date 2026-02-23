@@ -24,13 +24,9 @@ This document provides a comprehensive analysis of all improvement tasks for the
 
 ~~9. **[Complete Webhook support](feature-additions.md#1-complete-webhook-support)** (Features) — Completed~~
 
-10. **[Implement interfaces for all major components](code-architecture-improvements.md#1-implement-interfaces-for-all-major-components)** (Code Architecture)
-    - Impact: Medium | Difficulty: High
-    - Enables dependency injection and better testing
+~~10. **[Implement interfaces for all major components](code-architecture-improvements.md#1-implement-interfaces-for-all-major-components)** (Code Architecture)~~
 
-11. **[Implement proper service container/dependency injection](code-architecture-improvements.md#3-implement-proper-service-containerdependency-injection)** (Code Architecture)
-    - Impact: Medium | Difficulty: High
-    - Improves flexibility and testability
+~~11. **[Implement proper service container/dependency injection](code-architecture-improvements.md#3-implement-proper-service-containerdependency-injection)** (Code Architecture)~~
 
 12. **[Expand API coverage](feature-additions.md#6-support-full-api-coverage)** (Features)
     - Impact: High | Difficulty: High
@@ -138,8 +134,8 @@ This document provides a comprehensive analysis of all improvement tasks for the
 
 ### 🔧 Architecture Improvements (Code Quality & Maintainability)
 - ~~Refactor API service classes to reduce duplication — Completed~~
-- Implement interfaces for all major components
-- Implement proper service container/dependency injection
+- ~~Implement interfaces for all major components — Completed~~
+- ~~Implement proper service container/dependency injection — Completed~~
 - Separate configuration from implementation
 
 ### ⚡ Performance Enhancements (Optimization)

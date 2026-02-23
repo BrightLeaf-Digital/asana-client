@@ -19,7 +19,7 @@ $clientId = getenv('ASANA_CLIENT_ID');
 $clientSecret = getenv('ASANA_CLIENT_SECRET');
 $redirectUri = getenv('ASANA_REDIRECT_URI');
 
-$client = new AsanaClient($clientId, $clientSecret, $redirectUri);
+$client = AsanaClient::OAuth($clientId, $clientSecret, $redirectUri);
 $webhooks = $client->webhooks();
 
 // 1. Get the request details

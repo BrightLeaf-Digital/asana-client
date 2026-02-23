@@ -3,26 +3,22 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\GoalsApiService;
-use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Exceptions\ValidationException;
-use PHPUnit\Framework\MockObject\Exception as MockException;
+use BrightleafDigital\Http\HttpClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class GoalsApiServiceTest extends TestCase
 {
-    /** @var AsanaApiClient&MockObject */
+    /** @var HttpClientInterface&MockObject */
     private $mockClient;
 
     /** @var GoalsApiService */
     private GoalsApiService $service;
 
-    /**
-     * @throws MockException
-     */
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(AsanaApiClient::class);
+        $this->mockClient = $this->createMock(HttpClientInterface::class);
         $this->service = new GoalsApiService($this->mockClient);
     }
 
@@ -37,7 +33,7 @@ class GoalsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'goals/12345', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'goals/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
 
         $result = $this->service->getGoal('12345');
@@ -54,7 +50,7 @@ class GoalsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'goals/12345', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'goals/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getGoal('12345', $options);
@@ -67,10 +63,10 @@ class GoalsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'goals/12345', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'goals/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getGoal('12345', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getGoal('12345', [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -111,7 +107,7 @@ class GoalsApiServiceTest extends TestCase
                 'PUT',
                 'goals/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -134,7 +130,7 @@ class GoalsApiServiceTest extends TestCase
                 'PUT',
                 'goals/12345',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -154,11 +150,11 @@ class GoalsApiServiceTest extends TestCase
                 'PUT',
                 'goals/12345',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->updateGoal('12345', $data, [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->updateGoal('12345', $data, [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -192,7 +188,7 @@ class GoalsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('DELETE', 'goals/12345', [], AsanaApiClient::RESPONSE_DATA)
+            ->with('DELETE', 'goals/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $result = $this->service->deleteGoal('12345');
@@ -207,10 +203,10 @@ class GoalsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('DELETE', 'goals/12345', [], AsanaApiClient::RESPONSE_FULL)
+            ->with('DELETE', 'goals/12345', [], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->deleteGoal('12345', AsanaApiClient::RESPONSE_FULL);
+        $this->service->deleteGoal('12345', HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -253,7 +249,7 @@ class GoalsApiServiceTest extends TestCase
                 'GET',
                 'goals',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -275,7 +271,7 @@ class GoalsApiServiceTest extends TestCase
                 'GET',
                 'goals',
                 ['query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -293,11 +289,11 @@ class GoalsApiServiceTest extends TestCase
                 'GET',
                 'goals',
                 ['query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->getGoals([], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getGoals([], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -317,7 +313,7 @@ class GoalsApiServiceTest extends TestCase
                 'GET',
                 'goals',
                 ['query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -340,7 +336,7 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -363,7 +359,7 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -389,7 +385,7 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -416,7 +412,7 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/setMetric',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -439,7 +435,7 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/setMetric',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -459,11 +455,11 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/setMetric',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->createGoalMetric('12345', $data, [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->createGoalMetric('12345', $data, [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -504,7 +500,7 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/setMetricCurrentValue',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -527,7 +523,7 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/setMetricCurrentValue',
                 ['json' => ['data' => $data], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -547,11 +543,11 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/setMetricCurrentValue',
                 ['json' => ['data' => $data], 'query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->updateGoalMetric('12345', $data, [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->updateGoalMetric('12345', $data, [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -592,7 +588,7 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/addFollowers',
                 ['json' => ['data' => ['followers' => $followers]], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -615,7 +611,7 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/addFollowers',
                 ['json' => ['data' => ['followers' => $followers]], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -635,11 +631,11 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/addFollowers',
                 ['json' => ['data' => ['followers' => $followers]], 'query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->addFollowers('12345', $followers, [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->addFollowers('12345', $followers, [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -680,7 +676,7 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/removeFollowers',
                 ['json' => ['data' => ['followers' => $followers]], 'query' => []],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -703,7 +699,7 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/removeFollowers',
                 ['json' => ['data' => ['followers' => $followers]], 'query' => $options],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -723,11 +719,11 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/removeFollowers',
                 ['json' => ['data' => ['followers' => $followers]], 'query' => []],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->removeFollowers('12345', $followers, [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->removeFollowers('12345', $followers, [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -763,7 +759,7 @@ class GoalsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'goals/12345/parentGoals', ['query' => []], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'goals/12345/parentGoals', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
 
         $result = $this->service->getParentGoalsForGoal('12345');
@@ -780,7 +776,7 @@ class GoalsApiServiceTest extends TestCase
 
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'goals/12345/parentGoals', ['query' => $options], AsanaApiClient::RESPONSE_DATA)
+            ->with('GET', 'goals/12345/parentGoals', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getParentGoalsForGoal('12345', $options);
@@ -793,10 +789,10 @@ class GoalsApiServiceTest extends TestCase
     {
         $this->mockClient->expects($this->once())
             ->method('request')
-            ->with('GET', 'goals/12345/parentGoals', ['query' => []], AsanaApiClient::RESPONSE_FULL)
+            ->with('GET', 'goals/12345/parentGoals', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
-        $this->service->getParentGoalsForGoal('12345', [], AsanaApiClient::RESPONSE_FULL);
+        $this->service->getParentGoalsForGoal('12345', [], HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -841,7 +837,7 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/addCustomFieldSetting',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn($expectedResponse);
 
@@ -863,11 +859,11 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/addCustomFieldSetting',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->addCustomFieldSettingForGoal('12345', $data, AsanaApiClient::RESPONSE_FULL);
+        $this->service->addCustomFieldSettingForGoal('12345', $data, HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
@@ -907,7 +903,7 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/removeCustomFieldSetting',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_DATA
+                HttpClientInterface::RESPONSE_DATA
             )
             ->willReturn([]);
 
@@ -929,11 +925,11 @@ class GoalsApiServiceTest extends TestCase
                 'POST',
                 'goals/12345/removeCustomFieldSetting',
                 ['json' => ['data' => $data]],
-                AsanaApiClient::RESPONSE_FULL
+                HttpClientInterface::RESPONSE_FULL
             )
             ->willReturn([]);
 
-        $this->service->removeCustomFieldSettingForGoal('12345', $data, AsanaApiClient::RESPONSE_FULL);
+        $this->service->removeCustomFieldSettingForGoal('12345', $data, HttpClientInterface::RESPONSE_FULL);
     }
 
     /**
