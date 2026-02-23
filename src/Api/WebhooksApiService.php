@@ -393,7 +393,7 @@ class WebhooksApiService extends BaseApiService
      */
     public function isHandshakeRequest(array $headers): bool
     {
-        $normalizedHeaders = array_change_key_case($headers, CASE_LOWER);
+        $normalizedHeaders = array_change_key_case($headers);
         return isset($normalizedHeaders['x-hook-secret']);
     }
 
