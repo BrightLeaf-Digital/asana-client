@@ -1000,11 +1000,11 @@ The following table lists the 23 Asana REST API resource groups that are **not c
 
 | #  | Resource Group                     | Path Prefix              | Tier         | Impact   |
 |:---|:-----------------------------------|:-------------------------|:-------------|:---------|
-| 1  | **Stories (Comments)**             | `/stories`               | All          | **High** |
-| 2  | **Memberships (Project)**          | `/project_memberships`   | All          | Medium   |
-| 3  | **Memberships (Team)**             | `/team_memberships`      | All          | Medium   |
-| 4  | **Memberships (Portfolio)**        | `/portfolio_memberships` | All          | Medium   |
-| 5  | **Memberships (Workspace)**        | `/workspace_memberships` | All          | Medium   |
+| 1  | ~~**Stories (Comments)**~~         | `/stories`               | All          | **High** |
+| 2  | ~~**Memberships (Project)**~~      | `/project_memberships`   | All          | Medium   |
+| 3  | ~~**Memberships (Team)**~~          | `/team_memberships`      | All          | Medium   |
+| 4  | ~~**Memberships (Portfolio)**~~      | `/portfolio_memberships` | All          | Medium   |
+| 5  | ~~**Memberships (Workspace)**~~        | `/workspace_memberships` | All          | Medium   |
 | 6  | **Project Statuses**               | `/project_statuses`      | All          | Medium   |
 | 7  | **Audit Log API**                  | `/audit_log_events`      | Enterprise   | Medium   |
 | 8  | **Rules**                          | `/rules`                 | Business/Ent | Medium   |

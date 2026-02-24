@@ -8,7 +8,11 @@ use BrightleafDigital\Api\CustomFieldApiService;
 use BrightleafDigital\Api\EventsApiService;
 use BrightleafDigital\Api\GoalsApiService;
 use BrightleafDigital\Api\MembershipApiService;
+use BrightleafDigital\Api\PortfolioMembershipsApiService;
 use BrightleafDigital\Api\PortfoliosApiService;
+use BrightleafDigital\Api\ProjectMembershipsApiService;
+use BrightleafDigital\Api\TeamMembershipsApiService;
+use BrightleafDigital\Api\WorkspaceMembershipsApiService;
 use BrightleafDigital\Api\ProjectApiService;
 use BrightleafDigital\Api\ProjectTemplatesApiService;
 use BrightleafDigital\Api\SectionApiService;
@@ -171,6 +175,10 @@ class AsanaClient implements AsanaClientInterface
             TagsApiService::class,
             SectionApiService::class,
             MembershipApiService::class,
+            PortfolioMembershipsApiService::class,
+            ProjectMembershipsApiService::class,
+            TeamMembershipsApiService::class,
+            WorkspaceMembershipsApiService::class,
             AttachmentApiService::class,
             BatchApiService::class,
             CustomFieldApiService::class,
@@ -256,6 +264,42 @@ class AsanaClient implements AsanaClientInterface
     public function memberships(): MembershipApiService
     {
         return $this->container->get(MembershipApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function portfolioMemberships(): PortfolioMembershipsApiService
+    {
+        return $this->container->get(PortfolioMembershipsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function projectMemberships(): ProjectMembershipsApiService
+    {
+        return $this->container->get(ProjectMembershipsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function teamMemberships(): TeamMembershipsApiService
+    {
+        return $this->container->get(TeamMembershipsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function workspaceMemberships(): WorkspaceMembershipsApiService
+    {
+        return $this->container->get(WorkspaceMembershipsApiService::class);
     }
 
     /**

@@ -8,7 +8,11 @@ use BrightleafDigital\Api\CustomFieldApiService;
 use BrightleafDigital\Api\EventsApiService;
 use BrightleafDigital\Api\GoalsApiService;
 use BrightleafDigital\Api\MembershipApiService;
+use BrightleafDigital\Api\PortfolioMembershipsApiService;
 use BrightleafDigital\Api\PortfoliosApiService;
+use BrightleafDigital\Api\ProjectMembershipsApiService;
+use BrightleafDigital\Api\TeamMembershipsApiService;
+use BrightleafDigital\Api\WorkspaceMembershipsApiService;
 use BrightleafDigital\Api\ProjectApiService;
 use BrightleafDigital\Api\ProjectTemplatesApiService;
 use BrightleafDigital\Api\SectionApiService;
@@ -118,6 +122,26 @@ interface AsanaClientInterface
      * @return MembershipApiService
      */
     public function memberships(): MembershipApiService;
+
+    /**
+     * @return PortfolioMembershipsApiService
+     */
+    public function portfolioMemberships(): PortfolioMembershipsApiService;
+
+    /**
+     * @return ProjectMembershipsApiService
+     */
+    public function projectMemberships(): ProjectMembershipsApiService;
+
+    /**
+     * @return TeamMembershipsApiService
+     */
+    public function teamMemberships(): TeamMembershipsApiService;
+
+    /**
+     * @return WorkspaceMembershipsApiService
+     */
+    public function workspaceMemberships(): WorkspaceMembershipsApiService;
 
     /**
      * @return AttachmentApiService
