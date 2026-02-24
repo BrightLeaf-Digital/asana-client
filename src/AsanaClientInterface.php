@@ -2,7 +2,9 @@
 
 namespace BrightleafDigital;
 
+use BrightleafDigital\Api\AllocationsApiService;
 use BrightleafDigital\Api\AuditLogApiService;
+use BrightleafDigital\Api\BudgetsApiService;
 use BrightleafDigital\Api\RulesApiService;
 use BrightleafDigital\Api\AttachmentApiService;
 use BrightleafDigital\Api\BatchApiService;
@@ -14,6 +16,7 @@ use BrightleafDigital\Api\PortfolioMembershipsApiService;
 use BrightleafDigital\Api\PortfoliosApiService;
 use BrightleafDigital\Api\ProjectStatusesApiService;
 use BrightleafDigital\Api\ProjectMembershipsApiService;
+use BrightleafDigital\Api\ReactionsApiService;
 use BrightleafDigital\Api\TeamMembershipsApiService;
 use BrightleafDigital\Api\WorkspaceMembershipsApiService;
 use BrightleafDigital\Api\ProjectApiService;
@@ -137,6 +140,11 @@ interface AsanaClientInterface
     public function projectMemberships(): ProjectMembershipsApiService;
 
     /**
+     * @return ReactionsApiService
+     */
+    public function reactions(): ReactionsApiService;
+
+    /**
      * @return TeamMembershipsApiService
      */
     public function teamMemberships(): TeamMembershipsApiService;
@@ -147,9 +155,19 @@ interface AsanaClientInterface
     public function workspaceMemberships(): WorkspaceMembershipsApiService;
 
     /**
+     * @return AllocationsApiService
+     */
+    public function allocations(): AllocationsApiService;
+
+    /**
      * @return AuditLogApiService
      */
     public function auditLog(): AuditLogApiService;
+
+    /**
+     * @return BudgetsApiService
+     */
+    public function budgets(): BudgetsApiService;
 
     /**
      * @return RulesApiService

@@ -2,7 +2,9 @@
 
 namespace BrightleafDigital;
 
+use BrightleafDigital\Api\AllocationsApiService;
 use BrightleafDigital\Api\AuditLogApiService;
+use BrightleafDigital\Api\BudgetsApiService;
 use BrightleafDigital\Api\RulesApiService;
 use BrightleafDigital\Api\AttachmentApiService;
 use BrightleafDigital\Api\BatchApiService;
@@ -14,6 +16,7 @@ use BrightleafDigital\Api\PortfolioMembershipsApiService;
 use BrightleafDigital\Api\PortfoliosApiService;
 use BrightleafDigital\Api\ProjectStatusesApiService;
 use BrightleafDigital\Api\ProjectMembershipsApiService;
+use BrightleafDigital\Api\ReactionsApiService;
 use BrightleafDigital\Api\TeamMembershipsApiService;
 use BrightleafDigital\Api\WorkspaceMembershipsApiService;
 use BrightleafDigital\Api\ProjectApiService;
@@ -173,7 +176,9 @@ class AsanaClient implements AsanaClientInterface
     {
         $services = [
             TaskApiService::class,
+            AllocationsApiService::class,
             AuditLogApiService::class,
+            BudgetsApiService::class,
             RulesApiService::class,
             ProjectApiService::class,
             UserApiService::class,
@@ -182,6 +187,7 @@ class AsanaClient implements AsanaClientInterface
             MembershipApiService::class,
             PortfolioMembershipsApiService::class,
             ProjectMembershipsApiService::class,
+            ReactionsApiService::class,
             TeamMembershipsApiService::class,
             WorkspaceMembershipsApiService::class,
             AttachmentApiService::class,
@@ -270,6 +276,33 @@ class AsanaClient implements AsanaClientInterface
     public function memberships(): MembershipApiService
     {
         return $this->container->get(MembershipApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function allocations(): AllocationsApiService
+    {
+        return $this->container->get(AllocationsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function budgets(): BudgetsApiService
+    {
+        return $this->container->get(BudgetsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function reactions(): ReactionsApiService
+    {
+        return $this->container->get(ReactionsApiService::class);
     }
 
     /**
