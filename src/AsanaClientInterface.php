@@ -13,6 +13,7 @@ use BrightleafDigital\Api\ProjectApiService;
 use BrightleafDigital\Api\ProjectTemplatesApiService;
 use BrightleafDigital\Api\SectionApiService;
 use BrightleafDigital\Api\StatusUpdatesApiService;
+use BrightleafDigital\Api\StoriesApiService;
 use BrightleafDigital\Api\TagsApiService;
 use BrightleafDigital\Api\TaskApiService;
 use BrightleafDigital\Api\TeamsApiService;
@@ -157,6 +158,11 @@ interface AsanaClientInterface
      * @return StatusUpdatesApiService
      */
     public function statusUpdates(): StatusUpdatesApiService;
+
+    /**
+     * @return StoriesApiService
+     */
+    public function stories(): StoriesApiService;
 
     /**
      * @return TeamsApiService

@@ -13,6 +13,7 @@ use BrightleafDigital\Api\ProjectApiService;
 use BrightleafDigital\Api\ProjectTemplatesApiService;
 use BrightleafDigital\Api\SectionApiService;
 use BrightleafDigital\Api\StatusUpdatesApiService;
+use BrightleafDigital\Api\StoriesApiService;
 use BrightleafDigital\Api\TagsApiService;
 use BrightleafDigital\Api\TaskApiService;
 use BrightleafDigital\Api\TeamsApiService;
@@ -178,6 +179,7 @@ class AsanaClient implements AsanaClientInterface
             PortfoliosApiService::class,
             ProjectTemplatesApiService::class,
             StatusUpdatesApiService::class,
+            StoriesApiService::class,
             TeamsApiService::class,
             TimeTrackingEntriesApiService::class,
             UserTaskListsApiService::class,
@@ -326,6 +328,15 @@ class AsanaClient implements AsanaClientInterface
     public function statusUpdates(): StatusUpdatesApiService
     {
         return $this->container->get(StatusUpdatesApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function stories(): StoriesApiService
+    {
+        return $this->container->get(StoriesApiService::class);
     }
 
     /**
