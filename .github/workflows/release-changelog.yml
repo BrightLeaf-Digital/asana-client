@@ -24,6 +24,8 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+          git checkout main  # or your default branch name (main, master, etc.)
           git add CHANGELOG.md
           git commit -m "chore: update changelog for $GITHUB_REF_NAME" || echo "No changes to commit"
-          git push
+          git push origin main
