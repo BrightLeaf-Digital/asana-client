@@ -31,7 +31,7 @@ This document provides a comprehensive analysis of all improvement tasks for the
 12. **[Expand API coverage](feature-additions.md#6-support-full-api-coverage)** (Features)
     - Impact: High | Difficulty: High
     - Note: Priority 1: **Stories (Comments)**. Priority 2: **Memberships**.
-    - 25 services currently implemented; 17 resource groups still missing.
+    - 27 services currently implemented; 15 resource groups still missing.
 
 ### Phase 3: Enhanced Functionality (Medium Priority - Medium Term)
 13. **[Implement request batching helpers](performance-improvements.md#1-implement-request-batching)** (Performance)
@@ -175,7 +175,7 @@ This document provides a comprehensive analysis of all improvement tasks for the
 
 ### Feature Phase
 - ✅ Webhook support (HMAC verification and signature validation implemented)
-- 🔄 Full API endpoint coverage (~85-90% complete)
+- 🔄 Full API endpoint coverage (~90% complete)
 - 🔄 Pagination helpers (pending implementation)
 - 🔄 Model classes (pending implementation)
 

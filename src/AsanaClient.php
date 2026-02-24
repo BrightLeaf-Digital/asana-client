@@ -2,6 +2,8 @@
 
 namespace BrightleafDigital;
 
+use BrightleafDigital\Api\AuditLogApiService;
+use BrightleafDigital\Api\RulesApiService;
 use BrightleafDigital\Api\AttachmentApiService;
 use BrightleafDigital\Api\BatchApiService;
 use BrightleafDigital\Api\CustomFieldApiService;
@@ -171,6 +173,8 @@ class AsanaClient implements AsanaClientInterface
     {
         $services = [
             TaskApiService::class,
+            AuditLogApiService::class,
+            RulesApiService::class,
             ProjectApiService::class,
             UserApiService::class,
             TagsApiService::class,
@@ -302,6 +306,24 @@ class AsanaClient implements AsanaClientInterface
     public function workspaceMemberships(): WorkspaceMembershipsApiService
     {
         return $this->container->get(WorkspaceMembershipsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function auditLog(): AuditLogApiService
+    {
+        return $this->container->get(AuditLogApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function rules(): RulesApiService
+    {
+        return $this->container->get(RulesApiService::class);
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace BrightleafDigital;
 
+use BrightleafDigital\Api\AuditLogApiService;
+use BrightleafDigital\Api\RulesApiService;
 use BrightleafDigital\Api\AttachmentApiService;
 use BrightleafDigital\Api\BatchApiService;
 use BrightleafDigital\Api\CustomFieldApiService;
@@ -143,6 +145,16 @@ interface AsanaClientInterface
      * @return WorkspaceMembershipsApiService
      */
     public function workspaceMemberships(): WorkspaceMembershipsApiService;
+
+    /**
+     * @return AuditLogApiService
+     */
+    public function auditLog(): AuditLogApiService;
+
+    /**
+     * @return RulesApiService
+     */
+    public function rules(): RulesApiService;
 
     /**
      * @return AttachmentApiService
