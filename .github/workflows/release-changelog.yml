@@ -16,7 +16,7 @@ jobs:
         uses: orhun/git-cliff-action@v4
         with:
           config: cliff.release.toml
-          args: --tag "${{ github.ref_name }}" --prepend CHANGELOG.md
+          args: --tag "${{ github.ref_name }}" --prepend CHANGELOG.md -u
         env:
           OUTPUT: CHANGELOG.md
 
