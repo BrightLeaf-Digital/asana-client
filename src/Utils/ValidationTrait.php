@@ -175,17 +175,17 @@ trait ValidationTrait
     /**
      * Validate that a limit value is within acceptable range.
      *
-     * @param int $limit The limit value to validate.
-     * @param int $min The minimum allowed value (default: 1).
-     * @param int $max The maximum allowed value (default: 100).
+     * @param float $limit The limit value to validate.
+     * @param float $min The minimum allowed value (default: 1).
+     * @param float $max The maximum allowed value (default: 100).
      *
      * @throws ValidationException If the limit is outside the acceptable range.
      */
-    protected function validateLimit(int $limit, int $min = 1, int $max = 100): void
+    protected function validateLimit(float $limit, float $min = 1, float $max = 100): void
     {
         if ($limit < $min || $limit > $max) {
             throw new ValidationException(
-                sprintf('Limit must be between %d and %d.', $min, $max)
+                sprintf('Limit must be between %g and %g.', $min, $max)
             );
         }
     }

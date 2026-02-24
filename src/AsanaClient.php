@@ -32,6 +32,12 @@ use BrightleafDigital\Api\UserApiService;
 use BrightleafDigital\Api\UserTaskListsApiService;
 use BrightleafDigital\Api\WebhooksApiService;
 use BrightleafDigital\Api\WorkspaceApiService;
+use BrightleafDigital\Api\TaskTemplatesApiService;
+use BrightleafDigital\Api\OrganizationExportsApiService;
+use BrightleafDigital\Api\AccessRequestsApiService;
+use BrightleafDigital\Api\ProjectBriefsApiService;
+use BrightleafDigital\Api\GoalRelationshipsApiService;
+use BrightleafDigital\Api\CustomTypesApiService;
 use BrightleafDigital\Auth\AsanaOAuthHandler;
 use BrightleafDigital\Auth\AuthHandlerInterface;
 use BrightleafDigital\Auth\TokenManager;
@@ -205,6 +211,12 @@ class AsanaClient implements AsanaClientInterface
             UserTaskListsApiService::class,
             WebhooksApiService::class,
             WorkspaceApiService::class,
+            TaskTemplatesApiService::class,
+            OrganizationExportsApiService::class,
+            AccessRequestsApiService::class,
+            ProjectBriefsApiService::class,
+            GoalRelationshipsApiService::class,
+            CustomTypesApiService::class,
         ];
 
         foreach ($services as $service) {
@@ -492,6 +504,60 @@ class AsanaClient implements AsanaClientInterface
     public function workspaces(): WorkspaceApiService
     {
         return $this->container->get(WorkspaceApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function taskTemplates(): TaskTemplatesApiService
+    {
+        return $this->container->get(TaskTemplatesApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function organizationExports(): OrganizationExportsApiService
+    {
+        return $this->container->get(OrganizationExportsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function accessRequests(): AccessRequestsApiService
+    {
+        return $this->container->get(AccessRequestsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function projectBriefs(): ProjectBriefsApiService
+    {
+        return $this->container->get(ProjectBriefsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function goalRelationships(): GoalRelationshipsApiService
+    {
+        return $this->container->get(GoalRelationshipsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function customTypes(): CustomTypesApiService
+    {
+        return $this->container->get(CustomTypesApiService::class);
     }
 
     // --- Authentication & Helper Methods ---

@@ -32,6 +32,12 @@ use BrightleafDigital\Api\UserApiService;
 use BrightleafDigital\Api\UserTaskListsApiService;
 use BrightleafDigital\Api\WebhooksApiService;
 use BrightleafDigital\Api\WorkspaceApiService;
+use BrightleafDigital\Api\TaskTemplatesApiService;
+use BrightleafDigital\Api\OrganizationExportsApiService;
+use BrightleafDigital\Api\AccessRequestsApiService;
+use BrightleafDigital\Api\ProjectBriefsApiService;
+use BrightleafDigital\Api\GoalRelationshipsApiService;
+use BrightleafDigital\Api\CustomTypesApiService;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Container\ContainerInterface;
 
@@ -248,4 +254,34 @@ interface AsanaClientInterface
      * @return WorkspaceApiService
      */
     public function workspaces(): WorkspaceApiService;
+
+    /**
+     * @return TaskTemplatesApiService
+     */
+    public function taskTemplates(): TaskTemplatesApiService;
+
+    /**
+     * @return OrganizationExportsApiService
+     */
+    public function organizationExports(): OrganizationExportsApiService;
+
+    /**
+     * @return AccessRequestsApiService
+     */
+    public function accessRequests(): AccessRequestsApiService;
+
+    /**
+     * @return ProjectBriefsApiService
+     */
+    public function projectBriefs(): ProjectBriefsApiService;
+
+    /**
+     * @return GoalRelationshipsApiService
+     */
+    public function goalRelationships(): GoalRelationshipsApiService;
+
+    /**
+     * @return CustomTypesApiService
+     */
+    public function customTypes(): CustomTypesApiService;
 }

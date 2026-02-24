@@ -1009,15 +1009,15 @@ The following table lists the 23 Asana REST API resource groups that are **not c
 | 6  | ~~**Project Statuses**~~           | `/project_statuses`      | All          | Medium   |
 | 7  | ~~**Audit Log API**~~              | `/audit_log_events`      | Enterprise   | Medium   |
 | 8  | ~~**Rules**~~                      | `/rules`                 | Business/Ent | Medium   |
-| 9  | **Reactions**                      | `/reactions`             | All          | Low      |
-| 10 | **Allocations**                    | `/allocations`           | Business/Ent | Low      |
-| 11 | **Budgets**                        | `/budgets`               | Business/Ent | Low      |
-| 12 | **Task Templates**                 | `/task_templates`        | All          | Low      |
-| 13 | **Organization Exports**           | `/organization_exports`  | Enterprise   | Low      |
-| 14 | **Access Requests**                | `/access_requests`       | Enterprise   | Low      |
-| 15 | **Project Briefs**                 | `/project_briefs`        | All          | Low      |
-| 16 | **Goal Relationships**             | `/goal_relationships`    | All          | Low      |
-| 17 | **Custom Types**                   | `/custom_types`          | All          | Low      |
+| 9  | ~~**Reactions**~~                  | `/reactions`             | All          | Low      |
+| 10 | ~~**Allocations**~~                | `/allocations`           | Business/Ent | Low      |
+| 11 | ~~**Budgets**~~                    | `/budgets`               | Business/Ent | Low      |
+| 12 | ~~**Task Templates**~~             | `/task_templates`        | All          | Low      |
+| 13 | ~~**Organization Exports**~~       | `/organization_exports`  | Enterprise   | Low      |
+| 14 | ~~**Access Requests**~~            | `/access_requests`       | Enterprise   | Low      |
+| 15 | ~~**Project Briefs**~~             | `/project_briefs`        | All          | Low      |
+| 16 | ~~**Goal Relationships**~~         | `/goal_relationships`    | All          | Low      |
+| 17 | ~~**Custom Types**~~               | `/custom_types`          | All          | Low      |
 | 18 | **Exports**                        | `/exports`               | All          | Low      |
 | 19 | **Jobs**                           | `/jobs`                  | All          | Low      |
 | 20 | **Rates**                          | `/rates`                 | Business/Ent | Low      |
