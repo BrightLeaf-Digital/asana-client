@@ -17,8 +17,6 @@ jobs:
         with:
           config: cliff.release.toml
           args: --tag "${{ github.ref_name }}" --prepend CHANGELOG.md -u
-        env:
-          OUTPUT: CHANGELOG.md
 
       - name: Commit and push CHANGELOG
         env:
