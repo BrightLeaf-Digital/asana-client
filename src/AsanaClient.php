@@ -10,6 +10,7 @@ use BrightleafDigital\Api\GoalsApiService;
 use BrightleafDigital\Api\MembershipApiService;
 use BrightleafDigital\Api\PortfolioMembershipsApiService;
 use BrightleafDigital\Api\PortfoliosApiService;
+use BrightleafDigital\Api\ProjectStatusesApiService;
 use BrightleafDigital\Api\ProjectMembershipsApiService;
 use BrightleafDigital\Api\TeamMembershipsApiService;
 use BrightleafDigital\Api\WorkspaceMembershipsApiService;
@@ -185,6 +186,7 @@ class AsanaClient implements AsanaClientInterface
             EventsApiService::class,
             GoalsApiService::class,
             PortfoliosApiService::class,
+            ProjectStatusesApiService::class,
             ProjectTemplatesApiService::class,
             StatusUpdatesApiService::class,
             StoriesApiService::class,
@@ -354,6 +356,15 @@ class AsanaClient implements AsanaClientInterface
     public function portfolios(): PortfoliosApiService
     {
         return $this->container->get(PortfoliosApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function projectStatuses(): ProjectStatusesApiService
+    {
+        return $this->container->get(ProjectStatusesApiService::class);
     }
 
     /**

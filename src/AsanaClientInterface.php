@@ -10,6 +10,7 @@ use BrightleafDigital\Api\GoalsApiService;
 use BrightleafDigital\Api\MembershipApiService;
 use BrightleafDigital\Api\PortfolioMembershipsApiService;
 use BrightleafDigital\Api\PortfoliosApiService;
+use BrightleafDigital\Api\ProjectStatusesApiService;
 use BrightleafDigital\Api\ProjectMembershipsApiService;
 use BrightleafDigital\Api\TeamMembershipsApiService;
 use BrightleafDigital\Api\WorkspaceMembershipsApiService;
@@ -172,6 +173,11 @@ interface AsanaClientInterface
      * @return PortfoliosApiService
      */
     public function portfolios(): PortfoliosApiService;
+
+    /**
+     * @return ProjectStatusesApiService
+     */
+    public function projectStatuses(): ProjectStatusesApiService;
 
     /**
      * @return ProjectTemplatesApiService

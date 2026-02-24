@@ -31,7 +31,7 @@ This document provides a comprehensive analysis of all improvement tasks for the
 12. **[Expand API coverage](feature-additions.md#6-support-full-api-coverage)** (Features)
     - Impact: High | Difficulty: High
     - Note: Priority 1: **Stories (Comments)**. Priority 2: **Memberships**.
-    - 19 services currently implemented; 23 resource groups still missing.
+    - 25 services currently implemented; 17 resource groups still missing.
 
 ### Phase 3: Enhanced Functionality (Medium Priority - Medium Term)
 13. **[Implement request batching helpers](performance-improvements.md#1-implement-request-batching)** (Performance)
@@ -109,7 +109,7 @@ This document provides a comprehensive analysis of all improvement tasks for the
 - ~~**Add webhook security verification** - Implementation of HMAC signature validation — Completed~~
 - **Implement request batching** - Complex API endpoint understanding (Batch API service added; high-level helper patterns needed)
 - **Add integration tests** - Test environment setup, real API handling
-- **Support full API coverage** - Numerous API service classes (Ongoing: ~85% of endpoints covered)
+- **Support full API coverage** - Numerous API service classes (Ongoing: ~88% of endpoints covered)
 - **Create model classes for Asana resources** - Complex resource relationships
 - **Add event subscription management** - Event-driven patterns, sync tokens
 - **Implement asynchronous requests** - Complex async programming patterns
@@ -125,7 +125,7 @@ This document provides a comprehensive analysis of all improvement tasks for the
 
 ### 🎯 Feature Completeness (API Coverage)
 - **Implement cursor-based pagination helpers**
-- **Support full API coverage** — In progress (85% of endpoints covered)
+- **Support full API coverage** — In progress (88% of endpoints covered)
 - **Create model classes for Asana resources**
 - **Add event subscription management**
 
@@ -175,7 +175,7 @@ This document provides a comprehensive analysis of all improvement tasks for the
 
 ### Feature Phase
 - ✅ Webhook support (HMAC verification and signature validation implemented)
-- 🔄 Full API endpoint coverage (~80-85% complete)
+- 🔄 Full API endpoint coverage (~85-90% complete)
 - 🔄 Pagination helpers (pending implementation)
 - 🔄 Model classes (pending implementation)
 
