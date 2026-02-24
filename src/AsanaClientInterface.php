@@ -38,6 +38,12 @@ use BrightleafDigital\Api\AccessRequestsApiService;
 use BrightleafDigital\Api\ProjectBriefsApiService;
 use BrightleafDigital\Api\GoalRelationshipsApiService;
 use BrightleafDigital\Api\CustomTypesApiService;
+use BrightleafDigital\Api\ExportsApiService;
+use BrightleafDigital\Api\JobsApiService;
+use BrightleafDigital\Api\RatesApiService;
+use BrightleafDigital\Api\TimePeriodsApiService;
+use BrightleafDigital\Api\TypeaheadApiService;
+use BrightleafDigital\Api\CustomFieldSettingsApiService;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Container\ContainerInterface;
 
@@ -284,4 +290,34 @@ interface AsanaClientInterface
      * @return CustomTypesApiService
      */
     public function customTypes(): CustomTypesApiService;
+
+    /**
+     * @return ExportsApiService
+     */
+    public function exports(): ExportsApiService;
+
+    /**
+     * @return JobsApiService
+     */
+    public function jobs(): JobsApiService;
+
+    /**
+     * @return RatesApiService
+     */
+    public function rates(): RatesApiService;
+
+    /**
+     * @return TimePeriodsApiService
+     */
+    public function timePeriods(): TimePeriodsApiService;
+
+    /**
+     * @return TypeaheadApiService
+     */
+    public function typeahead(): TypeaheadApiService;
+
+    /**
+     * @return CustomFieldSettingsApiService
+     */
+    public function customFieldSettings(): CustomFieldSettingsApiService;
 }

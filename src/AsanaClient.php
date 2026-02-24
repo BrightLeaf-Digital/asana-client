@@ -38,6 +38,12 @@ use BrightleafDigital\Api\AccessRequestsApiService;
 use BrightleafDigital\Api\ProjectBriefsApiService;
 use BrightleafDigital\Api\GoalRelationshipsApiService;
 use BrightleafDigital\Api\CustomTypesApiService;
+use BrightleafDigital\Api\ExportsApiService;
+use BrightleafDigital\Api\JobsApiService;
+use BrightleafDigital\Api\RatesApiService;
+use BrightleafDigital\Api\TimePeriodsApiService;
+use BrightleafDigital\Api\TypeaheadApiService;
+use BrightleafDigital\Api\CustomFieldSettingsApiService;
 use BrightleafDigital\Auth\AsanaOAuthHandler;
 use BrightleafDigital\Auth\AuthHandlerInterface;
 use BrightleafDigital\Auth\TokenManager;
@@ -217,6 +223,12 @@ class AsanaClient implements AsanaClientInterface
             ProjectBriefsApiService::class,
             GoalRelationshipsApiService::class,
             CustomTypesApiService::class,
+            ExportsApiService::class,
+            JobsApiService::class,
+            RatesApiService::class,
+            TimePeriodsApiService::class,
+            TypeaheadApiService::class,
+            CustomFieldSettingsApiService::class,
         ];
 
         foreach ($services as $service) {
@@ -558,6 +570,60 @@ class AsanaClient implements AsanaClientInterface
     public function customTypes(): CustomTypesApiService
     {
         return $this->container->get(CustomTypesApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function exports(): ExportsApiService
+    {
+        return $this->container->get(ExportsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function jobs(): JobsApiService
+    {
+        return $this->container->get(JobsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function rates(): RatesApiService
+    {
+        return $this->container->get(RatesApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function timePeriods(): TimePeriodsApiService
+    {
+        return $this->container->get(TimePeriodsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function typeahead(): TypeaheadApiService
+    {
+        return $this->container->get(TypeaheadApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function customFieldSettings(): CustomFieldSettingsApiService
+    {
+        return $this->container->get(CustomFieldSettingsApiService::class);
     }
 
     // --- Authentication & Helper Methods ---
