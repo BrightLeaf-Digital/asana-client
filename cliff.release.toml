@@ -47,7 +47,7 @@ footer = ""
 body = """
 {%- if releases is defined -%}
 {%- for release in releases | filter(attribute="version") %}
-## [{{ release.version }}]{%- if release.timestamp %} - {{ release.timestamp | date(format="%Y-%m-%d") }}{%- endif %}
+## {{ release.version }}{%- if release.timestamp %} - {{ release.timestamp | date(format="%Y-%m-%d") }}{%- endif %}
 
 {%- for group, commits in release.commits | group_by(attribute="group") %}
 ### {{ group }}
