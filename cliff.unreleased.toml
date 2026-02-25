@@ -44,19 +44,13 @@ group   = "Removed"
 message = "^security"
 group   = "Security"
 
-# Catch-all
-[[git.commit_parsers]]
-message = ".*"
-group   = "Changed"
-
 [changelog]
 # No header/footer here because we are NOT writing to the real file.
 # We just want to preview the Unreleased section content.
 header = ""
 footer = ""
 
-body = """
-## [Unreleased]
+body = """## [Unreleased]
 
 {% if commits | length > 0 -%}
 {%- for group, commits in commits | group_by(attribute="group") %}

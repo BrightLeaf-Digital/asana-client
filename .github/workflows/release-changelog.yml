@@ -35,21 +35,22 @@ jobs:
             exit 1
           fi
 
-      - name: Create tag locally
-        run: |
-          git tag -a "$RELEASE_TAG" -m "$RELEASE_TAG"
-
       - name: Generate release notes
         uses: orhun/git-cliff-action@v4
         with:
           config: cliff.release.toml
-          args: --tag "$RELEASE_TAG" -o new_notes.md
+          args: --unreleased --tag "${{ env.RELEASE_TAG }}" -vv -o new_notes.md
 
       - name: Check if notes were generated
         run: |
+          if [ ! -f new_notes.md ]; then
+            echo "Error: new_notes.md was not created."
+            exit 1
+          fi
+          echo "File content length: $(wc -c < new_notes.md)"
           if [ ! -s new_notes.md ]; then
             echo "Error: Generated release notes are empty."
-            git tag -l
+            cat new_notes.md
             exit 1
           fi
           if ! grep -q "[a-zA-Z0-9]" new_notes.md; then
@@ -57,7 +58,7 @@ jobs:
             cat new_notes.md
             exit 1
           fi
-          echo "Release notes generated:"
+          echo "Release notes generated successfully:"
           cat new_notes.md
 
       - name: Insert release notes into CHANGELOG.md
@@ -73,7 +74,8 @@ jobs:
           
           # Insert the new notes before the first version header
           head -n $((LINE - 1)) CHANGELOG.md > CHANGELOG.tmp
-          cat new_notes.md >> CHANGELOG.tmp
+          # Trim leading blank lines from new_notes.md
+          sed '/./,$!d' new_notes.md >> CHANGELOG.tmp
           echo "" >> CHANGELOG.tmp # Add blank line between releases
           tail -n +$LINE CHANGELOG.md >> CHANGELOG.tmp
           mv CHANGELOG.tmp CHANGELOG.md
