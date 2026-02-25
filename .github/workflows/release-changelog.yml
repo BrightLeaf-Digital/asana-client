@@ -36,7 +36,7 @@ jobs:
         uses: orhun/git-cliff-action@v4
         with:
           config: cliff.release.toml
-          args: --unreleased --tag "v${{ inputs.version }}" --prepend CHANGELOG.md -u
+          args: --tag "v${{ inputs.version }}" --prepend CHANGELOG.md -u
 
       - name: Commit and push CHANGELOG
         run: |
