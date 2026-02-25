@@ -35,23 +35,37 @@ jobs:
             exit 1
           fi
 
-      - name: Generate release notes for this tag and prepend to CHANGELOG.md
-        uses: orhun/git-cliff-action@v4
-        with:
-          config: cliff.release.toml
-          args: --tag "${{ env.RELEASE_TAG }}" --prepend CHANGELOG.md -u
-
-      - name: Commit and push CHANGELOG
-        run: |
-          git add CHANGELOG.md
-          git commit -m "update changelog for $RELEASE_TAG" || echo "No changes to commit"
-          git push origin main
-
-      - name: Create tag on the changelog commit
+      - name: Create tag locally
         run: |
           git tag -a "$RELEASE_TAG" -m "$RELEASE_TAG"
 
-      - name: Push main and tag
+      - name: Generate release notes
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.release.toml
+          args: --tag "${{ env.RELEASE_TAG }}" --strip all -o new_notes.md
+
+      - name: Insert release notes into CHANGELOG.md
         run: |
+          # Find the line number of the first version header (starts with ##)
+          LINE=$(grep -n "^## " CHANGELOG.md | head -n 1 | cut -d: -f1)
+          if [ -z "$LINE" ]; then
+            # Fallback if no version header exists yet
+            LINE=$(wc -l < CHANGELOG.md)
+            LINE=$((LINE + 1))
+          fi
+          
+          # Insert the new notes before the first version header
+          head -n $((LINE - 1)) CHANGELOG.md > CHANGELOG.tmp
+          cat new_notes.md >> CHANGELOG.tmp
+          tail -n +$LINE CHANGELOG.md >> CHANGELOG.tmp
+          mv CHANGELOG.tmp CHANGELOG.md
+
+      - name: Commit and push CHANGELOG and updated tag
+        run: |
+          git add CHANGELOG.md
+          git commit -m "chore: update changelog for $RELEASE_TAG" || echo "No changes to commit"
+          # Update the tag to point to the changelog commit
+          git tag -f -a "$RELEASE_TAG" -m "$RELEASE_TAG"
           git push origin main
           git push origin "$RELEASE_TAG"
