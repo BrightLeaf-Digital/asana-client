@@ -1,31 +1,53 @@
 name: Release Changelog
 on:
-  push:
-    tags:
-      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'SemVer without "v" (e.g. 0.2.0)'
+        required: true
 
 jobs:
   changelog:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout repository with SSH
+        uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Validate version and ensure tag does not already exist
+        run: |
+          VERSION="${{ inputs.version }}"
+          echo "$VERSION" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' >/dev/null
+          TAG="v$VERSION"
+          git fetch --tags origin
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists. Refusing to continue."
+            exit 1
+          fi
 
       - name: Generate release notes for this tag and prepend to CHANGELOG.md
         uses: orhun/git-cliff-action@v4
         with:
           config: cliff.release.toml
-          args: --tag "${{ github.ref_name }}" --prepend CHANGELOG.md -u
+          args: --tag "v${{ inputs.version }}" --prepend CHANGELOG.md -u
 
       - name: Commit and push CHANGELOG
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin
-          git checkout main  # or your default branch name (main, master, etc.)
           git add CHANGELOG.md
-          git commit -m "chore: update changelog for $GITHUB_REF_NAME" || echo "No changes to commit"
+          git commit -m "chore: update changelog for v${{ inputs.version }}" || echo "No changes to commit"
           git push origin main
+
+      - name: Create tag on the changelog commit
+        run: |
+          git tag -a "v${{ inputs.version }}" -m "v${{ inputs.version }}"
+
+      - name: Push main and tag
+        run: |
+          git push origin main
+          git push origin "v${{ inputs.version }}"
