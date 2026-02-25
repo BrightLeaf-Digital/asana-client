@@ -44,7 +44,7 @@ jobs:
       - name: Commit and push CHANGELOG
         run: |
           git add CHANGELOG.md
-          git commit -m "chore: update changelog for $RELEASE_TAG" || echo "No changes to commit"
+          git commit -m "update changelog for $RELEASE_TAG" || echo "No changes to commit"
           git push origin main
 
       - name: Create tag on the changelog commit
