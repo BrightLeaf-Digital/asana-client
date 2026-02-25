@@ -9,6 +9,9 @@ on:
 jobs:
   changelog:
     runs-on: ubuntu-latest
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+      RELEASE_TAG: v${{ inputs.version }}
     steps:
       - name: Checkout repository with SSH
         uses: actions/checkout@v6
@@ -23,9 +26,9 @@ jobs:
 
       - name: Validate version and ensure tag does not already exist
         run: |
-          VERSION="${{ inputs.version }}"
+          VERSION="$RELEASE_VERSION"
           echo "$VERSION" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' >/dev/null
-          TAG="v$VERSION"
+          TAG="$RELEASE_TAG"
           git fetch --tags origin
           if git rev-parse "$TAG" >/dev/null 2>&1; then
             echo "Tag $TAG already exists. Refusing to continue."
@@ -36,19 +39,19 @@ jobs:
         uses: orhun/git-cliff-action@v4
         with:
           config: cliff.release.toml
-          args: --tag "v${{ inputs.version }}" --prepend CHANGELOG.md -u
+          args: --tag "${{ env.RELEASE_TAG }}" --prepend CHANGELOG.md -u
 
       - name: Commit and push CHANGELOG
         run: |
           git add CHANGELOG.md
-          git commit -m "chore: update changelog for v${{ inputs.version }}" || echo "No changes to commit"
+          git commit -m "chore: update changelog for $RELEASE_TAG" || echo "No changes to commit"
           git push origin main
 
       - name: Create tag on the changelog commit
         run: |
-          git tag -a "v${{ inputs.version }}" -m "v${{ inputs.version }}"
+          git tag -a "$RELEASE_TAG" -m "$RELEASE_TAG"
 
       - name: Push main and tag
         run: |
           git push origin main
-          git push origin "v${{ inputs.version }}"
+          git push origin "$RELEASE_TAG"
