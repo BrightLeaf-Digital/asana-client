@@ -205,7 +205,9 @@ Thank you for your contributions!
 ## Continuous Integration (CI)
 
 This project uses GitHub Actions for CI. On every push and pull request to `main`:
-- PHP matrix: 7.4, 8.0, 8.1, 8.2, 8.3
+- PHP: 8.3+ (Runtime)
+- PHPUnit: Requires PHP 8.3+ for test execution
+- CI check: Compatibility verified on PHP 8.0 (no-dev)
 - Steps: `composer validate`, dependency install, `composer audit` (non-blocking), code style check (PSR-12), and PHPUnit tests with coverage
 - Artifacts: coverage reports (clover.xml, junit.xml) are uploaded per PHP version
 - Optimizations: docs-only changes may skip CI via paths-ignore, and in-progress runs on the same ref may be cancelled

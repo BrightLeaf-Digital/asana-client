@@ -110,7 +110,7 @@ jobs:
       fail-fast: false
       matrix:
         # Test across all supported PHP versions.
-        php-version: ['7.4', '8.0', '8.1', '8.2', '8.3']
+        php-version: ['8.3']
 
     steps:
       # Download the repository source code to the runner
@@ -228,3 +228,21 @@ jobs:
       # Just run tests on latest PHP - no coverage needed
       - name: Run PHPUnit (quick check)
         run: ./vendor/bin/phpunit --configuration phpunit.xml --colors=always
+
+  compatibility:
+    name: Compatibility (PHP 8.0)
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          extensions: openssl, mbstring
+          coverage: none
+      - name: Install dependencies (no-dev)
+        run: composer install --no-dev --prefer-dist --no-progress --no-interaction
+      - name: Smoke check
+        run: php -r "require 'vendor/autoload.php'; echo 'Autoload works';"

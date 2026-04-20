@@ -197,7 +197,7 @@ class AttachmentApiServiceTest extends TestCase
      * The actual stream handling is tested via integration tests since
      * stream_get_meta_data behavior varies by environment.
      *
-     * @group integration
+     * #[Group('integration')]
      */
     public function testUploadAttachmentFromContents(): void
     {
@@ -209,7 +209,7 @@ class AttachmentApiServiceTest extends TestCase
     /**
      * Test uploadAttachmentFromContents with options.
      *
-     * @group integration
+     * #[Group('integration')]
      */
     public function testUploadAttachmentFromContentsWithOptions(): void
     {

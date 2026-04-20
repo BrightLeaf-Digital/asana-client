@@ -236,7 +236,7 @@ class AsanaApiClientTest extends TestCase
      */
     public function testRequestHandlesGuzzleExceptionWithoutResponse(): void
     {
-        $mockRequest = $this->createMock(Request::class);
+        $mockRequest = $this->createStub(Request::class);
 
         $exception = new RequestException(
             'Network error',
@@ -267,7 +267,7 @@ class AsanaApiClientTest extends TestCase
         $mockResponse->method('getStatusCode')->willReturn(503);
         $mockResponse->method('getReasonPhrase')->willReturn('Service Unavailable');
 
-        $mockRequest = $this->createMock(Request::class);
+        $mockRequest = $this->createStub(Request::class);
 
         $exception = new RequestException(
             'Server error',
@@ -476,7 +476,7 @@ class AsanaApiClientTest extends TestCase
      */
     public function testConstructorWithCustomLogger(): void
     {
-        $mockLogger = $this->createMock(LoggerInterface::class);
+        $mockLogger = $this->createStub(LoggerInterface::class);
         $client = new AsanaApiClient(fn() => 'test-token', $mockLogger);
 
         $this->assertSame($mockLogger, $client->getLogger());
@@ -516,7 +516,7 @@ class AsanaApiClientTest extends TestCase
     public function testSetLogger(): void
     {
         $client = new AsanaApiClient(fn() => 'test-token');
-        $mockLogger = $this->createMock(LoggerInterface::class);
+        $mockLogger = $this->createStub(LoggerInterface::class);
 
         $result = $client->setLogger($mockLogger);
 
@@ -553,7 +553,7 @@ class AsanaApiClientTest extends TestCase
         $mockResponse->method('hasHeader')->with('Retry-After')->willReturn(true);
         $mockResponse->method('getHeaderLine')->with('Retry-After')->willReturn('30');
 
-        $mockRequest = $this->createMock(Request::class);
+        $mockRequest = $this->createStub(Request::class);
 
         $exception = new RequestException(
             'Rate limit exceeded',
@@ -598,7 +598,7 @@ class AsanaApiClientTest extends TestCase
         $mockResponse->method('hasHeader')->with('Retry-After')->willReturn(true);
         $mockResponse->method('getHeaderLine')->with('Retry-After')->willReturn('45');
 
-        $mockRequest = $this->createMock(Request::class);
+        $mockRequest = $this->createStub(Request::class);
 
         $exception = new RequestException(
             'Rate limit exceeded',
@@ -683,7 +683,7 @@ class AsanaApiClientTest extends TestCase
         $mockResponse->method('getStatusCode')->willReturn(500);
         $mockResponse->method('getReasonPhrase')->willReturn('Internal Server Error');
 
-        $mockRequest = $this->createMock(Request::class);
+        $mockRequest = $this->createStub(Request::class);
 
         $exception = new RequestException(
             'Server error',

@@ -73,7 +73,7 @@ class TokenManagerTest extends TestCase
 
         $this->mockStorage->expects($this->once())
             ->method('save')
-            ->with($this->isType('array'));
+            ->with($this->isArray());
 
         $this->tokenManager->ensureValidToken();
 
