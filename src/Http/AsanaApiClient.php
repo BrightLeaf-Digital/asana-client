@@ -242,7 +242,7 @@ class AsanaApiClient implements HttpClientInterface
                 'max_retries' => $this->maxRetries,
             ]);
 
-            $body = $response ? (string) $response->getBody() : '';
+            $body = (string) $response->getBody();
             $decoded = json_decode($body, true);
             $details = is_array($decoded) ? $decoded : [];
 
