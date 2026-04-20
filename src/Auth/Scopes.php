@@ -52,6 +52,24 @@ class Scopes
      */
     public const JOBS_READ = 'jobs:read';
 
+    // 🔹 Ooo entries
+    /**
+     * DELETE /ooo_entries/{ooo_entry_gid}
+     */
+    public const OOO_ENTRIES_DELETE = 'ooo_entries:delete';
+
+    /**
+     * - GET /ooo_entries/{ooo_entry_gid}
+     * - GET /ooo_entries
+     */
+    public const OOO_ENTRIES_READ = 'ooo_entries:read';
+
+    /**
+     * - PUT /ooo_entries/{ooo_entry_gid}
+     * - POST /ooo_entries
+     */
+    public const OOO_ENTRIES_WRITE = 'ooo_entries:write';
+
     // 🔹 Portfolios
     /**
      * - GET /portfolios/{portfolio_gid}/custom_field_settings
@@ -70,6 +88,20 @@ class Scopes
      * - POST /portfolios/{portfolio_gid}/removeCustomFieldSetting
      */
     public const PORTFOLIOS_WRITE = 'portfolios:write';
+
+    // 🔹 Project portfolio settings
+
+    /**
+     * - GET /project_portfolio_settings/{project_portfolio_setting_gid}
+     * - GET /projects/{project_gid}/project_portfolio_settings
+     * - GET /portfolios/{portfolio_gid}/project_portfolio_settings
+     */
+    public const PROJECT_PORTFOLIO_SETTINGS_READ = 'project_portfolio_settings:read';
+
+    /**
+     * PUT /project_portfolio_settings/{project_portfolio_setting_gid}
+     */
+    public const PROJECT_PORTFOLIO_SETTINGS_WRITE = 'project_portfolio_settings:write';
 
     /**
      * 🔹 Project Templates
@@ -221,6 +253,26 @@ class Scopes
      * - GET /users/{user_gid}/teams
      */
     public const TEAMS_READ = 'teams:read';
+
+    // 🔹Time tracking categories
+
+    /**
+     * DELETE /time_tracking_categories/{time_tracking_category_gid}
+     */
+    public const TIME_TRACKING_CATEGORIES_DELETE = 'time_tracking_categories:delete';
+
+    /**
+     * - GET /time_tracking_categories/{time_tracking_category_gid}
+     * - GET /time_tracking_categories/{time_tracking_category_gid}/time_tracking_entries
+     * - GET /time_tracking_categories
+     */
+    public const TIME_TRACKING_CATEGORIES_READ = 'time_tracking_categories:read';
+
+    /**
+     * - PUT /time_tracking_categories/{time_tracking_category_gid}
+     * - POST /time_tracking_categories
+     */
+    public const TIME_TRACKING_CATEGORIES_WRITE = 'time_tracking_categories:write';
 
     /**
      * 🔹Time tracking entries
