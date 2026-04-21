@@ -10,6 +10,7 @@ use BrightleafDigital\Container\ServiceContainer;
 use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Storage\TokenStorageInterface;
 use League\OAuth2\Client\Token\AccessToken;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -20,6 +21,8 @@ class AsanaClientTest extends TestCase
 {
     private ServiceContainer $container;
     private AsanaClient $client;
+    private TokenStorageInterface $storage;
+    private AuthHandlerInterface $authHandler;
 
     protected function tearDown(): void
     {
@@ -32,20 +35,20 @@ class AsanaClientTest extends TestCase
         $this->container = new ServiceContainer();
         $this->container->set(LoggerInterface::class, new NullLogger());
 
-        $mockStorage = $this->createMock(TokenStorageInterface::class);
-        $this->container->set(TokenStorageInterface::class, $mockStorage);
+        $this->storage = $this->createStub(TokenStorageInterface::class);
+        $this->container->set(TokenStorageInterface::class, $this->storage);
 
-        $mockAuth = $this->createMock(AuthHandlerInterface::class);
-        $this->container->set(AuthHandlerInterface::class, $mockAuth);
+        $this->authHandler = $this->createStub(AuthHandlerInterface::class);
+        $this->container->set(AuthHandlerInterface::class, $this->authHandler);
 
-        $tokenManager = new TokenManager($mockStorage, $mockAuth);
+        $tokenManager = new TokenManager($this->storage, $this->authHandler);
         $this->container->set(TokenManager::class, $tokenManager);
 
-        $mockHttp = $this->createMock(HttpClientInterface::class);
-        $this->container->set(HttpClientInterface::class, $mockHttp);
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $this->container->set(HttpClientInterface::class, $httpClient);
 
         // Register a few services for testing
-        $this->container->set(TaskApiService::class, new TaskApiService($mockHttp));
+        $this->container->set(TaskApiService::class, new TaskApiService($httpClient));
 
         $this->client = new AsanaClient($this->container);
     }
@@ -61,7 +64,7 @@ class AsanaClientTest extends TestCase
      */
     public function testGetAuthorizationUrlDelegatesToAuthHandler(): void
     {
-        $this->container->get(AuthHandlerInterface::class)
+        $this->mockAuthHandler()
             ->expects($this->once())
             ->method('getAuthorizationUrl')
             ->with(['scope' => 'default'])
@@ -79,7 +82,7 @@ class AsanaClientTest extends TestCase
     {
         $token = new AccessToken(['access_token' => 'foo', 'expires' => time() + 3600]);
 
-        $this->container->get(AuthHandlerInterface::class)
+        $this->mockAuthHandler()
             ->expects($this->once())
             ->method('handleCallback')
             ->with('code123', 'verifier123')
@@ -137,15 +140,31 @@ class AsanaClientTest extends TestCase
         $oldToken = new AccessToken(['access_token' => 'old', 'refresh_token' => 'ref', 'expires' => time() - 10]);
         $newToken = new AccessToken(['access_token' => 'new', 'expires' => time() + 3600]);
 
-        $this->client->setAccessToken($oldToken);
-
-        $this->container->get(AuthHandlerInterface::class)
+        $this->mockAuthHandler()
             ->expects($this->once())
             ->method('refreshToken')
             ->willReturn($newToken);
 
+        $this->client->setAccessToken($oldToken);
+
         $this->client->refreshToken();
 
         $this->assertSame('new', $this->client->getAccessToken()->getToken());
+    }
+
+    /**
+     * @return AuthHandlerInterface&MockObject
+     */
+    private function mockAuthHandler(): AuthHandlerInterface
+    {
+        if ($this->authHandler instanceof MockObject) {
+            return $this->authHandler;
+        }
+
+        $this->authHandler = $this->createMock(AuthHandlerInterface::class);
+        $this->container->set(AuthHandlerInterface::class, $this->authHandler);
+        $this->container->set(TokenManager::class, new TokenManager($this->storage, $this->authHandler));
+
+        return $this->authHandler;
     }
 }

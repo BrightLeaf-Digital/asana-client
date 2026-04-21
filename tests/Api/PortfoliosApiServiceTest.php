@@ -10,15 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 class PortfoliosApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var PortfoliosApiService */
     private PortfoliosApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new PortfoliosApiService($this->mockClient);
     }
 
@@ -34,7 +37,7 @@ class PortfoliosApiServiceTest extends TestCase
             ['gid' => '222', 'name' => 'Portfolio B'],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -56,7 +59,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'name,owner'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -74,7 +77,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testGetPortfoliosWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -140,7 +143,7 @@ class PortfoliosApiServiceTest extends TestCase
             ['gid' => '111', 'name' => 'Portfolio A'],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -164,7 +167,7 @@ class PortfoliosApiServiceTest extends TestCase
             ['gid' => '111', 'name' => 'Portfolio A'],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -189,7 +192,7 @@ class PortfoliosApiServiceTest extends TestCase
         $data = ['name' => 'Product Launches', 'workspace' => '12345'];
         $expectedResponse = ['gid' => '99999', 'resource_type' => 'portfolio', 'name' => 'Product Launches'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -212,7 +215,7 @@ class PortfoliosApiServiceTest extends TestCase
         $data = ['name' => 'Product Launches', 'workspace' => '12345'];
         $options = ['opt_fields' => 'name,owner,workspace'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -237,7 +240,7 @@ class PortfoliosApiServiceTest extends TestCase
             'due_on' => '2026-12-31',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -292,7 +295,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $expectedResponse = ['gid' => '12345', 'resource_type' => 'portfolio', 'name' => 'My Portfolio'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'portfolios/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
@@ -309,7 +312,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'name,owner,members'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'portfolios/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -322,7 +325,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testGetPortfolioWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'portfolios/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
@@ -362,7 +365,7 @@ class PortfoliosApiServiceTest extends TestCase
         $data = ['name' => 'Updated Portfolio'];
         $expectedResponse = ['gid' => '12345', 'name' => 'Updated Portfolio'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -385,7 +388,7 @@ class PortfoliosApiServiceTest extends TestCase
         $data = ['name' => 'Updated'];
         $options = ['opt_fields' => 'name,owner'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -405,7 +408,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $data = ['name' => 'Updated'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -447,7 +450,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testDeletePortfolio(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('DELETE', 'portfolios/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -462,7 +465,7 @@ class PortfoliosApiServiceTest extends TestCase
      */
     public function testDeletePortfolioWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('DELETE', 'portfolios/12345', [], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
@@ -501,7 +504,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $expectedResponse = [['gid' => '111', 'name' => 'Project A']];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'portfolios/12345/items', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
@@ -518,7 +521,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'name,owner,due_on'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'portfolios/12345/items', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -557,7 +560,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $data = ['item' => '67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -577,7 +580,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $data = ['item' => '67890', 'insert_after' => '11111'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -632,7 +635,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $data = ['item' => '67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -694,7 +697,7 @@ class PortfoliosApiServiceTest extends TestCase
             'custom_field' => ['gid' => '67890'],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -716,7 +719,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $data = ['custom_field' => '67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -760,7 +763,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $data = ['custom_field' => '67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -782,7 +785,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $data = ['custom_field' => '67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -826,7 +829,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $data = ['members' => '67890,11111'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -847,7 +850,7 @@ class PortfoliosApiServiceTest extends TestCase
         $data = ['members' => '67890'];
         $options = ['opt_fields' => 'members'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -902,7 +905,7 @@ class PortfoliosApiServiceTest extends TestCase
     {
         $data = ['members' => '67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -925,7 +928,7 @@ class PortfoliosApiServiceTest extends TestCase
         $data = ['members' => '67890'];
         $options = ['opt_fields' => 'members'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -969,5 +972,20 @@ class PortfoliosApiServiceTest extends TestCase
         $this->expectExceptionMessage('Missing required field(s) for removing members from portfolio: members');
 
         $this->service->removeMembersFromPortfolio('12345', []);
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

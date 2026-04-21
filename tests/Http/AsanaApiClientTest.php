@@ -11,7 +11,6 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Uri;
-use PHPUnit\Framework\MockObject\Exception as MockException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
@@ -21,9 +20,6 @@ use ReflectionClass;
 
 class AsanaApiClientTest extends TestCase
 {
-    /** @var GuzzleClient&MockObject */
-    private $mockHttpClient;
-
     /** @var AsanaApiClient */
     private AsanaApiClient $apiClient;
 
@@ -31,16 +27,23 @@ class AsanaApiClientTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->mockHttpClient = $this->createMock(GuzzleClient::class);
-
-        // Create the API client with a real token provider
         $this->apiClient = new AsanaApiClient(fn() => 'test-access-token');
+    }
 
-        // Replace the internal httpClient with our mock
+    /**
+     * @return GuzzleClient&MockObject
+     */
+    private function injectMockHttpClient(?AsanaApiClient $apiClient = null): GuzzleClient
+    {
+        $mockHttpClient = $this->createMock(GuzzleClient::class);
+        $targetClient = $apiClient ?? $this->apiClient;
+
         $reflection = new ReflectionClass(AsanaApiClient::class);
         $httpClientProperty = $reflection->getProperty('httpClient');
         $httpClientProperty->setAccessible(true);
-        $httpClientProperty->setValue($this->apiClient, $this->mockHttpClient);
+        $httpClientProperty->setValue($targetClient, $mockHttpClient);
+
+        return $mockHttpClient;
     }
 
     /**
@@ -59,15 +62,16 @@ class AsanaApiClientTest extends TestCase
     public function testRequestReturnsDataByDefault(): void
     {
         $responseBody = ['data' => ['gid' => '12345', 'name' => 'Test Task']];
+        $mockHttpClient = $this->injectMockHttpClient();
 
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn(json_encode($responseBody));
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(200);
 
-        $this->mockHttpClient->expects($this->once())
+        $mockHttpClient->expects($this->once())
             ->method('request')
             ->with('GET', 'tasks/12345', [])
             ->willReturn($mockResponse);
@@ -86,15 +90,16 @@ class AsanaApiClientTest extends TestCase
             'data' => ['gid' => '12345'],
             'next_page' => ['offset' => 'abc123']
         ];
+        $mockHttpClient = $this->injectMockHttpClient();
 
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn(json_encode($responseBody));
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(200);
 
-        $this->mockHttpClient->expects($this->once())
+        $mockHttpClient->expects($this->once())
             ->method('request')
             ->willReturn($mockResponse);
 
@@ -110,17 +115,18 @@ class AsanaApiClientTest extends TestCase
     {
         $responseBody = ['data' => ['gid' => '12345']];
         $encodedBody = json_encode($responseBody);
+        $mockHttpClient = $this->injectMockHttpClient();
 
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn($encodedBody);
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(200);
         $mockResponse->method('getReasonPhrase')->willReturn('OK');
         $mockResponse->method('getHeaders')->willReturn(['Content-Type' => ['application/json']]);
 
-        $this->mockHttpClient->expects($this->once())
+        $mockHttpClient->expects($this->once())
             ->method('request')
             ->with('POST', 'tasks', ['json' => ['data' => ['name' => 'New Task']]])
             ->willReturn($mockResponse);
@@ -151,15 +157,16 @@ class AsanaApiClientTest extends TestCase
     public function testRequestReturnsFullBodyWhenNoDataKey(): void
     {
         $responseBody = ['gid' => '12345', 'name' => 'Test'];
+        $mockHttpClient = $this->injectMockHttpClient();
 
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn(json_encode($responseBody));
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(200);
 
-        $this->mockHttpClient->expects($this->once())
+        $mockHttpClient->expects($this->once())
             ->method('request')
             ->willReturn($mockResponse);
 
@@ -173,14 +180,15 @@ class AsanaApiClientTest extends TestCase
      */
     public function testRequestThrowsExceptionOnInvalidJson(): void
     {
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockHttpClient = $this->injectMockHttpClient();
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn('not valid json');
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(200);
 
-        $this->mockHttpClient->expects($this->once())
+        $mockHttpClient->expects($this->once())
             ->method('request')
             ->willReturn($mockResponse);
 
@@ -200,16 +208,17 @@ class AsanaApiClientTest extends TestCase
                 ['message' => 'task: Not a valid gid', 'help' => 'Check the ID']
             ]
         ];
+        $mockHttpClient = $this->injectMockHttpClient();
 
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn(json_encode($errorBody));
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(400);
         $mockResponse->method('getReasonPhrase')->willReturn('Bad Request');
 
-        $mockRequest = $this->createMock(Request::class);
+        $mockRequest = $this->createStub(Request::class);
         $mockRequest->method('getMethod')->willReturn('GET');
         $mockRequest->method('getUri')->willReturn(
             new Uri('https://app.asana.com/api/1.0/tasks/invalid')
@@ -221,7 +230,7 @@ class AsanaApiClientTest extends TestCase
             $mockResponse
         );
 
-        $this->mockHttpClient->expects($this->once())
+        $mockHttpClient->expects($this->once())
             ->method('request')
             ->willThrowException($exception);
 
@@ -236,6 +245,7 @@ class AsanaApiClientTest extends TestCase
      */
     public function testRequestHandlesGuzzleExceptionWithoutResponse(): void
     {
+        $mockHttpClient = $this->injectMockHttpClient();
         $mockRequest = $this->createStub(Request::class);
 
         $exception = new RequestException(
@@ -244,7 +254,7 @@ class AsanaApiClientTest extends TestCase
             null
         );
 
-        $this->mockHttpClient->expects($this->once())
+        $mockHttpClient->expects($this->once())
             ->method('request')
             ->willThrowException($exception);
 
@@ -259,10 +269,11 @@ class AsanaApiClientTest extends TestCase
      */
     public function testRequestHandlesGuzzleExceptionWithPlainTextBody(): void
     {
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockHttpClient = $this->injectMockHttpClient();
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn('Service Unavailable');
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(503);
         $mockResponse->method('getReasonPhrase')->willReturn('Service Unavailable');
@@ -275,7 +286,7 @@ class AsanaApiClientTest extends TestCase
             $mockResponse
         );
 
-        $this->mockHttpClient->expects($this->once())
+        $mockHttpClient->expects($this->once())
             ->method('request')
             ->willThrowException($exception);
 
@@ -291,11 +302,12 @@ class AsanaApiClientTest extends TestCase
     public function testRequestWithQueryParameters(): void
     {
         $responseBody = ['data' => []];
+        $mockHttpClient = $this->injectMockHttpClient();
 
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn(json_encode($responseBody));
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(200);
 
@@ -307,7 +319,7 @@ class AsanaApiClientTest extends TestCase
             ]
         ];
 
-        $this->mockHttpClient->expects($this->once())
+        $mockHttpClient->expects($this->once())
             ->method('request')
             ->with('GET', 'tasks', $expectedOptions)
             ->willReturn($mockResponse);
@@ -321,11 +333,12 @@ class AsanaApiClientTest extends TestCase
     public function testRequestWithJsonBody(): void
     {
         $responseBody = ['data' => ['gid' => '12345', 'name' => 'New Task']];
+        $mockHttpClient = $this->injectMockHttpClient();
 
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn(json_encode($responseBody));
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(201);
 
@@ -338,7 +351,7 @@ class AsanaApiClientTest extends TestCase
             ]
         ];
 
-        $this->mockHttpClient->expects($this->once())
+        $mockHttpClient->expects($this->once())
             ->method('request')
             ->with('POST', 'tasks', $taskData)
             ->willReturn($mockResponse);
@@ -355,15 +368,16 @@ class AsanaApiClientTest extends TestCase
     public function testPutRequest(): void
     {
         $responseBody = ['data' => ['gid' => '12345', 'name' => 'Updated Task']];
+        $mockHttpClient = $this->injectMockHttpClient();
 
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn(json_encode($responseBody));
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(200);
 
-        $this->mockHttpClient->expects($this->once())
+        $mockHttpClient->expects($this->once())
             ->method('request')
             ->with('PUT', 'tasks/12345', $this->anything())
             ->willReturn($mockResponse);
@@ -381,15 +395,16 @@ class AsanaApiClientTest extends TestCase
     public function testDeleteRequest(): void
     {
         $responseBody = ['data' => []];
+        $mockHttpClient = $this->injectMockHttpClient();
 
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn(json_encode($responseBody));
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(200);
 
-        $this->mockHttpClient->expects($this->once())
+        $mockHttpClient->expects($this->once())
             ->method('request')
             ->with('DELETE', 'tasks/12345', [])
             ->willReturn($mockResponse);
@@ -401,7 +416,6 @@ class AsanaApiClientTest extends TestCase
 
     /**
      * Test ApiException contains response data.
-     * @throws MockException
      */
     public function testApiExceptionContainsResponseData(): void
     {
@@ -410,16 +424,17 @@ class AsanaApiClientTest extends TestCase
                 ['message' => 'Invalid request', 'help' => 'See docs']
             ]
         ];
+        $mockHttpClient = $this->injectMockHttpClient();
 
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn(json_encode($errorBody));
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(400);
         $mockResponse->method('getReasonPhrase')->willReturn('Bad Request');
 
-        $mockRequest = $this->createMock(Request::class);
+        $mockRequest = $this->createStub(Request::class);
         $mockRequest->method('getMethod')->willReturn('GET');
         $mockRequest->method('getUri')->willReturn(
             new Uri('https://app.asana.com/api/1.0/tasks')
@@ -431,7 +446,7 @@ class AsanaApiClientTest extends TestCase
             $mockResponse
         );
 
-        $this->mockHttpClient->expects($this->once())
+        $mockHttpClient->expects($this->once())
             ->method('request')
             ->willThrowException($exception);
 
@@ -532,26 +547,20 @@ class AsanaApiClientTest extends TestCase
         // Create client with 0 retries to immediately throw exception
         $apiClient = new AsanaApiClient(fn() => 'test-token', null, 0);
 
-        $mockHttpClient = $this->createMock(GuzzleClient::class);
-
-        // Replace the internal httpClient with our mock
-        $reflection = new ReflectionClass(AsanaApiClient::class);
-        $httpClientProperty = $reflection->getProperty('httpClient');
-        $httpClientProperty->setAccessible(true);
-        $httpClientProperty->setValue($apiClient, $mockHttpClient);
+        $mockHttpClient = $this->injectMockHttpClient($apiClient);
 
         // Create a rate limit response
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn(json_encode([
             'errors' => [['message' => 'Rate limit exceeded']]
         ]));
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(429);
         $mockResponse->method('getReasonPhrase')->willReturn('Too Many Requests');
-        $mockResponse->method('hasHeader')->with('Retry-After')->willReturn(true);
-        $mockResponse->method('getHeaderLine')->with('Retry-After')->willReturn('30');
+        $mockResponse->method('hasHeader')->willReturn(true);
+        $mockResponse->method('getHeaderLine')->willReturn('30');
 
         $mockRequest = $this->createStub(Request::class);
 
@@ -579,24 +588,18 @@ class AsanaApiClientTest extends TestCase
         // Create client with 0 retries to immediately throw exception
         $apiClient = new AsanaApiClient(fn() => 'test-token', null, 0);
 
-        $mockHttpClient = $this->createMock(GuzzleClient::class);
-
-        // Replace the internal httpClient with our mock
-        $reflection = new ReflectionClass(AsanaApiClient::class);
-        $httpClientProperty = $reflection->getProperty('httpClient');
-        $httpClientProperty->setAccessible(true);
-        $httpClientProperty->setValue($apiClient, $mockHttpClient);
+        $mockHttpClient = $this->injectMockHttpClient($apiClient);
 
         // Create a rate limit response
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn('{}');
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(429);
         $mockResponse->method('getReasonPhrase')->willReturn('Too Many Requests');
-        $mockResponse->method('hasHeader')->with('Retry-After')->willReturn(true);
-        $mockResponse->method('getHeaderLine')->with('Retry-After')->willReturn('45');
+        $mockResponse->method('hasHeader')->willReturn(true);
+        $mockResponse->method('getHeaderLine')->willReturn('45');
 
         $mockRequest = $this->createStub(Request::class);
 
@@ -630,20 +633,14 @@ class AsanaApiClientTest extends TestCase
 
         $apiClient = new AsanaApiClient(fn() => 'test-token', $mockLogger);
 
-        $mockHttpClient = $this->createMock(GuzzleClient::class);
-
-        // Replace the internal httpClient with our mock
-        $reflection = new ReflectionClass(AsanaApiClient::class);
-        $httpClientProperty = $reflection->getProperty('httpClient');
-        $httpClientProperty->setAccessible(true);
-        $httpClientProperty->setValue($apiClient, $mockHttpClient);
+        $mockHttpClient = $this->injectMockHttpClient($apiClient);
 
         $responseBody = ['data' => ['gid' => '12345']];
 
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn(json_encode($responseBody));
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(200);
 
@@ -667,18 +664,12 @@ class AsanaApiClientTest extends TestCase
 
         $apiClient = new AsanaApiClient(fn() => 'test-token', $mockLogger);
 
-        $mockHttpClient = $this->createMock(GuzzleClient::class);
+        $mockHttpClient = $this->injectMockHttpClient($apiClient);
 
-        // Replace the internal httpClient with our mock
-        $reflection = new ReflectionClass(AsanaApiClient::class);
-        $httpClientProperty = $reflection->getProperty('httpClient');
-        $httpClientProperty->setAccessible(true);
-        $httpClientProperty->setValue($apiClient, $mockHttpClient);
-
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn('Server Error');
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(500);
         $mockResponse->method('getReasonPhrase')->willReturn('Internal Server Error');
@@ -706,17 +697,18 @@ class AsanaApiClientTest extends TestCase
     public function testResponseFullSanitizesOptions(): void
     {
         $responseBody = ['data' => ['gid' => '12345']];
+        $mockHttpClient = $this->injectMockHttpClient();
 
-        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream = $this->createStub(StreamInterface::class);
         $mockStream->method('__toString')->willReturn(json_encode($responseBody));
 
-        $mockResponse = $this->createMock(Response::class);
+        $mockResponse = $this->createStub(Response::class);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $mockResponse->method('getStatusCode')->willReturn(200);
         $mockResponse->method('getReasonPhrase')->willReturn('OK');
         $mockResponse->method('getHeaders')->willReturn([]);
 
-        $this->mockHttpClient->expects($this->once())
+        $mockHttpClient->expects($this->once())
             ->method('request')
             ->willReturn($mockResponse);
 

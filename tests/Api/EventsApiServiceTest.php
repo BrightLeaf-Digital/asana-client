@@ -10,15 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 class EventsApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var EventsApiService */
     private EventsApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new EventsApiService($this->mockClient);
     }
 
@@ -32,7 +35,7 @@ class EventsApiServiceTest extends TestCase
             ['type' => 'task', 'action' => 'changed', 'resource' => ['gid' => '12345']],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'events', ['query' => ['resource' => '12345']], HttpClientInterface::RESPONSE_NORMAL)
             ->willReturn($expectedResponse);
@@ -53,7 +56,7 @@ class EventsApiServiceTest extends TestCase
             ['type' => 'task', 'action' => 'added', 'resource' => ['gid' => '67890']],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -73,7 +76,7 @@ class EventsApiServiceTest extends TestCase
      */
     public function testGetEventsWithNullSyncToken(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'events', ['query' => ['resource' => '12345']], HttpClientInterface::RESPONSE_NORMAL)
             ->willReturn([]);
@@ -89,7 +92,7 @@ class EventsApiServiceTest extends TestCase
         $resourceGid = '12345';
         $options = ['opt_fields' => 'user,resource,type,action,created_at'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -111,7 +114,7 @@ class EventsApiServiceTest extends TestCase
         $syncToken = 'abc123synctoken';
         $options = ['opt_fields' => 'user,resource,type'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -129,7 +132,7 @@ class EventsApiServiceTest extends TestCase
      */
     public function testGetEventsWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'events', ['query' => ['resource' => '12345']], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
@@ -148,7 +151,7 @@ class EventsApiServiceTest extends TestCase
             'has_more' => false,
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'events', ['query' => ['resource' => '12345']], HttpClientInterface::RESPONSE_NORMAL)
             ->willReturn($expectedResponse);
@@ -207,7 +210,7 @@ class EventsApiServiceTest extends TestCase
             'has_more' => false,
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'workspaces/12345/events', ['query' => []], HttpClientInterface::RESPONSE_NORMAL)
             ->willReturn($expectedResponse);
@@ -232,7 +235,7 @@ class EventsApiServiceTest extends TestCase
             'has_more' => false,
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -252,7 +255,7 @@ class EventsApiServiceTest extends TestCase
      */
     public function testGetWorkspaceEventsWithNullSyncToken(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'workspaces/12345/events', ['query' => []], HttpClientInterface::RESPONSE_NORMAL)
             ->willReturn([]);
@@ -268,7 +271,7 @@ class EventsApiServiceTest extends TestCase
         $workspaceGid = '12345';
         $options = ['opt_fields' => 'user,resource,type,action,created_at'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -290,7 +293,7 @@ class EventsApiServiceTest extends TestCase
         $syncToken = 'abc123synctoken';
         $options = ['opt_fields' => 'user,resource,type'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -308,7 +311,7 @@ class EventsApiServiceTest extends TestCase
      */
     public function testGetWorkspaceEventsWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'workspaces/12345/events', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
@@ -327,7 +330,7 @@ class EventsApiServiceTest extends TestCase
             'has_more' => true,
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'workspaces/12345/events', ['query' => []], HttpClientInterface::RESPONSE_NORMAL)
             ->willReturn($expectedResponse);
@@ -370,5 +373,20 @@ class EventsApiServiceTest extends TestCase
         $this->expectExceptionMessage('Workspace GID must be a non-empty string.');
 
         $this->service->getWorkspaceEvents('   ');
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

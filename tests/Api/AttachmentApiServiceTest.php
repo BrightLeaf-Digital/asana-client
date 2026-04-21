@@ -11,18 +11,21 @@ use RuntimeException;
 
 class AttachmentApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var AttachmentApiService */
     private AttachmentApiService $service;
+
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
 
     /** @var string */
     private string $tempDir;
 
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new AttachmentApiService($this->mockClient);
         $this->tempDir = sys_get_temp_dir() . '/attachment_tests_' . uniqid('', true);
         if (!is_dir($this->tempDir)) {
@@ -62,7 +65,7 @@ class AttachmentApiServiceTest extends TestCase
      */
     public function testGetAttachment(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'attachments/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -77,7 +80,7 @@ class AttachmentApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'name,download_url,parent'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'attachments/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -90,7 +93,7 @@ class AttachmentApiServiceTest extends TestCase
      */
     public function testDeleteAttachment(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('DELETE', 'attachments/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -103,7 +106,7 @@ class AttachmentApiServiceTest extends TestCase
      */
     public function testGetAttachmentsForObject(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'attachments', ['query' => ['parent' => '12345']], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -119,7 +122,7 @@ class AttachmentApiServiceTest extends TestCase
         $options = ['opt_fields' => 'name,created_at', 'limit' => 50];
         $expectedQuery = array_merge(['parent' => '12345'], $options);
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'attachments', ['query' => $expectedQuery], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -136,7 +139,7 @@ class AttachmentApiServiceTest extends TestCase
         $filePath = $this->tempDir . '/test_file.txt';
         file_put_contents($filePath, 'Test file content');
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -165,7 +168,7 @@ class AttachmentApiServiceTest extends TestCase
         file_put_contents($filePath, 'Test file content');
         $options = ['opt_fields' => 'name,download_url'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -222,11 +225,26 @@ class AttachmentApiServiceTest extends TestCase
      */
     public function testGetAttachmentWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'attachments/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
         $this->service->getAttachment('12345', [], HttpClientInterface::RESPONSE_FULL);
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

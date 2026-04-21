@@ -10,15 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 class UserTaskListsApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var UserTaskListsApiService */
     private UserTaskListsApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new UserTaskListsApiService($this->mockClient);
     }
 
@@ -35,7 +38,7 @@ class UserTaskListsApiServiceTest extends TestCase
             'name' => 'My Tasks',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -57,7 +60,7 @@ class UserTaskListsApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'name,owner,workspace'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -75,7 +78,7 @@ class UserTaskListsApiServiceTest extends TestCase
      */
     public function testGetUserTaskListWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -131,7 +134,7 @@ class UserTaskListsApiServiceTest extends TestCase
             'name' => 'My Tasks',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -153,7 +156,7 @@ class UserTaskListsApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'name,owner,workspace'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -174,7 +177,7 @@ class UserTaskListsApiServiceTest extends TestCase
      */
     public function testGetUserTaskListForUserWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -229,7 +232,7 @@ class UserTaskListsApiServiceTest extends TestCase
             'name' => 'My Tasks',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -255,7 +258,7 @@ class UserTaskListsApiServiceTest extends TestCase
             'name' => 'My Tasks',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -294,5 +297,20 @@ class UserTaskListsApiServiceTest extends TestCase
         );
 
         $this->service->getUserTaskListForUser('12345', 'abc');
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

@@ -10,15 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 class StatusUpdatesApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var StatusUpdatesApiService */
     private StatusUpdatesApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new StatusUpdatesApiService($this->mockClient);
     }
 
@@ -37,7 +40,7 @@ class StatusUpdatesApiServiceTest extends TestCase
             'status_type' => 'on_track',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -59,7 +62,7 @@ class StatusUpdatesApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'title,text,status_type,author'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -77,7 +80,7 @@ class StatusUpdatesApiServiceTest extends TestCase
      */
     public function testGetStatusUpdateWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -127,7 +130,7 @@ class StatusUpdatesApiServiceTest extends TestCase
      */
     public function testDeleteStatusUpdate(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'DELETE',
@@ -147,7 +150,7 @@ class StatusUpdatesApiServiceTest extends TestCase
      */
     public function testDeleteStatusUpdateWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'DELETE',
@@ -201,7 +204,7 @@ class StatusUpdatesApiServiceTest extends TestCase
             ['gid' => '222', 'title' => 'Update B'],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -223,7 +226,7 @@ class StatusUpdatesApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'title,text,status_type'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -246,7 +249,7 @@ class StatusUpdatesApiServiceTest extends TestCase
     {
         $options = ['created_since' => '2026-01-01T00:00:00.000Z'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -267,7 +270,7 @@ class StatusUpdatesApiServiceTest extends TestCase
      */
     public function testGetStatusUpdatesForObjectWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -329,7 +332,7 @@ class StatusUpdatesApiServiceTest extends TestCase
             'status_type' => 'on_track',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -356,7 +359,7 @@ class StatusUpdatesApiServiceTest extends TestCase
         ];
         $options = ['opt_fields' => 'title,text,status_type,author'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -381,7 +384,7 @@ class StatusUpdatesApiServiceTest extends TestCase
             'title' => 'Q1 Status Report',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -405,7 +408,7 @@ class StatusUpdatesApiServiceTest extends TestCase
             'status_type' => 'on_track',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -482,5 +485,20 @@ class StatusUpdatesApiServiceTest extends TestCase
         );
 
         $this->service->createStatusUpdate([]);
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

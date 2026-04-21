@@ -10,15 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 class ProjectStatusesApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var ProjectStatusesApiService */
     private ProjectStatusesApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new ProjectStatusesApiService($this->mockClient);
     }
 
@@ -27,7 +30,7 @@ class ProjectStatusesApiServiceTest extends TestCase
      */
     public function testGetProjectStatus(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'project_statuses/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -40,7 +43,7 @@ class ProjectStatusesApiServiceTest extends TestCase
      */
     public function testDeleteProjectStatus(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('DELETE', 'project_statuses/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -53,7 +56,7 @@ class ProjectStatusesApiServiceTest extends TestCase
      */
     public function testGetProjectStatusesForProject(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'projects/67890/project_statuses', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -68,7 +71,7 @@ class ProjectStatusesApiServiceTest extends TestCase
     {
         $data = ['color' => 'green', 'text' => 'On track'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -97,5 +100,20 @@ class ProjectStatusesApiServiceTest extends TestCase
     {
         $this->expectException(ValidationException::class);
         $this->service->getProjectStatus('');
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

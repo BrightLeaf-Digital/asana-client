@@ -10,15 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 class BatchApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var BatchApiService */
     private BatchApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new BatchApiService($this->mockClient);
     }
 
@@ -44,7 +47,7 @@ class BatchApiServiceTest extends TestCase
             ],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -84,7 +87,7 @@ class BatchApiServiceTest extends TestCase
             ],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -113,7 +116,7 @@ class BatchApiServiceTest extends TestCase
         ];
         $options = ['opt_fields' => 'status_code,body'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -141,7 +144,7 @@ class BatchApiServiceTest extends TestCase
             ],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -176,7 +179,7 @@ class BatchApiServiceTest extends TestCase
             ],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -204,7 +207,7 @@ class BatchApiServiceTest extends TestCase
             ],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -368,5 +371,20 @@ class BatchApiServiceTest extends TestCase
         $this->service->createBatchRequest([
             ['relative_path' => '/tasks/12345', 'method' => '   '],
         ]);
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

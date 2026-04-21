@@ -10,15 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 class WebhooksApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var WebhooksApiService */
     private WebhooksApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new WebhooksApiService($this->mockClient);
     }
 
@@ -33,7 +36,7 @@ class WebhooksApiServiceTest extends TestCase
             ['gid' => '222', 'resource_type' => 'webhook', 'target' => 'https://example.com/webhooks2'],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'webhooks', ['query' => ['workspace' => '12345']], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
@@ -51,7 +54,7 @@ class WebhooksApiServiceTest extends TestCase
         $workspaceGid = '12345';
         $options = ['resource' => '67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -69,7 +72,7 @@ class WebhooksApiServiceTest extends TestCase
      */
     public function testGetWebhooksWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'webhooks', ['query' => ['workspace' => '12345']], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
@@ -113,7 +116,7 @@ class WebhooksApiServiceTest extends TestCase
             'active' => true,
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -136,7 +139,7 @@ class WebhooksApiServiceTest extends TestCase
         $data = ['resource' => '12345', 'target' => 'https://example.com/webhooks'];
         $options = ['opt_fields' => 'resource,target,active'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -162,7 +165,7 @@ class WebhooksApiServiceTest extends TestCase
             ],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -221,7 +224,7 @@ class WebhooksApiServiceTest extends TestCase
             'active' => true,
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'webhooks/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
@@ -238,7 +241,7 @@ class WebhooksApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'resource,target,active,filters'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'webhooks/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -251,7 +254,7 @@ class WebhooksApiServiceTest extends TestCase
      */
     public function testGetWebhookWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'webhooks/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
@@ -294,7 +297,7 @@ class WebhooksApiServiceTest extends TestCase
             'filters' => [['resource_type' => 'task', 'action' => 'changed']],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -317,7 +320,7 @@ class WebhooksApiServiceTest extends TestCase
         $data = ['filters' => [['resource_type' => 'task', 'action' => 'changed']]];
         $options = ['opt_fields' => 'resource,target,active,filters'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -337,7 +340,7 @@ class WebhooksApiServiceTest extends TestCase
     {
         $data = ['filters' => []];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -379,7 +382,7 @@ class WebhooksApiServiceTest extends TestCase
     {
         $webhookGid = '12345';
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('DELETE', 'webhooks/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -394,7 +397,7 @@ class WebhooksApiServiceTest extends TestCase
      */
     public function testDeleteWebhookWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('DELETE', 'webhooks/12345', [], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
@@ -509,5 +512,20 @@ class WebhooksApiServiceTest extends TestCase
 
         $noHeaders = ['Content-Type' => 'application/json'];
         $this->assertNull($this->service->getHandshakeSecret($noHeaders));
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

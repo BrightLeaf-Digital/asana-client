@@ -10,15 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 class GoalsApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var GoalsApiService */
     private GoalsApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new GoalsApiService($this->mockClient);
     }
 
@@ -31,7 +34,7 @@ class GoalsApiServiceTest extends TestCase
     {
         $expectedResponse = ['gid' => '12345', 'resource_type' => 'goal', 'name' => 'My Goal'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'goals/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
@@ -48,7 +51,7 @@ class GoalsApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'name,owner,workspace'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'goals/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -61,7 +64,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testGetGoalWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'goals/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
@@ -101,7 +104,7 @@ class GoalsApiServiceTest extends TestCase
         $data = ['name' => 'Updated Goal'];
         $expectedResponse = ['gid' => '12345', 'name' => 'Updated Goal'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -124,7 +127,7 @@ class GoalsApiServiceTest extends TestCase
         $data = ['name' => 'Updated'];
         $options = ['opt_fields' => 'name,owner'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -144,7 +147,7 @@ class GoalsApiServiceTest extends TestCase
     {
         $data = ['name' => 'Updated'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -186,7 +189,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testDeleteGoal(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('DELETE', 'goals/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -201,7 +204,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testDeleteGoalWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('DELETE', 'goals/12345', [], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
@@ -243,7 +246,7 @@ class GoalsApiServiceTest extends TestCase
             ['gid' => '222', 'name' => 'Goal B'],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -265,7 +268,7 @@ class GoalsApiServiceTest extends TestCase
     {
         $options = ['workspace' => '12345', 'opt_fields' => 'name,owner'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -283,7 +286,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testGetGoalsWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -307,7 +310,7 @@ class GoalsApiServiceTest extends TestCase
             'is_workspace_level' => true,
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -330,7 +333,7 @@ class GoalsApiServiceTest extends TestCase
         $data = ['name' => 'Increase revenue by 20%', 'workspace' => '12345'];
         $expectedResponse = ['gid' => '99999', 'resource_type' => 'goal', 'name' => 'Increase revenue by 20%'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -353,7 +356,7 @@ class GoalsApiServiceTest extends TestCase
         $data = ['name' => 'Increase revenue by 20%', 'workspace' => '12345'];
         $options = ['opt_fields' => 'name,owner,workspace'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -379,7 +382,7 @@ class GoalsApiServiceTest extends TestCase
             'notes' => 'Important business goal',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -406,7 +409,7 @@ class GoalsApiServiceTest extends TestCase
         ];
         $expectedResponse = ['gid' => '12345', 'name' => 'My Goal'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -429,7 +432,7 @@ class GoalsApiServiceTest extends TestCase
         $data = ['metric_type' => 'percentage', 'target_number_value' => 100];
         $options = ['opt_fields' => 'name,metric'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -449,7 +452,7 @@ class GoalsApiServiceTest extends TestCase
     {
         $data = ['metric_type' => 'number', 'target_number_value' => 50];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -494,7 +497,7 @@ class GoalsApiServiceTest extends TestCase
         $data = ['current_number_value' => 50];
         $expectedResponse = ['gid' => '12345', 'name' => 'My Goal'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -517,7 +520,7 @@ class GoalsApiServiceTest extends TestCase
         $data = ['current_number_value' => 75];
         $options = ['opt_fields' => 'name,metric'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -537,7 +540,7 @@ class GoalsApiServiceTest extends TestCase
     {
         $data = ['current_number_value' => 25];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -582,7 +585,7 @@ class GoalsApiServiceTest extends TestCase
         $followers = ['67890', '11111'];
         $expectedResponse = ['gid' => '12345', 'name' => 'My Goal'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -605,7 +608,7 @@ class GoalsApiServiceTest extends TestCase
         $followers = ['67890'];
         $options = ['opt_fields' => 'name,followers'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -625,7 +628,7 @@ class GoalsApiServiceTest extends TestCase
     {
         $followers = ['67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -670,7 +673,7 @@ class GoalsApiServiceTest extends TestCase
         $followers = ['67890', '11111'];
         $expectedResponse = ['gid' => '12345', 'name' => 'My Goal'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -693,7 +696,7 @@ class GoalsApiServiceTest extends TestCase
         $followers = ['67890'];
         $options = ['opt_fields' => 'name,followers'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -713,7 +716,7 @@ class GoalsApiServiceTest extends TestCase
     {
         $followers = ['67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -757,7 +760,7 @@ class GoalsApiServiceTest extends TestCase
     {
         $expectedResponse = [['gid' => '111', 'name' => 'Parent Goal']];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'goals/12345/parentGoals', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
@@ -774,7 +777,7 @@ class GoalsApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'name,owner,workspace'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'goals/12345/parentGoals', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -787,7 +790,7 @@ class GoalsApiServiceTest extends TestCase
      */
     public function testGetParentGoalsForGoalWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'goals/12345/parentGoals', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
@@ -831,7 +834,7 @@ class GoalsApiServiceTest extends TestCase
             'custom_field' => ['gid' => '67890'],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -853,7 +856,7 @@ class GoalsApiServiceTest extends TestCase
     {
         $data = ['custom_field' => '67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -897,7 +900,7 @@ class GoalsApiServiceTest extends TestCase
     {
         $data = ['custom_field' => '67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -919,7 +922,7 @@ class GoalsApiServiceTest extends TestCase
     {
         $data = ['custom_field' => '67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -952,5 +955,20 @@ class GoalsApiServiceTest extends TestCase
         $this->expectExceptionMessage('Goal GID must be a numeric string.');
 
         $this->service->removeCustomFieldSettingForGoal('abc', ['custom_field' => '67890']);
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

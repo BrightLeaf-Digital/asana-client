@@ -10,15 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 class ProjectApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var ProjectApiService */
     private ProjectApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new ProjectApiService($this->mockClient);
     }
 
@@ -27,7 +30,7 @@ class ProjectApiServiceTest extends TestCase
      */
     public function testGetProjectsWithWorkspace(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'projects', ['query' => ['workspace' => '12345']], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -40,7 +43,7 @@ class ProjectApiServiceTest extends TestCase
      */
     public function testGetProjectsWithTeam(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'projects', ['query' => ['team' => '67890']], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -55,7 +58,7 @@ class ProjectApiServiceTest extends TestCase
     {
         $expectedQuery = ['workspace' => '12345', 'team' => '67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'projects', ['query' => $expectedQuery], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -82,7 +85,7 @@ class ProjectApiServiceTest extends TestCase
         $options = ['archived' => false, 'limit' => 50, 'opt_fields' => 'name,owner'];
         $expectedQuery = array_merge(['workspace' => '12345'], $options);
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'projects', ['query' => $expectedQuery], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -97,7 +100,7 @@ class ProjectApiServiceTest extends TestCase
     {
         $projectData = ['name' => 'New Project', 'workspace' => '12345'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -115,7 +118,7 @@ class ProjectApiServiceTest extends TestCase
      */
     public function testGetProject(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'projects/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -130,7 +133,7 @@ class ProjectApiServiceTest extends TestCase
     {
         $updateData = ['name' => 'Updated Project'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -148,7 +151,7 @@ class ProjectApiServiceTest extends TestCase
      */
     public function testDeleteProject(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('DELETE', 'projects/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -163,7 +166,7 @@ class ProjectApiServiceTest extends TestCase
     {
         $data = ['name' => 'Duplicated Project', 'include' => ['members', 'notes']];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -181,7 +184,7 @@ class ProjectApiServiceTest extends TestCase
      */
     public function testGetProjectsForTask(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'tasks/67890/projects', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -194,7 +197,7 @@ class ProjectApiServiceTest extends TestCase
      */
     public function testGetProjectsForTeam(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'teams/99999/projects', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -209,7 +212,7 @@ class ProjectApiServiceTest extends TestCase
     {
         $data = ['name' => 'Team Project'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -227,7 +230,7 @@ class ProjectApiServiceTest extends TestCase
      */
     public function testGetProjectsForWorkspace(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'workspaces/12345/projects', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -242,7 +245,7 @@ class ProjectApiServiceTest extends TestCase
     {
         $data = ['name' => 'Workspace Project'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -262,7 +265,7 @@ class ProjectApiServiceTest extends TestCase
     {
         $data = ['custom_field' => '55555', 'is_important' => true];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -282,7 +285,7 @@ class ProjectApiServiceTest extends TestCase
     {
         $data = ['custom_field' => '55555'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -300,7 +303,7 @@ class ProjectApiServiceTest extends TestCase
      */
     public function testGetCustomFieldsForProject(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'projects/12345/custom_field_settings', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -313,7 +316,7 @@ class ProjectApiServiceTest extends TestCase
      */
     public function testGetTaskCountsForProject(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'projects/12345/task_counts', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -328,7 +331,7 @@ class ProjectApiServiceTest extends TestCase
     {
         $members = ['user1', 'user2'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -348,7 +351,7 @@ class ProjectApiServiceTest extends TestCase
     {
         $members = ['user1'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -368,7 +371,7 @@ class ProjectApiServiceTest extends TestCase
     {
         $followers = ['user1', 'user2'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -388,7 +391,7 @@ class ProjectApiServiceTest extends TestCase
     {
         $followers = ['user1'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -408,7 +411,7 @@ class ProjectApiServiceTest extends TestCase
     {
         $data = ['name' => 'Template Name', 'description' => 'Template description'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -419,5 +422,20 @@ class ProjectApiServiceTest extends TestCase
             ->willReturn([]);
 
         $this->service->createProjectTemplateFromProject('12345', $data);
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

@@ -13,19 +13,23 @@ use Psr\Log\NullLogger;
 
 class TokenManagerTest extends TestCase
 {
-    /** @var TokenStorageInterface&MockObject */
-    private $mockStorage;
+    private TokenStorageInterface $mockStorage;
 
-    /** @var AuthHandlerInterface&MockObject */
-    private $mockAuthHandler;
+    private AuthHandlerInterface $mockAuthHandler;
+    /** @var (TokenStorageInterface&MockObject)|null */
+    private $mockStorageMock = null;
+    /** @var (AuthHandlerInterface&MockObject)|null */
+    private $mockAuthHandlerMock = null;
 
     /** @var TokenManager */
-    private $tokenManager;
+    private TokenManager $tokenManager;
 
     protected function setUp(): void
     {
-        $this->mockStorage = $this->createMock(TokenStorageInterface::class);
-        $this->mockAuthHandler = $this->createMock(AuthHandlerInterface::class);
+        $this->mockStorage = $this->createStub(TokenStorageInterface::class);
+        $this->mockAuthHandler = $this->createStub(AuthHandlerInterface::class);
+        $this->mockStorageMock = null;
+        $this->mockAuthHandlerMock = null;
         $this->tokenManager = new TokenManager(
             $this->mockStorage,
             $this->mockAuthHandler,
@@ -36,7 +40,7 @@ class TokenManagerTest extends TestCase
     public function testGetAccessTokenStringLoadsFromStorage(): void
     {
         $tokenData = ['access_token' => 'test-token', 'expires' => time() + 3600];
-        $this->mockStorage->expects($this->once())
+        $this->mockStorage()->expects($this->once())
             ->method('load')
             ->willReturn($tokenData);
 
@@ -47,7 +51,9 @@ class TokenManagerTest extends TestCase
 
     public function testGetAccessTokenStringThrowsExceptionIfNoToken(): void
     {
-        $this->mockStorage->method('load')->willReturn(null);
+        $stubStorage = $this->createStub(TokenStorageInterface::class);
+        $stubStorage->method('load')->willReturn(null);
+        $this->tokenManager = new TokenManager($stubStorage, $this->mockAuthHandler, new NullLogger());
 
         $this->expectException(TokenInvalidException::class);
         $this->tokenManager->getAccessTokenString();
@@ -66,12 +72,16 @@ class TokenManagerTest extends TestCase
             'expires' => time() + 3600
         ]);
 
-        $this->mockStorage->method('load')->willReturn($expiredToken->jsonSerialize());
-        $this->mockAuthHandler->expects($this->once())
+        $storageMock = $this->mockStorage();
+        $storageMock->expects($this->once())
+            ->method('load')
+            ->willReturn($expiredToken->jsonSerialize());
+
+        $this->mockAuthHandler()->expects($this->once())
             ->method('refreshToken')
             ->willReturn($newToken);
 
-        $this->mockStorage->expects($this->once())
+        $storageMock->expects($this->once())
             ->method('save')
             ->with($this->isArray());
 
@@ -83,7 +93,7 @@ class TokenManagerTest extends TestCase
     public function testSetAccessTokenSavesToStorage(): void
     {
         $token = new AccessToken(['access_token' => 'manual-token', 'expires' => time() + 3600]);
-        $this->mockStorage->expects($this->once())
+        $this->mockStorage()->expects($this->once())
             ->method('save')
             ->with($token->jsonSerialize());
 
@@ -103,5 +113,33 @@ class TokenManagerTest extends TestCase
 
         $this->tokenManager->setAccessToken($token);
         $this->assertTrue($called);
+    }
+
+    /**
+     * @return TokenStorageInterface&MockObject
+     */
+    private function mockStorage(): TokenStorageInterface
+    {
+        if ($this->mockStorageMock === null) {
+            $this->mockStorageMock = $this->createMock(TokenStorageInterface::class);
+            $this->mockStorage = $this->mockStorageMock;
+            $this->tokenManager = new TokenManager($this->mockStorage, $this->mockAuthHandler, new NullLogger());
+        }
+
+        return $this->mockStorageMock;
+    }
+
+    /**
+     * @return AuthHandlerInterface&MockObject
+     */
+    private function mockAuthHandler(): AuthHandlerInterface
+    {
+        if ($this->mockAuthHandlerMock === null) {
+            $this->mockAuthHandlerMock = $this->createMock(AuthHandlerInterface::class);
+            $this->mockAuthHandler = $this->mockAuthHandlerMock;
+            $this->tokenManager = new TokenManager($this->mockStorage, $this->mockAuthHandler, new NullLogger());
+        }
+
+        return $this->mockAuthHandlerMock;
     }
 }

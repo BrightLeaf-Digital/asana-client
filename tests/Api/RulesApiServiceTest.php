@@ -9,15 +9,18 @@ use PHPUnit\Framework\TestCase;
 
 class RulesApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var RulesApiService */
     private RulesApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new RulesApiService($this->mockClient);
     }
 
@@ -29,7 +32,7 @@ class RulesApiServiceTest extends TestCase
         $ruleTriggerGid = '12345';
         $data = ['variable_name' => 'value'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -51,7 +54,7 @@ class RulesApiServiceTest extends TestCase
         $data = ['variable_name' => 'value'];
         $options = ['opt_pretty' => 'true'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -72,7 +75,7 @@ class RulesApiServiceTest extends TestCase
         $ruleTriggerGid = '12345';
         $data = ['variable_name' => 'value'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -92,5 +95,20 @@ class RulesApiServiceTest extends TestCase
     {
         $this->expectException(\BrightleafDigital\Exceptions\ValidationException::class);
         $this->service->triggerRule('', []);
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

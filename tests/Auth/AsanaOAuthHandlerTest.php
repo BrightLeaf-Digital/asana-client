@@ -5,7 +5,6 @@ namespace BrightleafDigital\Tests\Auth;
 use BrightleafDigital\Auth\AsanaOAuthHandler;
 use BrightleafDigital\Auth\OAuth2Provider;
 use League\OAuth2\Client\Token\AccessToken;
-use PHPUnit\Framework\MockObject\Exception as MockException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -16,12 +15,14 @@ class AsanaOAuthHandlerTest extends TestCase
     /** @var AsanaOAuthHandler */
     private AsanaOAuthHandler $handler;
 
-    /** @var OAuth2Provider&MockObject */
-    private $mockProvider;
+    private OAuth2Provider $mockProvider;
+    /** @var (OAuth2Provider&MockObject)|null */
+    private $mockProviderMock = null;
 
     protected function setUp(): void
     {
-        $this->mockProvider = $this->createMock(OAuth2Provider::class);
+        $this->mockProvider = $this->createStub(OAuth2Provider::class);
+        $this->mockProviderMock = null;
 
         // Create the handler with real credentials
         $this->handler = new AsanaOAuthHandler(
@@ -45,7 +46,7 @@ class AsanaOAuthHandlerTest extends TestCase
         $expectedUrl = 'https://app.asana.com/-/oauth_authorize?client_id=test';
         $options = ['scope' => 'tasks:read'];
 
-        $this->mockProvider->expects($this->once())
+        $this->mockProvider()->expects($this->once())
             ->method('getAuthorizationUrl')
             ->with($options)
             ->willReturn($expectedUrl);
@@ -68,7 +69,7 @@ class AsanaOAuthHandlerTest extends TestCase
         ];
         $options = ['scope' => 'tasks:read'];
 
-        $this->mockProvider->expects($this->once())
+        $this->mockProvider()->expects($this->once())
             ->method('getSecureAuthorizationUrl')
             ->with($options, true, true)
             ->willReturn($expectedResult);
@@ -90,7 +91,7 @@ class AsanaOAuthHandlerTest extends TestCase
         ];
         $options = ['scope' => 'tasks:read'];
 
-        $this->mockProvider->expects($this->once())
+        $this->mockProvider()->expects($this->once())
             ->method('getSecureAuthorizationUrl')
             ->with($options, false, true)
             ->willReturn($expectedResult);
@@ -111,7 +112,7 @@ class AsanaOAuthHandlerTest extends TestCase
         ];
         $options = ['scope' => 'tasks:read'];
 
-        $this->mockProvider->expects($this->once())
+        $this->mockProvider()->expects($this->once())
             ->method('getSecureAuthorizationUrl')
             ->with($options, true, false)
             ->willReturn($expectedResult);
@@ -133,7 +134,7 @@ class AsanaOAuthHandlerTest extends TestCase
         ];
         $mockToken = new AccessToken($tokenData);
 
-        $this->mockProvider->expects($this->once())
+        $this->mockProvider()->expects($this->once())
             ->method('getAccessToken')
             ->with('authorization_code', [
                 'code' => 'auth-code-123',
@@ -158,7 +159,7 @@ class AsanaOAuthHandlerTest extends TestCase
         ];
         $mockToken = new AccessToken($tokenData);
 
-        $this->mockProvider->expects($this->once())
+        $this->mockProvider()->expects($this->once())
             ->method('getAccessToken')
             ->with('authorization_code', [
                 'code' => 'auth-code-123',
@@ -183,7 +184,7 @@ class AsanaOAuthHandlerTest extends TestCase
         ];
         $mockToken = new AccessToken($tokenData);
 
-        $this->mockProvider->expects($this->once())
+        $this->mockProvider()->expects($this->once())
             ->method('getAccessToken')
             ->with('authorization_code', ['code' => 'auth-code'])
             ->willReturn($mockToken);
@@ -212,7 +213,7 @@ class AsanaOAuthHandlerTest extends TestCase
         ];
         $newToken = new AccessToken($newTokenData);
 
-        $this->mockProvider->expects($this->once())
+        $this->mockProvider()->expects($this->once())
             ->method('getAccessToken')
             ->with('refresh_token', ['refresh_token' => 'refresh-token-123'])
             ->willReturn($newToken);
@@ -243,7 +244,7 @@ class AsanaOAuthHandlerTest extends TestCase
             'expires' => time() + 3600,
         ]);
 
-        $this->mockProvider->expects($this->once())
+        $this->mockProvider()->expects($this->once())
             ->method('getAccessToken')
             ->with('refresh_token', ['refresh_token' => $originalRefreshToken])
             ->willReturn($newTokenFromProvider);
@@ -280,7 +281,7 @@ class AsanaOAuthHandlerTest extends TestCase
     {
         $options = ['scope' => 'tasks:read'];
 
-        $this->mockProvider->expects($this->exactly(2))
+        $this->mockProvider()->expects($this->exactly(2))
             ->method('getAuthorizationUrl')
             ->with($options)
             ->willReturn('https://example.com/auth');
@@ -302,7 +303,23 @@ class AsanaOAuthHandlerTest extends TestCase
 
         $handler = new AsanaOAuthHandler('client-id', 'client-secret', 'redirect-uri', $mockLogger);
 
-        $this->mockProvider->method('getAuthorizationUrl')->willReturn('https://example.com/auth');
         $handler->getAuthorizationUrl([]);
+    }
+
+    /**
+     * @return OAuth2Provider&MockObject
+     */
+    private function mockProvider(): OAuth2Provider
+    {
+        if ($this->mockProviderMock === null) {
+            $this->mockProviderMock = $this->createMock(OAuth2Provider::class);
+            $this->mockProvider = $this->mockProviderMock;
+            $reflection = new ReflectionClass(AsanaOAuthHandler::class);
+            $providerProperty = $reflection->getProperty('provider');
+            $providerProperty->setAccessible(true);
+            $providerProperty->setValue($this->handler, $this->mockProvider);
+        }
+
+        return $this->mockProviderMock;
     }
 }

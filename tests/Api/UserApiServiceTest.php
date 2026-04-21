@@ -10,15 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 class UserApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var UserApiService */
     private UserApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new UserApiService($this->mockClient);
     }
 
@@ -27,7 +30,7 @@ class UserApiServiceTest extends TestCase
      */
     public function testGetUsersWithWorkspace(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'users', ['query' => ['workspace' => '12345']], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -40,7 +43,7 @@ class UserApiServiceTest extends TestCase
      */
     public function testGetUsersWithTeam(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'users', ['query' => ['team' => '67890']], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -67,7 +70,7 @@ class UserApiServiceTest extends TestCase
         $options = ['opt_fields' => 'name,email', 'limit' => 50];
         $expectedQuery = array_merge(['workspace' => '12345'], $options);
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'users', ['query' => $expectedQuery], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -80,7 +83,7 @@ class UserApiServiceTest extends TestCase
      */
     public function testGetUser(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'users/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -93,7 +96,7 @@ class UserApiServiceTest extends TestCase
      */
     public function testGetUserWithMeIdentifier(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'users/me', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -108,7 +111,7 @@ class UserApiServiceTest extends TestCase
     {
         $options = ['workspace' => '12345', 'resource_type' => 'project'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'users/67890/favorites', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -121,7 +124,7 @@ class UserApiServiceTest extends TestCase
      */
     public function testGetUsersForTeam(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'teams/12345/users', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -134,7 +137,7 @@ class UserApiServiceTest extends TestCase
      */
     public function testGetUsersForWorkspace(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'workspaces/12345/users', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -147,7 +150,7 @@ class UserApiServiceTest extends TestCase
      */
     public function testGetCurrentUser(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'users/me', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -162,7 +165,7 @@ class UserApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'name,email,photo'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'users/me', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -177,7 +180,7 @@ class UserApiServiceTest extends TestCase
     {
         $options = ['workspace' => '12345', 'resource_type' => 'project'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'users/me/favorites', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -190,11 +193,26 @@ class UserApiServiceTest extends TestCase
      */
     public function testGetUserWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'users/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
 
         $this->service->getUser('12345', [], HttpClientInterface::RESPONSE_FULL);
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

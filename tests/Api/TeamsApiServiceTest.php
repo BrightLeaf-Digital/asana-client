@@ -10,15 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 class TeamsApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var TeamsApiService */
     private TeamsApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new TeamsApiService($this->mockClient);
     }
 
@@ -32,7 +35,7 @@ class TeamsApiServiceTest extends TestCase
         $data = ['name' => 'Engineering', 'organization' => '12345'];
         $expectedResponse = ['gid' => '99999', 'resource_type' => 'team', 'name' => 'Engineering'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -55,7 +58,7 @@ class TeamsApiServiceTest extends TestCase
         $data = ['name' => 'Engineering', 'organization' => '12345'];
         $options = ['opt_fields' => 'name,description,organization'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -80,7 +83,7 @@ class TeamsApiServiceTest extends TestCase
             'visibility' => 'secret',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -135,7 +138,7 @@ class TeamsApiServiceTest extends TestCase
     {
         $expectedResponse = ['gid' => '12345', 'resource_type' => 'team', 'name' => 'Engineering'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'teams/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
@@ -152,7 +155,7 @@ class TeamsApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'name,description,organization'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'teams/12345', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -165,7 +168,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testGetTeamWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'teams/12345', ['query' => []], HttpClientInterface::RESPONSE_FULL)
             ->willReturn([]);
@@ -205,7 +208,7 @@ class TeamsApiServiceTest extends TestCase
         $data = ['name' => 'Updated Team', 'description' => 'New description'];
         $expectedResponse = ['gid' => '12345', 'resource_type' => 'team', 'name' => 'Updated Team'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -228,7 +231,7 @@ class TeamsApiServiceTest extends TestCase
         $data = ['name' => 'Updated Team'];
         $options = ['opt_fields' => 'name,description'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -248,7 +251,7 @@ class TeamsApiServiceTest extends TestCase
     {
         $data = ['name' => 'Updated Team'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -294,7 +297,7 @@ class TeamsApiServiceTest extends TestCase
             ['gid' => '111', 'name' => 'Engineering'],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'workspaces/12345/teams', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn($expectedResponse);
@@ -311,7 +314,7 @@ class TeamsApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'name,description', 'limit' => 50];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'workspaces/12345/teams', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -353,7 +356,7 @@ class TeamsApiServiceTest extends TestCase
             ['gid' => '222', 'name' => 'Design'],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -375,7 +378,7 @@ class TeamsApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'name,description'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -393,7 +396,7 @@ class TeamsApiServiceTest extends TestCase
      */
     public function testGetTeamsForUserWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -437,7 +440,7 @@ class TeamsApiServiceTest extends TestCase
             ['gid' => '111', 'name' => 'Engineering'],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -461,7 +464,7 @@ class TeamsApiServiceTest extends TestCase
             ['gid' => '111', 'name' => 'Engineering'],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -507,7 +510,7 @@ class TeamsApiServiceTest extends TestCase
     {
         $data = ['user' => '67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -528,7 +531,7 @@ class TeamsApiServiceTest extends TestCase
         $data = ['user' => '67890'];
         $options = ['opt_fields' => 'user,team'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -583,7 +586,7 @@ class TeamsApiServiceTest extends TestCase
     {
         $data = ['user' => '67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -606,7 +609,7 @@ class TeamsApiServiceTest extends TestCase
         $data = ['user' => '67890'];
         $options = ['opt_pretty' => true];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -650,5 +653,20 @@ class TeamsApiServiceTest extends TestCase
         $this->expectExceptionMessage('Missing required field(s) for removing user from team: user');
 
         $this->service->removeUserFromTeam('12345', []);
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

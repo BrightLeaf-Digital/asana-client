@@ -10,15 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 class ProjectTemplatesApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var ProjectTemplatesApiService */
     private ProjectTemplatesApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new ProjectTemplatesApiService($this->mockClient);
     }
 
@@ -35,7 +38,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
             'name' => 'Sprint Template',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -57,7 +60,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'name,description,owner,team'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -75,7 +78,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testGetProjectTemplateWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -125,7 +128,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testDeleteProjectTemplate(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'DELETE',
@@ -145,7 +148,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testDeleteProjectTemplateWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'DELETE',
@@ -199,7 +202,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
             ['gid' => '222', 'name' => 'Template B'],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -221,7 +224,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
     {
         $options = ['workspace' => '12345'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -241,7 +244,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
     {
         $options = ['team' => '67890'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -259,7 +262,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testGetProjectTemplatesWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -283,7 +286,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
             'limit' => 50,
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -307,7 +310,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
             ['gid' => '111', 'name' => 'Team Template A'],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -329,7 +332,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'name,description,owner'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -347,7 +350,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
      */
     public function testGetProjectTemplatesForTeamWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -404,7 +407,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
             'status' => 'queued',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -427,7 +430,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
         $data = ['name' => 'Q1 Product Launch'];
         $options = ['opt_fields' => 'status,new_project'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -452,7 +455,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
             'is_strict' => false,
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -472,7 +475,7 @@ class ProjectTemplatesApiServiceTest extends TestCase
     {
         $data = ['name' => 'Q1 Product Launch'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -549,5 +552,20 @@ class ProjectTemplatesApiServiceTest extends TestCase
             '12345',
             ['team' => '67890', 'public' => true]
         );
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

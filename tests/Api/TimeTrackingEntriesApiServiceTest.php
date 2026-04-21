@@ -10,15 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 class TimeTrackingEntriesApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var TimeTrackingEntriesApiService */
     private TimeTrackingEntriesApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new TimeTrackingEntriesApiService($this->mockClient);
     }
 
@@ -34,7 +37,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
             ['gid' => '222', 'duration_minutes' => 60],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -59,7 +62,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
             'limit' => 50,
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -77,7 +80,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testGetTimeTrackingEntriesForTaskWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -135,7 +138,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
             'duration_minutes' => 60,
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -158,7 +161,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
         $data = ['entered_on' => '2026-02-05', 'duration_minutes' => 60];
         $options = ['opt_fields' => 'duration_minutes,entered_on,created_by'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -182,7 +185,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
             'created_by' => '67890',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -202,7 +205,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
     {
         $data = ['entered_on' => '2026-02-05', 'duration_minutes' => 60];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -312,7 +315,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
             'entered_on' => '2026-02-05',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -334,7 +337,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
     {
         $options = ['opt_fields' => 'duration_minutes,entered_on,created_by'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -352,7 +355,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testGetTimeTrackingEntryWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -408,7 +411,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
             'duration_minutes' => 90,
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -431,7 +434,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
         $data = ['duration_minutes' => 90];
         $options = ['opt_fields' => 'duration_minutes,entered_on'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -451,7 +454,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
     {
         $data = ['duration_minutes' => 90];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -508,7 +511,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testDeleteTimeTrackingEntry(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'DELETE',
@@ -528,7 +531,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testDeleteTimeTrackingEntryWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'DELETE',
@@ -582,7 +585,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
             ['gid' => '222', 'duration_minutes' => 60],
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -609,7 +612,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
             'opt_fields' => 'duration_minutes,entered_on,task',
         ];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -627,7 +630,7 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
      */
     public function testGetTimeTrackingEntriesWithCustomResponseType(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'GET',
@@ -638,5 +641,20 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
             ->willReturn([]);
 
         $this->service->getTimeTrackingEntries([], HttpClientInterface::RESPONSE_FULL);
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }

@@ -9,15 +9,18 @@ use PHPUnit\Framework\TestCase;
 
 class StoriesApiServiceTest extends TestCase
 {
-    /** @var HttpClientInterface&MockObject */
-    private $mockClient;
+    private HttpClientInterface $mockClient;
 
     /** @var StoriesApiService */
     private StoriesApiService $service;
 
+    /** @var (HttpClientInterface&MockObject)|null */
+    private $mockClientMock = null;
+
     protected function setUp(): void
     {
-        $this->mockClient = $this->createMock(HttpClientInterface::class);
+        $this->mockClient = $this->createStub(HttpClientInterface::class);
+        $this->mockClientMock = null;
         $this->service = new StoriesApiService($this->mockClient);
     }
 
@@ -26,7 +29,7 @@ class StoriesApiServiceTest extends TestCase
      */
     public function testGetStory(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'stories/12345', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -41,7 +44,7 @@ class StoriesApiServiceTest extends TestCase
     {
         $data = ['text' => 'Updated comment'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'PUT',
@@ -59,7 +62,7 @@ class StoriesApiServiceTest extends TestCase
      */
     public function testDeleteStory(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('DELETE', 'stories/12345', [], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -72,7 +75,7 @@ class StoriesApiServiceTest extends TestCase
      */
     public function testGetStoriesForTask(): void
     {
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with('GET', 'tasks/67890/stories', ['query' => []], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
@@ -87,7 +90,7 @@ class StoriesApiServiceTest extends TestCase
     {
         $data = ['text' => 'New comment'];
 
-        $this->mockClient->expects($this->once())
+        $this->mockClient()->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
@@ -116,5 +119,20 @@ class StoriesApiServiceTest extends TestCase
     {
         $this->expectException(\BrightleafDigital\Exceptions\ValidationException::class);
         $this->service->createStoryForTask('67890', ['is_pinned' => true]);
+    }
+
+    /**
+     * @return HttpClientInterface&MockObject
+     */
+    private function mockClient(): HttpClientInterface
+    {
+        if ($this->mockClientMock === null) {
+            $this->mockClientMock = $this->createMock(HttpClientInterface::class);
+            $this->mockClient = $this->mockClientMock;
+            $serviceClass = $this->service::class;
+            $this->service = new $serviceClass($this->mockClient);
+        }
+
+        return $this->mockClientMock;
     }
 }
