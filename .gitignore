@@ -10,3 +10,4 @@ docs/openapi
 .phpunit.result.cache
 build
 .output.txt
+CLAUDE.md
