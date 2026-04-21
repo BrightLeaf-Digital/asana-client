@@ -1,10 +1,9 @@
 includes:
   - vendor/phpstan/phpstan-phpunit/extension.neon
-  - phpstan-baseline.neon
 
 parameters:
   level: 6
-  phpVersion: 80000
+  phpVersion: 80300
   paths:
     - src
     - tests

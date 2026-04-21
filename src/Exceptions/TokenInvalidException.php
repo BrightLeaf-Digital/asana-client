@@ -18,7 +18,7 @@ class TokenInvalidException extends AuthException
      *
      * @return void
      */
-    public function __construct(string $message, int $code = 0, array $data = [], Throwable $previous = null)
+    public function __construct(string $message, int $code = 0, array $data = [], ?Throwable $previous = null)
     {
         $this->data = $data;
         parent::__construct($message, $code, $previous);

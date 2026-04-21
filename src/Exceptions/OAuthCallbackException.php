@@ -17,7 +17,7 @@ class OAuthCallbackException extends AuthException
      * @param Throwable|null $previous The previous throwable used for exception chaining.
      *
      */
-    public function __construct(string $message, int $code = 0, array $data = [], Throwable $previous = null)
+    public function __construct(string $message, int $code = 0, array $data = [], ?Throwable $previous = null)
     {
         $this->data = $data;
         parent::__construct($message, $code, $previous);
