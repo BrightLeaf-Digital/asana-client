@@ -4,6 +4,7 @@ namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\AttachmentApiService;
 use BrightleafDigital\Http\HttpClientInterface;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -196,9 +197,8 @@ class AttachmentApiServiceTest extends TestCase
      * Note: This test verifies the method signature and mock expectations.
      * The actual stream handling is tested via integration tests since
      * stream_get_meta_data behavior varies by environment.
-     *
-     * #[Group('integration')]
      */
+    #[Group('integration')]
     public function testUploadAttachmentFromContents(): void
     {
         $this->markTestSkipped(
@@ -208,9 +208,8 @@ class AttachmentApiServiceTest extends TestCase
 
     /**
      * Test uploadAttachmentFromContents with options.
-     *
-     * #[Group('integration')]
      */
+    #[Group('integration')]
     public function testUploadAttachmentFromContentsWithOptions(): void
     {
         $this->markTestSkipped(

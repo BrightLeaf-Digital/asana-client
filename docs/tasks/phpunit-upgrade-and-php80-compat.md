@@ -3,7 +3,7 @@
 ## Current Status
 - PHPUnit upgraded to `12.5.23`.
 - PHP 7.4 runtime support dropped; minimum runtime is `PHP 8.0+`.
-- CI infrastructure updated to test on PHP 8.3 with a compatibility smoke check on PHP 8.0.
+- CI infrastructure updated to test on PHP 8.3 and run PHPCompatibility checks against `8.0+`.
 - Migration task fully completed.
 
 ## Remaining Actionable Items (Technical Debt)

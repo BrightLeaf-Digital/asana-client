@@ -50,9 +50,9 @@ jobs:
           coverage: none  # No coverage needed for linting job
           ini-values: memory_limit=-1  # Remove memory limit for Composer operations
 
-      # Verify that composer.json and composer.lock are valid and in sync
-      - name: Validate composer.json and composer.lock
-        run: composer validate --strict
+      # Validate composer manifest
+      - name: Validate composer.json
+        run: composer ci:validate
 
       # Install project dependencies using cached composer packages for speed
       - name: Install dependencies (with cache)
@@ -62,11 +62,15 @@ jobs:
 
       # Check for known security vulnerabilities in dependencies
       - name: Composer audit
-        run: composer audit --no-interaction --format plain
+        run: composer ci:audit
 
       # Enforce PSR-12 coding standards on source and test files
       - name: Run PHP CodeSniffer (PSR-12)
-        run: ./vendor/bin/phpcs --standard=PSR12 src tests
+        run: composer lint
+
+      # Validate language compatibility for supported runtime versions
+      - name: Run PHPCompatibility checks (PHP 8.0+)
+        run: composer lint:compat
 
   # Static analysis - catch potential bugs and type mismatches
   analyse:
@@ -90,7 +94,7 @@ jobs:
           composer-options: --prefer-dist --no-progress --no-interaction
 
       - name: Run PHPStan
-        run: ./vendor/bin/phpstan analyse --configuration=phpstan.neon.dist --memory-limit=512M
+        run: composer analyse
 
   # Full test matrix - conditional based on PR type
   tests:
@@ -142,20 +146,15 @@ jobs:
         with:
           composer-options: --prefer-dist --no-progress --no-interaction
 
-      # Create directory structure for coverage and test result files (only for PHP 8.3)
-      - name: Prepare coverage directory
-        if: ${{ matrix.php-version == '8.3' }}
-        run: mkdir -p build/logs
-
       # Execute PHPUnit for non-coverage PHP versions
       - name: Run PHPUnit (no coverage)
         if: ${{ matrix.php-version != '8.3' }}
-        run: ./vendor/bin/phpunit --configuration phpunit.xml --colors=always
+        run: composer test
 
       # Execute PHPUnit with coverage and XML reporting (PHP 8.3 only)
       - name: Run PHPUnit with coverage
         if: ${{ matrix.php-version == '8.3' }}
-        run: ./vendor/bin/phpunit --configuration phpunit.xml --coverage-clover build/logs/clover.xml --log-junit build/logs/junit.xml --colors=always
+        run: composer test:coverage
 
       # Upload test results and coverage data as artifacts (PHP 8.3 only)
       - name: Upload coverage artifacts
@@ -192,11 +191,11 @@ jobs:
 
       # Install the lowest allowed versions of all dependencies to test compatibility
       - name: Update to lowest dependencies
-        run: composer update --prefer-lowest --prefer-stable --no-interaction --no-progress
+        run: composer deps:lowest
 
       # Run tests without coverage to verify functionality with minimum dependency versions
       - name: Run PHPUnit (no coverage)
-        run: ./vendor/bin/phpunit --configuration phpunit.xml --colors=always
+        run: composer test
 
   # Lightweight check for dev-only and CI updates
   quick-check:
@@ -227,22 +226,4 @@ jobs:
 
       # Just run tests on latest PHP - no coverage needed
       - name: Run PHPUnit (quick check)
-        run: ./vendor/bin/phpunit --configuration phpunit.xml --colors=always
-
-  compatibility:
-    name: Compatibility (PHP 8.0)
-    runs-on: ubuntu-latest
-    needs: lint
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.0'
-          extensions: openssl, mbstring
-          coverage: none
-      - name: Install dependencies (no-dev)
-        run: composer install --no-dev --prefer-dist --no-progress --no-interaction
-      - name: Smoke check
-        run: php -r "require 'vendor/autoload.php'; echo 'Autoload works';"
+        run: composer test

@@ -1,12 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Ternary operator condition is always true\.$#'
-			identifier: ternary.alwaysTrue
-			count: 1
-			path: src/Http/AsanaApiClient.php
-
-		-
 			message: '#^Parameter \#1 \$invocationRule of method PHPUnit\\Framework\\MockObject\\MockObject\:\:expects\(\) expects PHPUnit\\Framework\\MockObject\\Rule\\InvocationOrder, PHPUnit\\Framework\\MockObject\\Rule\\InvokedCount given\.$#'
 			identifier: argument.type
 			count: 4

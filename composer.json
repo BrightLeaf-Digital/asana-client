@@ -19,10 +19,16 @@
   "require-dev": {
     "vlucas/phpdotenv": ">=v5.6.2",
     "squizlabs/php_codesniffer": "^3.13.2 || ^4.0.0",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
+    "phpcompatibility/php-compatibility": "^10.0.0@dev",
     "phpunit/phpunit": "^12.5.22",
     "phpstan/phpstan": "^1.12 || ^2.0",
-    "phpstan/phpstan-phpunit": "^2.0",
-    "rector/rector": "^2.4"
+    "phpstan/phpstan-phpunit": "^2.0"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   },
   "autoload": {
     "psr-4": {
@@ -35,13 +41,18 @@
     }
   },
   "scripts": {
+    "ci:validate": "composer validate --strict",
+    "ci:audit": "composer audit --no-interaction --format plain",
+    "deps:lowest": "composer update --prefer-lowest --prefer-stable --no-interaction --no-progress",
     "lint": "phpcs --standard=PSR12 src tests",
+    "lint:compat": "phpcs --standard=PHPCompatibility --runtime-set testVersion 8.0- src/",
     "lint:fix": "phpcbf --standard=PSR12 src tests",
     "test": "phpunit --configuration phpunit.xml",
     "test:coverage": "php -r \"is_dir('build/logs') || mkdir('build/logs', 0777, true);\" && XDEBUG_MODE=coverage phpunit --configuration phpunit.xml --coverage-clover build/logs/clover.xml --log-junit build/logs/junit.xml",
     "analyse": "phpstan analyse --configuration=phpstan.neon.dist --memory-limit=512M",
     "check": [
       "@lint",
+      "@lint:compat",
       "@analyse",
       "@test"
     ]
