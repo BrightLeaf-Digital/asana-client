@@ -44,6 +44,11 @@ use BrightleafDigital\Api\RatesApiService;
 use BrightleafDigital\Api\TimePeriodsApiService;
 use BrightleafDigital\Api\TypeaheadApiService;
 use BrightleafDigital\Api\CustomFieldSettingsApiService;
+use BrightleafDigital\Api\OooEntriesApiService;
+use BrightleafDigital\Api\ProjectPortfolioSettingsApiService;
+use BrightleafDigital\Api\RolesApiService;
+use BrightleafDigital\Api\TimesheetApprovalStatusesApiService;
+use BrightleafDigital\Api\TimeTrackingCategoriesApiService;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Container\ContainerInterface;
 
@@ -320,4 +325,29 @@ interface AsanaClientInterface
      * @return CustomFieldSettingsApiService
      */
     public function customFieldSettings(): CustomFieldSettingsApiService;
+
+    /**
+     * @return RolesApiService
+     */
+    public function roles(): RolesApiService;
+
+    /**
+     * @return TimesheetApprovalStatusesApiService
+     */
+    public function timesheetApprovalStatuses(): TimesheetApprovalStatusesApiService;
+
+    /**
+     * @return TimeTrackingCategoriesApiService
+     */
+    public function timeTrackingCategories(): TimeTrackingCategoriesApiService;
+
+    /**
+     * @return OooEntriesApiService
+     */
+    public function oooEntries(): OooEntriesApiService;
+
+    /**
+     * @return ProjectPortfolioSettingsApiService
+     */
+    public function projectPortfolioSettings(): ProjectPortfolioSettingsApiService;
 }

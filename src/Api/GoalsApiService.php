@@ -85,6 +85,10 @@ class GoalsApiService extends BaseApiService
      * - status (string): Status of the goal
      * - liked (bool): Whether the goal is liked
      * - notes (string): Free-form textual notes about the goal
+     * - privacy_setting (string): Controls goal visibility.
+     *   Allowed values: "public_to_workspace", "members_only"
+     * - default_access_level (string): Default role granted to new goal members.
+     *   Allowed values: "admin", "editor", "commenter", "viewer"
      *   Example: ["name" => "Updated Goal Name", "status" => "on_track"]
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
@@ -251,6 +255,10 @@ class GoalsApiService extends BaseApiService
      * - liked (bool): Whether the goal is liked by the current user
      * - is_workspace_level (bool): Whether this is a workspace-level goal
      * - notes (string): Free-form textual notes about the goal
+     * - privacy_setting (string): Controls goal visibility.
+     *   Allowed values: "public_to_workspace", "members_only"
+     * - default_access_level (string): Default role granted to new goal members.
+     *   Allowed values: "admin", "editor", "commenter", "viewer"
      *   Example: ["name" => "Increase revenue by 20%", "workspace" => "12345"]
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
@@ -691,6 +699,119 @@ class GoalsApiService extends BaseApiService
             'POST',
             "goals/$goalGid/removeCustomFieldSetting",
             ['json' => ['data' => $data]],
+            $responseType
+        );
+    }
+
+    /**
+     * Get stories for a goal
+     * GET /goals/{goal_gid}/stories
+     * Returns a list of stories (comments and activity) for the specified goal.
+     * Requires the `goals:read` OAuth scope.
+     * API Documentation: https://developers.asana.com/reference/getstoriesforgoal
+     *
+     * @param string $goalGid The unique global ID of the goal.
+     *                        Example: "12345"
+     * @param array $options Optional parameters to customize the request:
+     *
+     * Pagination parameters:
+     * - limit (int): Maximum number of stories to return. Default is 20, max is 100
+     * - offset (string): Offset token for pagination
+     *
+     * Display parameters:
+     * - opt_fields (string): Comma-separated fields to include in the response
+     *   (e.g., "created_at,created_by,html_text,is_pinned,resource_subtype,text,type")
+     * - opt_pretty (bool): Returns formatted JSON if true
+     *
+     * @param int $responseType The type of response to return:
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * @return array The response data based on the specified response type.
+     *
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
+     * - Just the data array containing the list of story objects with fields including:
+     *   - gid: Unique identifier of the story
+     *   - resource_type: Always "story"
+     *   - resource_subtype: E.g. "comment_added", "sticker_reaction"
+     *   - text: The plain-text content of the story
+     *   - created_at: When the story was created
+     *   - created_by: Object containing the author details
+     *
+     * @throws ApiException
+     * @throws RateLimitException
+     * @throws ValidationException
+     */
+    public function getStoriesForGoal(
+        string $goalGid,
+        array $options = [],
+        int $responseType = HttpClientInterface::RESPONSE_DATA
+    ): array {
+        $this->validateGid($goalGid, 'Goal GID');
+
+        return $this->client->request(
+            'GET',
+            "goals/$goalGid/stories",
+            ['query' => $options],
+            $responseType
+        );
+    }
+
+    /**
+     * Create a story for a goal
+     * POST /goals/{goal_gid}/stories
+     * Adds a comment or sticker reaction to the specified goal.
+     * Requires the `goals:write` OAuth scope.
+     * API Documentation: https://developers.asana.com/reference/createstoryforgoal
+     *
+     * @param string $goalGid The unique global ID of the goal to add the story to.
+     *                        Example: "12345"
+     * @param array $data Data for creating the story. Supported fields include:
+     *                    Required (one of):
+     * - text (string): The plain-text content of the comment.
+     *   Example: "Great progress this week!"
+     *                    Optional:
+     * - html_text (string): The HTML-formatted content of the comment.
+     *   Example: "<body>Great <em>progress</em> this week!</body>"
+     * - sticker_name (string): The name of the sticker reaction to add.
+     *   Example: "thumbs_up"
+     *   Example: ["text" => "Great progress this week!"]
+     * @param array $options Optional parameters to customize the request:
+     * - opt_fields (string): Comma-separated fields to include in the response
+     * - opt_pretty (bool): Returns formatted JSON if true
+     *
+     * @param int $responseType The type of response to return:
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * @return array The response data based on the specified response type.
+     *
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
+     * - Just the data object containing the created story details including:
+     *   - gid: Unique identifier of the story
+     *   - resource_type: Always "story"
+     *   - text: The content of the story
+     *   - created_at: When the story was created
+     *   - created_by: Object containing the author details
+     *
+     * @throws ApiException
+     * @throws RateLimitException
+     * @throws ValidationException
+     */
+    public function createStoryForGoal(
+        string $goalGid,
+        array $data,
+        array $options = [],
+        int $responseType = HttpClientInterface::RESPONSE_DATA
+    ): array {
+        $this->validateGid($goalGid, 'Goal GID');
+
+        return $this->client->request(
+            'POST',
+            "goals/$goalGid/stories",
+            ['json' => ['data' => $data], 'query' => $options],
             $responseType
         );
     }

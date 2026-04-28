@@ -1705,7 +1705,15 @@ class TaskApiService extends BaseApiService
      * @param string $workspaceGid The unique global ID of the workspace where the tasks should be searched.
      * @param array $options Optional query parameters to refine the search. Supported keys include:
      * - `text` (string): A full-text search string (e.g., portions of the task name or description).
-     *   - `resource_subtype` (string): Filter by task type. Common values are `default_task`, `milestone`, `section`.
+     *   - `resource_subtype` (string): Filter by task type.
+     *     Common values: `default_task`, `milestone`, `section`.
+     *     Use `custom` to return only tasks with a Custom Task Type applied. When filtering by `custom`,
+     *     the `custom_types.{CUSTOM_TYPE_GID}.custom_type_status_option.gid` parameter becomes available.
+     *     Note: `custom_fields.{status_field_gid}.value` cannot be combined with the custom_types filter.
+     *   - `custom_types.{CUSTOM_TYPE_GID}.custom_type_status_option.gid` (string): When `resource_subtype=custom`,
+     *     filter by a specific Custom Task Type GID and status option GID within that type.
+     *     Returns HTTP 400 if `resource_subtype` is not `custom`.
+     *     Example: `['resource_subtype' => 'custom', 'custom_types.12345.custom_type_status_option.gid' => '67890']`
      *   - `completed` (bool): Filter by task completion status (`true` for completed, `false` for incomplete tasks).
      *   - `completed_on.after` (string, ISO 8601): Include tasks completed after the given timestamp.
      *   - `completed_on.before` (string, ISO 8601): Include tasks completed before the given timestamp.

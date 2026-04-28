@@ -2,6 +2,7 @@
 
 namespace BrightleafDigital\Api;
 
+use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Exceptions\ApiException;
 use BrightleafDigital\Exceptions\ValidationException;
@@ -1386,6 +1387,83 @@ class ProjectApiService extends BaseApiService
             'POST',
             "projects/$projectGid/saveAsTemplate",
             ['json' => ['data' => $data], 'query' => $options],
+            $responseType
+        );
+    }
+
+    /**
+     * Search projects in a workspace
+     * GET /workspaces/{workspace_gid}/projects/search
+     * Executes an advanced search against projects in the given workspace with filtering and sorting.
+     * Unlike the standard list endpoints, this endpoint supports full-text search and
+     * custom-field filtering. Results are limited to 100 and are not paginated.
+     * Requires Asana Starter, Advanced, Enterprise, or Enterprise+ and the `projects:read` OAuth scope.
+     * API Documentation: https://developers.asana.com/reference/searchprojectsforworkspace
+     *
+     * @param string $workspaceGid The unique global ID of the workspace to search in.
+     *                             Example: "12345"
+     * @param array $options Optional query parameters to refine the search:
+     *
+     * Text & member filters:
+     * - text (string): Full-text search string matched against project names.
+     *   Example: "marketing"
+     * - members.any (string): Comma-separated user GIDs; returns projects where any of these users are members.
+     *   Example: "67890,11111"
+     *
+     * Date filters (use YYYY-MM-DD format):
+     * - created_on (string): Projects created on this exact date
+     * - created_on.after (string): Projects created strictly after this date
+     * - created_on.before (string): Projects created strictly before this date
+     * - created_at.after (string): Projects created at or after this ISO-8601 datetime
+     * - modified_on.after (string): Projects last modified after this date
+     * - completed_at.after (string): Projects completed after this datetime
+     *
+     * Custom field filters:
+     * - custom_fields.{gid}.value (string): Filter by custom field value. Supports
+     *   operator suffixes: `.starts_with`, `.ends_with`, `.contains`, `.less_than`, `.greater_than`
+     *   Example: "custom_fields.12345.value.contains=launch"
+     *
+     * Sorting:
+     * - sort_by (string): Field to sort results by.
+     *   Allowed values: "due_date", "created_at", "completed_at", "modified_at"
+     * - sort_ascending (bool): Sort in ascending order when true. Default is false.
+     *
+     * Display parameters:
+     * - opt_fields (string): Comma-separated fields to include in the response
+     * - opt_pretty (bool): Returns formatted JSON if true
+     *
+     * @param int $responseType The type of response to return:
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * @return array The response data based on the specified response type.
+     *
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
+     * - Just the data array (up to 100 projects) with fields including:
+     *   - gid: Unique identifier of the project
+     *   - resource_type: Always "project"
+     *   - name: Name of the project
+     *   Additional fields as specified in opt_fields
+     *
+     * Note: The search index updates asynchronously (typically 10–60 seconds latency),
+     * so recently created or modified projects may not appear immediately.
+     *
+     * @throws ApiException
+     * @throws RateLimitException
+     * @throws ValidationException
+     */
+    public function searchProjects(
+        string $workspaceGid,
+        array $options = [],
+        int $responseType = HttpClientInterface::RESPONSE_DATA
+    ): array {
+        $this->validateGid($workspaceGid, 'Workspace GID');
+
+        return $this->client->request(
+            'GET',
+            "workspaces/$workspaceGid/projects/search",
+            ['query' => $options],
             $responseType
         );
     }

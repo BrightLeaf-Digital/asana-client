@@ -44,6 +44,11 @@ use BrightleafDigital\Api\RatesApiService;
 use BrightleafDigital\Api\TimePeriodsApiService;
 use BrightleafDigital\Api\TypeaheadApiService;
 use BrightleafDigital\Api\CustomFieldSettingsApiService;
+use BrightleafDigital\Api\OooEntriesApiService;
+use BrightleafDigital\Api\ProjectPortfolioSettingsApiService;
+use BrightleafDigital\Api\RolesApiService;
+use BrightleafDigital\Api\TimesheetApprovalStatusesApiService;
+use BrightleafDigital\Api\TimeTrackingCategoriesApiService;
 use BrightleafDigital\Auth\AsanaOAuthHandler;
 use BrightleafDigital\Auth\AuthHandlerInterface;
 use BrightleafDigital\Auth\TokenManager;
@@ -229,6 +234,11 @@ class AsanaClient implements AsanaClientInterface
             TimePeriodsApiService::class,
             TypeaheadApiService::class,
             CustomFieldSettingsApiService::class,
+            RolesApiService::class,
+            TimesheetApprovalStatusesApiService::class,
+            TimeTrackingCategoriesApiService::class,
+            OooEntriesApiService::class,
+            ProjectPortfolioSettingsApiService::class,
         ];
 
         foreach ($services as $service) {
@@ -624,6 +634,51 @@ class AsanaClient implements AsanaClientInterface
     public function customFieldSettings(): CustomFieldSettingsApiService
     {
         return $this->container->get(CustomFieldSettingsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function roles(): RolesApiService
+    {
+        return $this->container->get(RolesApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function timesheetApprovalStatuses(): TimesheetApprovalStatusesApiService
+    {
+        return $this->container->get(TimesheetApprovalStatusesApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function timeTrackingCategories(): TimeTrackingCategoriesApiService
+    {
+        return $this->container->get(TimeTrackingCategoriesApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function oooEntries(): OooEntriesApiService
+    {
+        return $this->container->get(OooEntriesApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function projectPortfolioSettings(): ProjectPortfolioSettingsApiService
+    {
+        return $this->container->get(ProjectPortfolioSettingsApiService::class);
     }
 
     // --- Authentication & Helper Methods ---

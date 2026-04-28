@@ -957,6 +957,190 @@ class GoalsApiServiceTest extends TestCase
         $this->service->removeCustomFieldSettingForGoal('abc', ['custom_field' => '67890']);
     }
 
+    // ── getStoriesForGoal ────────────────────────────────────────────────
+
+    /**
+     * Test getStoriesForGoal calls client with correct parameters.
+     */
+    public function testGetStoriesForGoal(): void
+    {
+        $expectedResponse = [
+            ['gid' => '111', 'resource_type' => 'story', 'text' => 'Great progress!'],
+            ['gid' => '222', 'resource_type' => 'story', 'text' => 'On track!'],
+        ];
+
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with('GET', 'goals/12345/stories', ['query' => []], HttpClientInterface::RESPONSE_DATA)
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->getStoriesForGoal('12345');
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test getStoriesForGoal with options.
+     */
+    public function testGetStoriesForGoalWithOptions(): void
+    {
+        $options = ['opt_fields' => 'text,created_at,created_by', 'limit' => 50];
+
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with('GET', 'goals/12345/stories', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
+            ->willReturn([]);
+
+        $this->service->getStoriesForGoal('12345', $options);
+    }
+
+    /**
+     * Test getStoriesForGoal with custom response type.
+     */
+    public function testGetStoriesForGoalWithCustomResponseType(): void
+    {
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with('GET', 'goals/12345/stories', ['query' => []], HttpClientInterface::RESPONSE_FULL)
+            ->willReturn([]);
+
+        $this->service->getStoriesForGoal('12345', [], HttpClientInterface::RESPONSE_FULL);
+    }
+
+    /**
+     * Test getStoriesForGoal throws exception for empty GID.
+     */
+    public function testGetStoriesForGoalThrowsExceptionForEmptyGid(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Goal GID must be a non-empty string.');
+
+        $this->service->getStoriesForGoal('');
+    }
+
+    /**
+     * Test getStoriesForGoal throws exception for non-numeric GID.
+     */
+    public function testGetStoriesForGoalThrowsExceptionForNonNumericGid(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Goal GID must be a numeric string.');
+
+        $this->service->getStoriesForGoal('abc');
+    }
+
+    // ── createStoryForGoal ───────────────────────────────────────────────
+
+    /**
+     * Test createStoryForGoal calls client with correct parameters.
+     */
+    public function testCreateStoryForGoal(): void
+    {
+        $data = ['text' => 'Great progress this week!'];
+        $expectedResponse = [
+            'gid' => '99999',
+            'resource_type' => 'story',
+            'text' => 'Great progress this week!',
+        ];
+
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'goals/12345/stories',
+                ['json' => ['data' => $data], 'query' => []],
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->createStoryForGoal('12345', $data);
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test createStoryForGoal with html_text.
+     */
+    public function testCreateStoryForGoalWithHtmlText(): void
+    {
+        $data = ['html_text' => '<body>Great <em>progress</em>!</body>'];
+
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'goals/12345/stories',
+                ['json' => ['data' => $data], 'query' => []],
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $this->service->createStoryForGoal('12345', $data);
+    }
+
+    /**
+     * Test createStoryForGoal with options.
+     */
+    public function testCreateStoryForGoalWithOptions(): void
+    {
+        $data = ['text' => 'Update'];
+        $options = ['opt_fields' => 'text,created_at,created_by'];
+
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'goals/12345/stories',
+                ['json' => ['data' => $data], 'query' => $options],
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $this->service->createStoryForGoal('12345', $data, $options);
+    }
+
+    /**
+     * Test createStoryForGoal with custom response type.
+     */
+    public function testCreateStoryForGoalWithCustomResponseType(): void
+    {
+        $data = ['text' => 'Update'];
+
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'goals/12345/stories',
+                ['json' => ['data' => $data], 'query' => []],
+                HttpClientInterface::RESPONSE_FULL
+            )
+            ->willReturn([]);
+
+        $this->service->createStoryForGoal('12345', $data, [], HttpClientInterface::RESPONSE_FULL);
+    }
+
+    /**
+     * Test createStoryForGoal throws exception for empty GID.
+     */
+    public function testCreateStoryForGoalThrowsExceptionForEmptyGid(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Goal GID must be a non-empty string.');
+
+        $this->service->createStoryForGoal('', ['text' => 'Update']);
+    }
+
+    /**
+     * Test createStoryForGoal throws exception for non-numeric GID.
+     */
+    public function testCreateStoryForGoalThrowsExceptionForNonNumericGid(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Goal GID must be a numeric string.');
+
+        $this->service->createStoryForGoal('abc', ['text' => 'Update']);
+    }
+
     /**
      * @return HttpClientInterface&MockObject
      */

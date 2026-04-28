@@ -55,10 +55,13 @@ class MembershipApiService extends BaseApiService
      * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of memberships with fields including:
      *   - gid: Unique identifier of the membership
-     * - resource_type: Always "membership"
-     * - access_level: The access level of the membership
-     * - member: Object containing member details (user or team)
-     * - parent: Object containing parent resource details
+     *   - resource_type: Always "membership"
+     *   - resource_subtype: The membership subtype. One of: "project_membership",
+     *     "goal_membership", "portfolio_membership", "custom_field_membership",
+     *     "custom_type_membership" (returned when the parent is a Custom Task Type)
+     *   - access_level: The access level of the membership
+     *   - member: Object containing member details (user or team)
+     *   - parent: Object containing parent resource details
      *                 Additional fields as specified in opt_fields
      *
      * @throws ApiException If the API request fails due to:
@@ -83,7 +86,8 @@ class MembershipApiService extends BaseApiService
      * API Documentation: https://developers.asana.com/reference/createmembership
      * @param array $data Data for creating the membership. Supported fields include:
      *                    Required:
-     * - parent (string): The parent id of the membership (goal, project, portfolio, or custom_field)
+     * - parent (string): The parent id of the membership. Supported parent types:
+     *   goal, project, portfolio, custom_field, or custom_type (Custom Task Type GID).
      *   Example: "12345"
      * - member (string): The gid of the user or team being added as a member.
      *   Example: "67890"
@@ -93,6 +97,7 @@ class MembershipApiService extends BaseApiService
      *                      Projects can have access levels: "admin", "editor", "commenter"
      *                      Portfolios can have access levels: "admin", "editor", "viewer"
      *                      Custom Fields can have access levels: "admin", "editor", "user"
+     *                      Custom Task Types can have access levels: "admin", "editor", "user"
      *                    Example: ["parent" => "12345", "member" => "67890", "access_level" => "editor"]
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response

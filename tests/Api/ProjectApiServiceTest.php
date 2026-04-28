@@ -424,6 +424,97 @@ class ProjectApiServiceTest extends TestCase
         $this->service->createProjectTemplateFromProject('12345', $data);
     }
 
+    // ── searchProjects ───────────────────────────────────────────────────
+
+    /**
+     * Test searchProjects calls client with correct parameters.
+     */
+    public function testSearchProjects(): void
+    {
+        $expectedResponse = [
+            ['gid' => '111', 'name' => 'Alpha Project'],
+            ['gid' => '222', 'name' => 'Beta Project'],
+        ];
+
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'workspaces/12345/projects/search',
+                ['query' => []],
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->searchProjects('12345');
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test searchProjects with filtering options.
+     */
+    public function testSearchProjectsWithOptions(): void
+    {
+        $options = [
+            'text' => 'launch',
+            'archived' => false,
+            'opt_fields' => 'name,owner,due_date',
+        ];
+
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'workspaces/12345/projects/search',
+                ['query' => $options],
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $this->service->searchProjects('12345', $options);
+    }
+
+    /**
+     * Test searchProjects with custom response type.
+     */
+    public function testSearchProjectsWithCustomResponseType(): void
+    {
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                'workspaces/12345/projects/search',
+                ['query' => []],
+                HttpClientInterface::RESPONSE_FULL
+            )
+            ->willReturn([]);
+
+        $this->service->searchProjects('12345', [], HttpClientInterface::RESPONSE_FULL);
+    }
+
+    /**
+     * Test searchProjects throws exception for empty workspace GID.
+     */
+    public function testSearchProjectsThrowsExceptionForEmptyWorkspaceGid(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Workspace GID must be a non-empty string.');
+
+        $this->service->searchProjects('');
+    }
+
+    /**
+     * Test searchProjects throws exception for non-numeric workspace GID.
+     */
+    public function testSearchProjectsThrowsExceptionForNonNumericWorkspaceGid(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Workspace GID must be a numeric string.');
+
+        $this->service->searchProjects('abc');
+    }
+
     /**
      * @return HttpClientInterface&MockObject
      */

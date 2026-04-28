@@ -974,6 +974,111 @@ class PortfoliosApiServiceTest extends TestCase
         $this->service->removeMembersFromPortfolio('12345', []);
     }
 
+    // ── duplicatePortfolio ───────────────────────────────────────────────
+
+    /**
+     * Test duplicatePortfolio calls client with correct parameters.
+     */
+    public function testDuplicatePortfolio(): void
+    {
+        $expectedResponse = ['gid' => '99999', 'resource_type' => 'job'];
+
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'portfolios/12345/duplicate',
+                ['json' => ['data' => []], 'query' => []],
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn($expectedResponse);
+
+        $result = $this->service->duplicatePortfolio('12345');
+
+        $this->assertSame($expectedResponse, $result);
+    }
+
+    /**
+     * Test duplicatePortfolio with data.
+     */
+    public function testDuplicatePortfolioWithData(): void
+    {
+        $data = ['name' => 'Copy of My Portfolio'];
+
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'portfolios/12345/duplicate',
+                ['json' => ['data' => $data], 'query' => []],
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $this->service->duplicatePortfolio('12345', $data);
+    }
+
+    /**
+     * Test duplicatePortfolio with options.
+     */
+    public function testDuplicatePortfolioWithOptions(): void
+    {
+        $data = ['name' => 'Copy of My Portfolio'];
+        $options = ['opt_fields' => 'name,status'];
+
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'portfolios/12345/duplicate',
+                ['json' => ['data' => $data], 'query' => $options],
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $this->service->duplicatePortfolio('12345', $data, $options);
+    }
+
+    /**
+     * Test duplicatePortfolio with custom response type.
+     */
+    public function testDuplicatePortfolioWithCustomResponseType(): void
+    {
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'portfolios/12345/duplicate',
+                ['json' => ['data' => []], 'query' => []],
+                HttpClientInterface::RESPONSE_FULL
+            )
+            ->willReturn([]);
+
+        $this->service->duplicatePortfolio('12345', [], [], HttpClientInterface::RESPONSE_FULL);
+    }
+
+    /**
+     * Test duplicatePortfolio throws exception for empty GID.
+     */
+    public function testDuplicatePortfolioThrowsExceptionForEmptyGid(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Portfolio GID must be a non-empty string.');
+
+        $this->service->duplicatePortfolio('');
+    }
+
+    /**
+     * Test duplicatePortfolio throws exception for non-numeric GID.
+     */
+    public function testDuplicatePortfolioThrowsExceptionForNonNumericGid(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Portfolio GID must be a numeric string.');
+
+        $this->service->duplicatePortfolio('abc');
+    }
+
     /**
      * @return HttpClientInterface&MockObject
      */

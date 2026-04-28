@@ -85,6 +85,14 @@ class TimeTrackingEntriesApiService extends BaseApiService
      *                    Optional:
      * - created_by (string): GID of the user who created the entry.
      *   Defaults to the authenticated user.
+     * - categories (array): Array containing at most one time tracking category GID to assign.
+     *   Requires the Timesheets & Budgets Add-on (TBAO).
+     *   Example: [["gid" => "99999"]]
+     * - description (string): Free-text description of the time entry.
+     *   Requires the Timesheets & Budgeting add-on.
+     * - billable_status (string): Billable classification of the entry.
+     *   Allowed values: "billable", "non_billable", "not_set"
+     *   Requires the Timesheets & Budgeting add-on.
      *                    Example: ["entered_on" => "2026-02-05", "duration_minutes" => 60]
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include
@@ -202,6 +210,15 @@ class TimeTrackingEntriesApiService extends BaseApiService
      * @param array $data The properties to update. Can include:
      * - duration_minutes (int): Duration in minutes
      * - entered_on (string): Date in YYYY-MM-DD format
+     * - categories (array): Array containing at most one time tracking category GID.
+     *   Pass an empty array to remove the assigned category.
+     *   Requires the Timesheets & Budgets Add-on (TBAO).
+     *   Example: [["gid" => "99999"]]
+     * - description (string): Free-text description of the time entry.
+     *   Requires the Timesheets & Budgeting add-on.
+     * - billable_status (string): Billable classification of the entry.
+     *   Allowed values: "billable", "non_billable", "not_set"
+     *   Requires the Timesheets & Budgeting add-on.
      *   Example: ["duration_minutes" => 90]
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include
@@ -296,8 +313,11 @@ class TimeTrackingEntriesApiService extends BaseApiService
      *
      * Filtering parameters:
      * - workspace (string): GID of the workspace to filter entries from
+     * - user (string): GID of the user to filter entries by
      * - start_date (string): Start date in YYYY-MM-DD format to filter entries
      * - end_date (string): End date in YYYY-MM-DD format to filter entries
+     * - timesheet_approval_status_gid (string): Filter entries belonging to a specific
+     *   timesheet approval status record. Requires the Timesheets & Budgeting add-on.
      * Pagination parameters:
      * - limit (int): Maximum number of entries to return. Default is 20, max is 100
      * - offset (string): Offset token for pagination

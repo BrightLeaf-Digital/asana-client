@@ -713,4 +713,62 @@ class PortfoliosApiService extends BaseApiService
             $responseType
         );
     }
+
+    /**
+     * Duplicate a portfolio
+     * POST /portfolios/{portfolio_gid}/duplicate
+     * Creates a duplicate of the specified portfolio asynchronously. Returns a job object
+     * that can be polled via the Jobs API to track completion. The fields
+     * `custom_fields` and `saved_views` are always duplicated; additional content
+     * can be included via the `include` parameter.
+     * API Documentation: https://developers.asana.com/reference/duplicateportfolio
+     *
+     * @param string $portfolioGid The unique global ID of the portfolio to duplicate.
+     *                             Example: "12345"
+     * @param array $data Data for the duplication. Supported fields include:
+     *                    Optional:
+     * - name (string): Name for the new portfolio. Defaults to a copy of the original name.
+     *   Example: "Copy of Q4 Portfolio"
+     * - include (string): Comma-separated list of optional content to copy.
+     *   Allowed values: "description", "members", "permissions", "templates",
+     *                   "rules", "child_projects", "child_portfolios"
+     *   Note: child_projects and child_portfolios use an all-or-nothing approach.
+     *   Example: ["name" => "Copy of Q4 Portfolio", "include" => "members,child_projects"]
+     * @param array $options Optional parameters to customize the request:
+     * - opt_fields (string): Comma-separated fields to include in the response
+     * - opt_pretty (bool): Returns formatted JSON if true
+     *
+     * @param int $responseType The type of response to return:
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * @return array The response data based on the specified response type.
+     *
+     * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
+     * - Just the data object containing the job details including:
+     *   - gid: Unique identifier of the duplication job
+     *   - resource_type: Always "job"
+     *   - status: Current status ("not_started", "in_progress", "succeeded", "failed")
+     *   - new_project: Object with the new portfolio's GID once duplication completes
+     *
+     * @throws ApiException
+     * @throws RateLimitException
+     * @throws ValidationException
+     */
+    public function duplicatePortfolio(
+        string $portfolioGid,
+        array $data = [],
+        array $options = [],
+        int $responseType = HttpClientInterface::RESPONSE_DATA
+    ): array {
+        $this->validateGid($portfolioGid, 'Portfolio GID');
+
+        return $this->client->request(
+            'POST',
+            "portfolios/$portfolioGid/duplicate",
+            ['json' => ['data' => $data], 'query' => $options],
+            $responseType
+        );
+    }
 }
