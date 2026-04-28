@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## v0.2.1 - 2026-04-28
+
+### Added
+- add new scopes for ooo entries, portfolios, and time tracking (ffa664e)
+- add OooEntriesApiService and ProjectPortfolioSettingsApiService and RolesApiService and TimesheetApprovalStatusesApiService and TimeTrackingCategoriesApiService  with full CRUD operations and unit tests (1aa03de)
+
+### Chore
+- migrate to PHP 8.0+, upgrade PHPUnit to 12.5, update CI and tools config (1680368)
+- remove old phpstan and rector configurations (c517cc6)
+- update .gitignore to include CLAUDE.md (691cf58)
+- add PHPCompatibility, refine scripts and workflows (6e00841)
+- remove phpstan-baseline, update PHPStan config, and adjust exception constructors (28241af)
+- update test suites with stub-based mock creation and method adjustments (831b9a9)
+
+### Documentation
+- outline PHPUnit upgrade and PHP 8.0+ compatibility steps (7722a4e)
+
+### Fixed
+- fixed phpstan warning with always true ternary (65e6f40)
+
+
 ## v0.2.0 - 2026-02-25
 
 ### Added
