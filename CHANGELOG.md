@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## v0.2.2 - 2026-05-25
+
+### Chore
+- drop PHP 8.0 support, update docs, and CI for PHP 8.1+ compatibility (56c95e5)
+
+
 ## v0.2.1 - 2026-04-28
 
 ### Added
