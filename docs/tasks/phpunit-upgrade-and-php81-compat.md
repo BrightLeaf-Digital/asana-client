@@ -1,10 +1,10 @@
-# PHPUnit Migration: Post-Migration Maintenance Plan
+# PHPUnit and PHP 8.1 Compatibility Maintenance Plan
 
 ## Current Status
-- PHPUnit upgraded to `12.5.23`.
-- PHP 7.4 runtime support dropped; minimum runtime is `PHP 8.0+`.
-- CI infrastructure updated to test on PHP 8.3 and run PHPCompatibility checks against `8.0+`.
-- Migration task fully completed.
+- PHPUnit is pinned to the `12.5` line for development and test execution.
+- PHP 7.4 and 8.0 runtime support dropped; minimum runtime is `PHP 8.1+`.
+- CI verifies production dependency installation on PHP 8.1 and runs PHPUnit on PHP 8.3+.
+- PHPCompatibility checks source compatibility against `8.1+`.
 - PHPStan baseline removed as it is no longer required.
 
 ## Addressing PHPUnit Notices

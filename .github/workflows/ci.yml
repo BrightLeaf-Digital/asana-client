@@ -2,7 +2,7 @@
 # This pipeline validates Composer config, installs dependencies, audits for vulnerabilities,
 # enforces PSR-12 coding standards via PHPCS (lint job), runs PHPUnit tests with coverage (tests job),
 # and verifies compatibility with the lowest allowed dependency versions (lowest-deps job).
-# Tests run on multiple PHP versions to ensure broad compatibility.
+# Runtime installation is checked on PHP 8.1; PHPUnit runs on PHP 8.3+ because it is a dev dependency.
 name: CI
 
 # Concurrency prevents duplicate runs on the same branch/PR by cancelling in-progress runs.
@@ -69,8 +69,32 @@ jobs:
         run: composer lint
 
       # Validate language compatibility for supported runtime versions
-      - name: Run PHPCompatibility checks (PHP 8.0+)
+      - name: Run PHPCompatibility checks (PHP 8.1+)
         run: composer lint:compat
+
+  runtime-compat:
+    name: Runtime Compat (PHP 8.1)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: openssl, mbstring
+          coverage: none
+          ini-values: memory_limit=-1
+
+      - name: Install production dependencies
+        uses: ramsey/composer-install@v3
+        with:
+          dependency-versions: locked
+          composer-options: --no-dev --prefer-dist --no-progress --no-interaction
+
+      - name: Check production platform requirements
+        run: composer check-platform-reqs --no-dev --no-interaction
 
   # Static analysis - catch potential bugs and type mismatches
   analyse:
@@ -108,12 +132,12 @@ jobs:
       github.actor != 'dependabot[bot]' || 
       contains(github.event.pull_request.labels.*.name, 'major-update') ||
       contains(github.event.pull_request.labels.*.name, 'production')
-    needs: [lint, analyse]
+    needs: [lint, runtime-compat, analyse]
     strategy:
       # Continue running all matrix jobs even if one fails to get full coverage of results.
       fail-fast: false
       matrix:
-        # Test across all supported PHP versions.
+        # PHPUnit 12 is a dev dependency and requires PHP 8.3+.
         php-version: ['8.3']
 
     steps:
