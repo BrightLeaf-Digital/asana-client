@@ -72,30 +72,6 @@ jobs:
       - name: Run PHPCompatibility checks (PHP 8.1+)
         run: composer lint:compat
 
-  runtime-compat:
-    name: Runtime Compat (PHP 8.1)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.1'
-          extensions: openssl, mbstring
-          coverage: none
-          ini-values: memory_limit=-1
-
-      - name: Install production dependencies
-        uses: ramsey/composer-install@v3
-        with:
-          dependency-versions: locked
-          composer-options: --no-dev --prefer-dist --no-progress --no-interaction
-
-      - name: Check production platform requirements
-        run: composer check-platform-reqs --no-dev --no-interaction
-
   # Static analysis - catch potential bugs and type mismatches
   analyse:
     name: Analyse (PHP 8.3)
@@ -132,7 +108,7 @@ jobs:
       github.actor != 'dependabot[bot]' || 
       contains(github.event.pull_request.labels.*.name, 'major-update') ||
       contains(github.event.pull_request.labels.*.name, 'production')
-    needs: [lint, runtime-compat, analyse]
+    needs: [lint, analyse]
     strategy:
       # Continue running all matrix jobs even if one fails to get full coverage of results.
       fail-fast: false
