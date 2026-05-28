@@ -10,6 +10,7 @@ use BrightleafDigital\Container\ServiceContainer;
 use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Storage\TokenStorageInterface;
 use League\OAuth2\Client\Token\AccessToken;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
@@ -17,12 +18,12 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+#[AllowMockObjectsWithoutExpectations]
 class AsanaClientTest extends TestCase
 {
-    private ServiceContainer $container;
     private AsanaClient $client;
-    private TokenStorageInterface $storage;
-    private AuthHandlerInterface $authHandler;
+    private TokenStorageInterface&MockObject $storage;
+    private AuthHandlerInterface&MockObject $authHandler;
 
     protected function tearDown(): void
     {
@@ -32,25 +33,25 @@ class AsanaClientTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->container = new ServiceContainer();
-        $this->container->set(LoggerInterface::class, new NullLogger());
+        $container = new ServiceContainer();
+        $container->set(LoggerInterface::class, new NullLogger());
 
         $this->storage = $this->createMock(TokenStorageInterface::class);
-        $this->container->set(TokenStorageInterface::class, $this->storage);
+        $container->set(TokenStorageInterface::class, $this->storage);
 
-        $this->authHandler = $this->createStub(AuthHandlerInterface::class);
-        $this->container->set(AuthHandlerInterface::class, $this->authHandler);
+        $this->authHandler = $this->createMock(AuthHandlerInterface::class);
+        $container->set(AuthHandlerInterface::class, $this->authHandler);
 
         $tokenManager = new TokenManager($this->storage, $this->authHandler);
-        $this->container->set(TokenManager::class, $tokenManager);
+        $container->set(TokenManager::class, $tokenManager);
 
         $httpClient = $this->createStub(HttpClientInterface::class);
-        $this->container->set(HttpClientInterface::class, $httpClient);
+        $container->set(HttpClientInterface::class, $httpClient);
 
         // Register a few services for testing
-        $this->container->set(TaskApiService::class, new TaskApiService($httpClient));
+        $container->set(TaskApiService::class, new TaskApiService($httpClient));
 
-        $this->client = new AsanaClient($this->container);
+        $this->client = new AsanaClient($container);
     }
 
     public function testTasksReturnsService(): void
@@ -189,16 +190,8 @@ class AsanaClientTest extends TestCase
     /**
      * @return AuthHandlerInterface&MockObject
      */
-    private function mockAuthHandler(): AuthHandlerInterface
+    private function mockAuthHandler(): AuthHandlerInterface&MockObject
     {
-        if ($this->authHandler instanceof MockObject) {
-            return $this->authHandler;
-        }
-
-        $this->authHandler = $this->createMock(AuthHandlerInterface::class);
-        $this->container->set(AuthHandlerInterface::class, $this->authHandler);
-        $this->container->set(TokenManager::class, new TokenManager($this->storage, $this->authHandler));
-
         return $this->authHandler;
     }
 }

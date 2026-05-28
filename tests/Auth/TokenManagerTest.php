@@ -118,7 +118,7 @@ class TokenManagerTest extends TestCase
     /**
      * @return TokenStorageInterface&MockObject
      */
-    private function mockStorage(): TokenStorageInterface
+    private function mockStorage(): TokenStorageInterface&MockObject
     {
         if ($this->mockStorageMock === null) {
             $this->mockStorageMock = $this->createMock(TokenStorageInterface::class);
@@ -132,7 +132,7 @@ class TokenManagerTest extends TestCase
     /**
      * @return AuthHandlerInterface&MockObject
      */
-    private function mockAuthHandler(): AuthHandlerInterface
+    private function mockAuthHandler(): AuthHandlerInterface&MockObject
     {
         if ($this->mockAuthHandlerMock === null) {
             $this->mockAuthHandlerMock = $this->createMock(AuthHandlerInterface::class);
