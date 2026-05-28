@@ -35,7 +35,7 @@ class AsanaClientTest extends TestCase
         $this->container = new ServiceContainer();
         $this->container->set(LoggerInterface::class, new NullLogger());
 
-        $this->storage = $this->createStub(TokenStorageInterface::class);
+        $this->storage = $this->createMock(TokenStorageInterface::class);
         $this->container->set(TokenStorageInterface::class, $this->storage);
 
         $this->authHandler = $this->createStub(AuthHandlerInterface::class);
@@ -147,6 +147,40 @@ class AsanaClientTest extends TestCase
 
         $this->client->setAccessToken($oldToken);
 
+        $this->client->refreshToken();
+
+        $this->assertSame('new', $this->client->getAccessToken()->getToken());
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function testRefreshTokenSavesToStorage(): void
+    {
+        $oldToken = new AccessToken(['access_token' => 'old', 'refresh_token' => 'ref', 'expires' => time() - 10]);
+        $newTokenData = ['access_token' => 'new', 'expires' => time() + 3600];
+        $newToken = new AccessToken($newTokenData);
+
+        // Expect the storage to be called with the new token data during refresh
+        // It is called twice: once for setAccessToken() and once for refreshToken()
+        $this->storage->expects($this->exactly(2))
+            ->method('save')
+            ->with($this->callback(function ($tokenData) {
+                static $count = 0;
+                $count++;
+                if ($count === 1) {
+                    return $tokenData['access_token'] === 'old';
+                }
+                return $tokenData['access_token'] === 'new';
+            }));
+
+        $this->mockAuthHandler()
+            ->expects($this->once())
+            ->method('refreshToken')
+            ->willReturn($newToken);
+
+        $this->client->setAccessToken($oldToken);
         $this->client->refreshToken();
 
         $this->assertSame('new', $this->client->getAccessToken()->getToken());

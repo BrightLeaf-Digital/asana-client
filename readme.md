@@ -225,122 +225,55 @@ $me = $client->users()->getCurrentUser();
 
 ### Token Management and Storage Options
 
-The `handleCallback()` method returns an array that contains the token itself, which expires in an hour; the timestamp 
-of expiry; a refresh token you can use to get a new access token; and some additional metadata.
+The `handleCallback()` method returns an `AccessToken` object, which contains the token itself, its expiry, and a refresh token.
 
-This library provides flexibility in how you manage and store tokens. By default, the `saveToken`, `loadToken` and
-`retrieveToken` methods offer a simple way for beginners to securely save tokens for future use. However, advanced users have full 
-control over token handling and can store their tokens wherever and however they see fit.
+This library provides flexibility in how you manage and store tokens. By default, tokens are automatically persisted to a `token.json` file in your current working directory.
 
 #### Built-In Token Storage
 
-> ⚠️ **IMPORTANT SECURITY WARNING**: The `CryptoUtils` class are designed for 
-**local development environments only** and are not recommended for production use. For production applications, please 
-use a vetted security library or a secure credential management service.
+The library uses a `TokenManager` to handle the token lifecycle. When you initialize the client using a static factory method, you can specify how tokens should be stored.
 
-The library provides several methods to manage and persist OAuth tokens. These methods are useful 
-for developers looking for a quick and simple way to handle token storage without having to implement custom logic 
-from scratch. They are intended for development settings to provide developers with an easy way to store tokens and explore
-the library. In production environments more secure methods should be used.
-
-1. **`saveToken`**: Encrypts and stores the current token securely to file storage (default: `token.json` in the working directory).
-This ensures sensitive fields like `access_token` and `refresh_token` are safely stored in encrypted form.
-2. **`loadToken`**: Reads the encrypted token from storage, decrypts it, and initializes the client for further use. 
-If no token is available or decryption fails, the process gracefully returns with a failure.
-3. **`retrieveToken`**: Similar to `loadToken`, this static method provides a convenient way to securely load and 
-decrypt a stored token **outside the context of an instantiated client**.
-
->The password you supply to the CryptoUtils::encrypt and decrypt methods should be a regular string password or 
-passphrase, not a pre-generated encryption key or binary blob. You can use a strong passphrase (e.g., 
-'my-long-dev-password') or store a more complex string (like one from a password manager) in your .env file. This value 
-is run through PBKDF2 key derivation with a salt and never used directly as a raw encryption key.
-
-The library's default methods use encryption to protect sensitive fields during storage,
-ensuring that tokens are not left exposed in plaintext. Developers still need to safeguard passwords and token files to maintain security.
-
+1.  **Default File Storage**: If no storage is specified, it defaults to `./token.json`.
+2.  **Custom File Path**: Pass a string path to use `FileTokenStorage` at that location.
+3.  **In-Memory Storage**: Pass `false` to use `MemoryTokenStorage` (no disk writes).
+4.  **Custom Implementation**: Pass a `TokenStorageInterface` instance.
 
 ##### **Automatic Token Refresh Support**
-One major improvement in the library is the ability to automatically handle token refreshes and trigger callbacks when 
-a token is refreshed. This ensures that tokens remain valid without manual intervention, and any changes to the token 
-(after refreshing) are propagated to persistent storage.
+
+The library **automatically handles token refreshes**. When a token expires, the client will:
+1.  Request a new token from Asana.
+2.  **Automatically save** it to your configured storage (e.g., update the `token.json` file).
+3.  Notify any subscribers.
 
 ```php
 use BrightleafDigital\AsanaClient;
 
-$salt = 'your-secure-salt';
+// Initialize the client (automatically loads/saves to token.json)
+$asanaClient = AsanaClient::OAuth($clientId, $clientSecret, $redirectUri, __DIR__ . '/token.json', null, $salt);
 
-// Initialize the client with a stored token
-$asanaClient = AsanaClient::withAccessToken('client-id', 'client-secret', AsanaClient::retrieveToken($salt));
-
-// Subscribe to the 'token refreshed' event
-$asanaClient->onTokenRefresh(function (array $token) use ($asanaClient, $salt) {
-    // Save the refreshed token securely
-    $asanaClient->saveToken($salt);
-
-    // Optional: Log or process the refreshed token
+// Optional: Subscribe to refresh events for additional logging or custom logic
+$asanaClient->subscribeToTokenRefresh(function ($newToken) {
+    // Note: You DON'T need to call save() here; the library already did it!
     echo "Token refreshed successfully!";
 });
 
 // Example API call that triggers a token refresh if the token is expired
-$userInfo = $asanaClient->users()->me();
+$userInfo = $asanaClient->users()->getCurrentUser();
 ```
-
-- The library **automatically refreshes tokens** when they expire, ensuring uninterrupted API access.
-- Developers can subscribe to the **token refresh event** by registering a callback through the `onTokenRefresh` method.
-- The callback receives the refreshed token data as a parameter, allowing developers to persist or process the 
-updated token as needed.
-- You can still refresh the token manually if ever required with the `refreshToken` method.
 
 #### **Flexible Token Handling for Advanced Users**
-While the library provides the `saveToken`, `loadToken`, and `retrieveToken` methods for built-in token handling, 
-advanced users can (and should) bypass these methods entirely and manage tokens themselves. 
-1. Retrieve tokens directly using `$client->getAccessToken()` or upon refresh with `$asanaClient->onTokenRefresh()`.
-2. Encrypt tokens using production grade libraries.
-3. Store tokens using external methods or third-party services (e.g., databases, cloud secrets management services, etc.).
+
+Advanced users can bypass the built-in storage by implementing `TokenStorageInterface` or by using memory storage (`false`) combined with `subscribeToTokenRefresh()` to handle their own persistence (e.g., to a database).
 
 ```php
-use BrightleafDigital\AsanaClient;
-use BrightleafDigital\Utils\CryptoUtils;
+// Use memory storage (false) so no files are written
+$client = AsanaClient::withAccessToken($clientId, $clientSecret, $tokenData, false);
 
-// Retrieve the access token for custom handling
-$tokenArray = $asanaClient->getAccessToken();
-
-// Encrypt the token manually
-$password = 'your-password';
-$encryptedToken = CryptoUtils::encrypt(json_encode($tokenArray), $password); // or just encrypt $tokenArray['access_token'] and $tokenArray['refresh_token']
-
-// Store the encrypted token in a database or a secure location
-storeTokenInDatabase($encryptedToken);
-
-// Later: Load and decrypt the token
-$storedToken = retrieveTokenFromDatabase();
-$tokenData = json_decode(CryptoUtils::decrypt($storedToken, $password), true);
-
-// Initialize the client with the decrypted token
-$asanaClient = AsanaClient::withAccessToken('client-id', 'client-secret', $tokenData);
+// Subscribe to refresh events to keep your DB in sync
+$client->subscribeToTokenRefresh(function($newToken) use ($db) {
+    $db->update('users')->set(['token' => json_encode($newToken)])->execute();
+});
 ```
-
-#### **Security Best Practices**
-When using token storage methods:
-1. The token storage file (`token.json`  by default) should have restricted access permissions (e.g., `chmod 600`). 
-2. If possible, store sensitive credential files (like `token.json`) in secure locations outside your project directory 
-or source control.
-3. While your password is meant to be a human-memorable password or passphrase, not a random key or binary blob you still
-should keep it safe as an environment variable outside version control. 
-
-#### **Summary of Token Management Methods**
-
-| Method           | Description                                                                                  | Primary Use Case                         |
-|------------------|----------------------------------------------------------------------------------------------|------------------------------------------|
-| `saveToken`      | Encrypts and saves the current token to a file.                                              | Beginner-friendly token storage.         |
-| `loadToken`      | Decrypts and loads the token from storage into the client.                                   | Quick token initialization.              |
-| `retrieveToken`  | Static utility to securely load and decrypt tokens for external use.                         | Advanced workflows requiring raw tokens. |
-| `onTokenRefresh` | Register a callback to handle token updates after an automatic refresh.                      | Keeping persistent storage up-to-date.   |
-| `getAccessToken` | Directly retrieves the current token in its raw array format for manual handling or storage. | Custom storage workflows.                |
-
-
-If `loadToken()` or `retrieveToken()` fails (e.g., corrupt/missing token file, incorrect password), they return `false` 
-or throw an exception. Use this behavior to handle missing tokens gracefully and re-run your OAuth flows if needed.
 
 ### Examples
 More examples are available in the `examples` folder, including:

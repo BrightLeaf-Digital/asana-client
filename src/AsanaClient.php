@@ -56,6 +56,7 @@ use BrightleafDigital\Container\ServiceContainer;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Storage\FileTokenStorage;
+use BrightleafDigital\Storage\MemoryTokenStorage;
 use BrightleafDigital\Storage\TokenStorageInterface;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Container\ContainerExceptionInterface;
@@ -88,7 +89,7 @@ class AsanaClient implements AsanaClientInterface
      * @param string|null $clientId
      * @param string|null $clientSecret
      * @param string|null $redirectUri
-     * @param string|null $tokenStoragePath
+     * @param string|TokenStorageInterface|bool|null $tokenStorage
      * @param LoggerInterface|null $logger
      * @param string|null $salt Optional salt/password for encrypting tokens.
      *
@@ -98,7 +99,7 @@ class AsanaClient implements AsanaClientInterface
         ?string $clientId = null,
         ?string $clientSecret = null,
         ?string $redirectUri = null,
-        ?string $tokenStoragePath = null,
+        string|TokenStorageInterface|bool|null $tokenStorage = null,
         ?LoggerInterface $logger = null,
         ?string $salt = null
     ): self {
@@ -106,8 +107,14 @@ class AsanaClient implements AsanaClientInterface
         $logger = $logger ?? new NullLogger();
         $container->set(LoggerInterface::class, $logger);
 
-        $path = $tokenStoragePath ?? getcwd() . '/token.json';
-        $container->set(TokenStorageInterface::class, new FileTokenStorage($path, $salt));
+        if ($tokenStorage instanceof TokenStorageInterface) {
+            $container->set(TokenStorageInterface::class, $tokenStorage);
+        } elseif ($tokenStorage === false) {
+            $container->set(TokenStorageInterface::class, new MemoryTokenStorage());
+        } else {
+            $path = $tokenStorage ?? getcwd() . '/token.json';
+            $container->set(TokenStorageInterface::class, new FileTokenStorage($path, $salt));
+        }
 
         if ($clientId && $clientSecret) {
             $container->set(
@@ -139,9 +146,10 @@ class AsanaClient implements AsanaClientInterface
 
     /**
      * Bootstraps a default AsanaClient with a Personal Access Token (PAT).
+     * The token will be automatically saved to the configured storage.
      *
      * @param string $personalAccessToken The Personal Access Token (PAT) to use for authentication.
-     * @param string|null $tokenStoragePath Optional path to store the token securely.
+     * @param string|TokenStorageInterface|bool|null $tokenStorage
      * @param LoggerInterface|null $logger Optional logger instance for logging.
      * @param string|null $salt Optional salt for token storage encryption.
      *
@@ -151,11 +159,11 @@ class AsanaClient implements AsanaClientInterface
      */
     public static function withPAT(
         string $personalAccessToken,
-        ?string $tokenStoragePath = null,
+        string|TokenStorageInterface|bool|null $tokenStorage = null,
         ?LoggerInterface $logger = null,
         ?string $salt = null
     ): self {
-        $client = self::OAuth(null, null, null, $tokenStoragePath, $logger, $salt);
+        $client = self::OAuth(null, null, null, $tokenStorage, $logger, $salt);
         $tokenManager = $client->getContainer()->get(TokenManager::class);
         $tokenManager->setAccessToken(new AccessToken(['access_token' => $personalAccessToken]));
         return $client;
@@ -163,11 +171,12 @@ class AsanaClient implements AsanaClientInterface
 
     /**
      * Bootstraps a default AsanaClient with an existing access token.
+     * The token will be automatically saved to the configured storage.
      *
      * @param string $clientId The client ID for the OAuth application.
      * @param string $clientSecret The client secret for the OAuth application.
      * @param array $token The access token to use for authentication.
-     * @param string|null $tokenStoragePath Optional path to store the token securely.
+     * @param string|TokenStorageInterface|bool|null $tokenStorage
      * @param LoggerInterface|null $logger Optional logger instance for logging.
      * @param string|null $salt Optional salt for token storage encryption.
      *
@@ -179,11 +188,11 @@ class AsanaClient implements AsanaClientInterface
         string $clientId,
         string $clientSecret,
         array $token,
-        ?string $tokenStoragePath = null,
+        string|TokenStorageInterface|bool|null $tokenStorage = null,
         ?LoggerInterface $logger = null,
         ?string $salt = null
     ): self {
-        $client = self::OAuth($clientId, $clientSecret, '', $tokenStoragePath, $logger, $salt);
+        $client = self::OAuth($clientId, $clientSecret, '', $tokenStorage, $logger, $salt);
         $tokenManager = $client->getContainer()->get(TokenManager::class);
         $tokenManager->setAccessToken(new AccessToken($token));
         return $client;

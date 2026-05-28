@@ -18,11 +18,6 @@ $salt         = $_ENV['SALT'] ?? ($_ENV['PASSWORD'] ?? null);
 
 $asanaClient = AsanaClient::OAuth($clientId, $clientSecret, $redirectUri, __DIR__ . '/token.json', null, $salt);
 
-$asanaClient->subscribeToTokenRefresh(function ($token) use ($asanaClient) {
-    $asanaClient->getContainer()
-        ->get(TokenStorageInterface::class)
-        ->save($token->jsonSerialize());
-});
 
 
 
