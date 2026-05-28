@@ -46,6 +46,12 @@ class Scopes
      */
     public const GOALS_READ = 'goals:read';
 
+    /**
+     * - POST /goals/{goal_gid}/addCustomFieldSetting
+     * - POST /goals/{goal_gid}/removeCustomFieldSetting
+     */
+    public const GOALS_WRITE = 'goals:write';
+
     // 🔹 Jobs
     /**
      * GET /jobs/{job_gid}
@@ -160,6 +166,11 @@ class Scopes
 
     // 🔹 Stories
     /**
+     * DELETE /stories/{story_gid}
+     */
+    public const STORIES_DELETE = 'stories:delete';
+
+    /**
      * - GET /stories/{story_gid}
      * - GET /tasks/{task_gid}/stories
      */
@@ -192,6 +203,13 @@ class Scopes
      * - GET /task_templates/{task_template_gid}
      */
     public const TASK_TEMPLATES_READ = 'task_templates:read';
+
+    // 🔹 Project Sections
+    /**
+     * Field-level scope for the `memberships` field on tasks.
+     * Required alongside `projects:read` to access task membership data.
+     */
+    public const PROJECT_SECTIONS_READ = 'project_sections:read';
 
     // 🔹 Tasks
     /**
@@ -274,6 +292,14 @@ class Scopes
      */
     public const TIME_TRACKING_CATEGORIES_WRITE = 'time_tracking_categories:write';
 
+    // 🔹 Time Periods
+    /**
+     * Field-level scope to access the `time_period` field on goals and the full TimePeriod object.
+     * - GET /time_periods/{time_period_gid}
+     * - GET /time_periods
+     */
+    public const TIME_PERIODS_READ = 'time_periods:read';
+
     /**
      * 🔹Time tracking entries
      * - GET /tasks/{task_gid}/time_tracking_entries
@@ -299,7 +325,7 @@ class Scopes
      * 🔹 Typeahead
      * GET /workspaces/{workspace_gid}/typeahead
      */
-    public const WORKSPACE_TYPEAHEAD_READ = 'workspace.typeahead:read';
+    public const WORKSPACE_TYPEAHEAD_READ = 'workspaces.typeahead:read';
 
     /**
      * 🔹 Users

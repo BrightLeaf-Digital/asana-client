@@ -152,7 +152,7 @@ class ScopesTest extends TestCase
      */
     public function testWorkspaceTypeaheadScopes(): void
     {
-        $this->assertSame('workspace.typeahead:read', Scopes::WORKSPACE_TYPEAHEAD_READ);
+        $this->assertSame('workspaces.typeahead:read', Scopes::WORKSPACE_TYPEAHEAD_READ);
     }
 
     /**
