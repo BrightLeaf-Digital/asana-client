@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## v0.2.3 - 2026-05-28
+
+### Added
+- add MemoryTokenStorage with unit tests and update AsanaClient for flexible token storage options (6f58a40)
+
+### Chore
+- update mock definitions and refactor setup in AsanaClientTest for streamlined configuration (8c32dec)
+
+
 ## v0.2.2 - 2026-05-25
 
 ### Chore
