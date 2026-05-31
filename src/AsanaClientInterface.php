@@ -2,6 +2,7 @@
 
 namespace BrightleafDigital;
 
+use BrightleafDigital\Api\AgentApiService;
 use BrightleafDigital\Api\AllocationsApiService;
 use BrightleafDigital\Api\AuditLogApiService;
 use BrightleafDigital\Api\BudgetsApiService;
@@ -116,6 +117,17 @@ interface AsanaClientInterface
      * @return string
      */
     public function handleHandshake(array $headers): string;
+    /**
+     * @param string $flag
+     * @return static
+     */
+    public function enableFeatureFlag(string $flag): static;
+
+    /**
+     * @return AgentApiService
+     */
+    public function agents(): AgentApiService;
+
     /**
      * @return TaskApiService
      */

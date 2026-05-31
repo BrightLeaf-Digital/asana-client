@@ -2,6 +2,7 @@
 
 namespace BrightleafDigital;
 
+use BrightleafDigital\Api\AgentApiService;
 use BrightleafDigital\Api\AllocationsApiService;
 use BrightleafDigital\Api\AuditLogApiService;
 use BrightleafDigital\Api\BudgetsApiService;
@@ -201,6 +202,7 @@ class AsanaClient implements AsanaClientInterface
     private static function registerServices(ServiceContainer $container): void
     {
         $services = [
+            AgentApiService::class,
             TaskApiService::class,
             AllocationsApiService::class,
             AuditLogApiService::class,
@@ -266,6 +268,15 @@ class AsanaClient implements AsanaClientInterface
     }
 
     // --- Service Accessors ---
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function agents(): AgentApiService
+    {
+        return $this->container->get(AgentApiService::class);
+    }
 
     /**
      * @throws ContainerExceptionInterface
@@ -688,6 +699,23 @@ class AsanaClient implements AsanaClientInterface
     public function projectPortfolioSettings(): ProjectPortfolioSettingsApiService
     {
         return $this->container->get(ProjectPortfolioSettingsApiService::class);
+    }
+
+    // --- Feature Flags ---
+
+    /**
+     * Enable an Asana feature flag sent via the Asana-Enable header on every request.
+     * Required for early-access features such as AI Teammates (ai_teammate_actors).
+     *
+     * @param string $flag The feature flag value (e.g., 'ai_teammate_actors').
+     * @return $this
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function enableFeatureFlag(string $flag): static
+    {
+        $this->container->get(HttpClientInterface::class)->enableFeatureFlag($flag);
+        return $this;
     }
 
     // --- Authentication & Helper Methods ---

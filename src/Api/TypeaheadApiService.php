@@ -22,11 +22,15 @@ class TypeaheadApiService extends BaseApiService
      *
      * @param string $workspaceGid Globally unique identifier for the workspace.
      * @param array $options Optional parameters to customize the request:
-     * - resource_type (string, required): The type of values the typeahead should return.
+     * - resource_type (string): The type of values the typeahead should return.
      *   (custom_field, goal, project, project_template, portfolio, tag, task, team, user)
-     * - type (string): Deprecated, use resource_type instead.
+     *   Required unless `type` is provided.
+     * - type (string): Use instead of resource_type for agent searches.
+     *   New values: "actor" (users + agents), "agent" (agents only).
+     *   Requires the Asana-Enable: ai_teammate_actors feature flag for agent/actor values.
+     *   Other values are deprecated in favour of resource_type.
      * - query (string): The string to search for.
-     * - count (int): The number of results to return. The 1-100, default 20.
+     * - count (int): The number of results to return (1–100, default 20).
      * - opt_fields (string): Comma-separated list of fields.
      * - opt_pretty (bool): Pretty JSON.
      * @param int $responseType The type of response to return.
@@ -34,7 +38,7 @@ class TypeaheadApiService extends BaseApiService
      * @return array The response data.
      * @throws ApiException
      * @throws RateLimitException
-     * @throws ValidationException If workspace GID is empty.
+     * @throws ValidationException If workspace GID is empty or neither resource_type nor type is provided.
      */
     public function typeaheadForWorkspace(
         string $workspaceGid,
@@ -42,7 +46,7 @@ class TypeaheadApiService extends BaseApiService
         int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
         $this->validateGid($workspaceGid, 'Workspace GID');
-        $this->validateRequiredFields($options, ['resource_type'], 'Typeahead for workspace');
+        $this->validateAtLeastOneField($options, ['resource_type', 'type'], 'Typeahead for workspace');
         return $this->client->request(
             'GET',
             "workspaces/$workspaceGid/typeahead",

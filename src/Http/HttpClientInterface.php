@@ -35,4 +35,13 @@ interface HttpClientInterface
         array $options = [],
         int $responseType = self::RESPONSE_DATA
     ): array;
+
+    /**
+     * Enable an Asana feature flag sent via the Asana-Enable request header.
+     * Required for early-access features such as AI Teammates (ai_teammate_actors).
+     *
+     * @param string $flag The feature flag value (e.g., 'ai_teammate_actors').
+     * @return static
+     */
+    public function enableFeatureFlag(string $flag): static;
 }

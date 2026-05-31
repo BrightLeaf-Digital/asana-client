@@ -39,4 +39,50 @@ class TypeaheadApiServiceTest extends TestCase
         $actual = $this->service->typeaheadForWorkspace($workspaceGid, $options);
         $this->assertSame($expected, $actual);
     }
+
+    public function testTypeaheadForWorkspaceWithAgentType(): void
+    {
+        $workspaceGid = '12345';
+        $options = ['type' => 'agent', 'query' => 'my bot'];
+        $expected = ['data' => []];
+
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                "workspaces/$workspaceGid/typeahead",
+                ['query' => $options],
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn($expected);
+
+        $actual = $this->service->typeaheadForWorkspace($workspaceGid, $options);
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testTypeaheadForWorkspaceWithActorType(): void
+    {
+        $workspaceGid = '12345';
+        $options = ['type' => 'actor', 'query' => 'assignee'];
+        $expected = ['data' => []];
+
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                "workspaces/$workspaceGid/typeahead",
+                ['query' => $options],
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn($expected);
+
+        $actual = $this->service->typeaheadForWorkspace($workspaceGid, $options);
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testTypeaheadForWorkspaceThrowsWhenNeitherResourceTypeNorTypeProvided(): void
+    {
+        $this->expectException(\BrightleafDigital\Exceptions\ValidationException::class);
+        $this->service->typeaheadForWorkspace('12345', ['query' => 'test']);
+    }
 }

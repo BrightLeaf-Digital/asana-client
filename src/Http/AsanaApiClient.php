@@ -61,6 +61,12 @@ class AsanaApiClient implements HttpClientInterface
     private int $maxLogBodyLength;
 
     /**
+     * Asana feature flags to include in every request via the Asana-Enable header.
+     * @var string[]
+     */
+    private array $featureFlags = [];
+
+    /**
      * Creates a new Asana API client instance.
      * @param callable $tokenProvider Callable that returns the current access token
      * @param LoggerInterface|null $logger PSR-3 compatible logger instance
@@ -83,6 +89,9 @@ class AsanaApiClient implements HttpClientInterface
             return function (RequestInterface $request, array $options) use ($handler) {
                 $token = ($this->tokenProvider)();
                 $request = $request->withHeader('Authorization', 'Bearer ' . $token);
+                if (!empty($this->featureFlags)) {
+                    $request = $request->withHeader('Asana-Enable', implode(',', $this->featureFlags));
+                }
                 return $handler($request, $options);
             };
         }, 'asana_auth');
@@ -369,6 +378,17 @@ class AsanaApiClient implements HttpClientInterface
         }
 
         return $sanitized;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function enableFeatureFlag(string $flag): static
+    {
+        if (!in_array($flag, $this->featureFlags, true)) {
+            $this->featureFlags[] = $flag;
+        }
+        return $this;
     }
 
     /**

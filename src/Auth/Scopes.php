@@ -4,6 +4,13 @@ namespace BrightleafDigital\Auth;
 
 class Scopes
 {
+    // 🔹 Agents (AI Teammates)
+    /**
+     * - GET /workspaces/{workspace_gid}/agents
+     * - GET /agents/{agent_gid}
+     */
+    public const AGENTS_READ = 'agents:read';
+
     // 🔹 Attachments
 
     /**
