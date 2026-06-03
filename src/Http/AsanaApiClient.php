@@ -170,29 +170,22 @@ class AsanaApiClient implements HttpClientInterface
                 'response' => $this->truncateResponseBody((string) $response->getBody()),
             ]);
 
-            switch ($responseType) {
-                case self::RESPONSE_FULL:
-                    return [
-                        'status' => $response->getStatusCode(),
-                        'reason' => $response->getReasonPhrase(),
-                        'headers' => $response->getHeaders(),
-                        'body' => $decodedBody,
-                        'raw_body' => (string)$response->getBody(),
-                        'request' => [
-                            'method' => $method,
-                            'uri' => $uri,
-                            'options' => $this->sanitizeOptions($options),
-                        ],
-                    ];
-
-                case self::RESPONSE_NORMAL:
-                    return $decodedBody;
-
-                case self::RESPONSE_DATA:
-                default:
-                    // Return just the data subset if it exists, otherwise return the full decoded body
-                    return $decodedBody['data'] ?? $decodedBody;
-            }
+            return match ($responseType) {
+                self::RESPONSE_FULL => [
+                    'status' => $response->getStatusCode(),
+                    'reason' => $response->getReasonPhrase(),
+                    'headers' => $response->getHeaders(),
+                    'body' => $decodedBody,
+                    'raw_body' => (string)$response->getBody(),
+                    'request' => [
+                        'method' => $method,
+                        'uri' => $uri,
+                        'options' => $this->sanitizeOptions($options),
+                    ],
+                ],
+                self::RESPONSE_NORMAL => $decodedBody,
+                default => $decodedBody['data'] ?? $decodedBody,
+            };
         } catch (GuzzleException $e) {
             return $this->handleGuzzleException($e, $method, $uri, $options, $responseType, $retryCount);
         }
