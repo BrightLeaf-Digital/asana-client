@@ -5,6 +5,7 @@ namespace BrightleafDigital\Api;
 use BrightleafDigital\Exceptions\ValidationException;
 use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Exceptions\ApiException;
+use BrightleafDigital\Exceptions\RateLimitException;
 
 class StatusUpdatesApiService extends BaseApiService
 {
@@ -53,6 +54,7 @@ class StatusUpdatesApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getStatusUpdate(
         string $statusUpdateGid,
@@ -99,6 +101,7 @@ class StatusUpdatesApiService extends BaseApiService
      * - Insufficient permissions to delete the status update
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException
      */
     public function deleteStatusUpdate(
         string $statusUpdateGid,
@@ -156,6 +159,7 @@ class StatusUpdatesApiService extends BaseApiService
      * - Just the data array containing the list of status updates
      * @throws ApiException|ValidationException If invalid parent GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getStatusUpdatesForObject(
         string $parentGid,
@@ -218,6 +222,7 @@ class StatusUpdatesApiService extends BaseApiService
      * - Just the data object containing the created status update details
      * @throws ValidationException If required fields (parent, text, status_type) are missing
      * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function createStatusUpdate(
         array $data,

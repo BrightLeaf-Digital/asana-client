@@ -4,6 +4,7 @@ namespace BrightleafDigital\Api;
 
 use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Exceptions\ApiException;
+use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
@@ -72,6 +73,7 @@ class BatchApiService extends BaseApiService
      * @throws ValidationException If actions array is empty or actions are missing
      *                                  required fields (relative_path, method)
      * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function createBatchRequest(
         array $actions,

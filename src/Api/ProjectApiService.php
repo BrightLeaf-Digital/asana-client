@@ -72,6 +72,7 @@ class ProjectApiService extends BaseApiService
      * - Insufficient permissions
      * - Rate limiting
      * - Network connectivity issues
+     * @throws RateLimitException
      */
     public function getProjects(
         ?string $workspace = null,
@@ -167,6 +168,7 @@ class ProjectApiService extends BaseApiService
      * - Insufficient permissions
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException
      */
     public function createProject(
         array $data,
@@ -233,6 +235,7 @@ class ProjectApiService extends BaseApiService
      * @throws ApiException If the API request fails due to invalid project GID, insufficient permissions,
      *                          network issues, or rate limiting occurs
      * @throws ValidationException If project GID is empty
+     * @throws RateLimitException
      */
     public function getProject(
         string $projectGid,
@@ -313,6 +316,7 @@ class ProjectApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid project GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
      */
     public function updateProject(
         string $projectGid,
@@ -358,12 +362,14 @@ class ProjectApiService extends BaseApiService
      *
      * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data object (empty JSON object {}) indicating successful deletion
-     * @throws ApiException|ValidationException If the API request fails due to:*@throws ValidationException
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid project GID
      * - Insufficient permissions to delete the project
      * - Network connectivity issues
      * - Rate limiting
+     * @throws ValidationException
+     * @throws RateLimitException
      */
     public function deleteProject(string $projectGid, int $responseType = HttpClientInterface::RESPONSE_DATA): array
     {
@@ -423,6 +429,7 @@ class ProjectApiService extends BaseApiService
      * - new_project: Object containing the new project details once duplication is complete
      * @throws ApiException|ValidationException If the API request fails due to invalid project GID, malformed data,
      *                          insufficient permissions, network issues, or rate limiting
+     * @throws RateLimitException
      */
     public function duplicateProject(
         string $projectGid,
@@ -494,6 +501,7 @@ class ProjectApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid task GID provided, permission errors,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getProjectsForTask(
         string $taskGid,
@@ -562,6 +570,7 @@ class ProjectApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid team GID provided, permission errors,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getProjectsForTeam(
         string $teamGid,
@@ -640,6 +649,7 @@ class ProjectApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid team GID provided, missing required fields,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
      */
     public function createProjectInTeam(
         string $teamGid,
@@ -712,6 +722,7 @@ class ProjectApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid workspace GID provided, permission errors,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getProjectsForWorkspace(
         string $workspaceGid,
@@ -788,6 +799,7 @@ class ProjectApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid workspace GID provided, missing required fields,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
      */
     public function createProjectInWorkspace(
         string $workspaceGid,
@@ -855,6 +867,7 @@ class ProjectApiService extends BaseApiService
      * - project: Object containing project details
      * @throws ApiException|ValidationException If invalid project GID provided, invalid custom field GID,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
      */
     public function addCustomFieldToProject(
         string $projectGid,
@@ -910,6 +923,7 @@ class ProjectApiService extends BaseApiService
      * - Just the data object (empty JSON object {}) indicating successful removal
      * @throws ApiException|ValidationException If invalid project GID provided, invalid custom field GID,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
      */
     public function removeCustomFieldFromProject(
         string $projectGid,
@@ -979,6 +993,7 @@ class ProjectApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid project GID provided, permission errors,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getCustomFieldsForProject(
         string $projectGid,
@@ -1044,6 +1059,7 @@ class ProjectApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid project GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getTaskCountsForProject(
         string $projectGid,
@@ -1104,6 +1120,7 @@ class ProjectApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid project GID provided, invalid user GIDs,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
      */
     public function addMembersToProject(
         string $projectGid,
@@ -1170,6 +1187,7 @@ class ProjectApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid project GID provided, invalid user GIDs,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
      */
     public function removeMembersFromProject(
         string $projectGid,
@@ -1235,6 +1253,7 @@ class ProjectApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid project GID provided, invalid user GIDs,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
      */
     public function addFollowersToProject(
         string $projectGid,
@@ -1300,6 +1319,7 @@ class ProjectApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid project GID provided, invalid user GIDs,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
      */
     public function removeFollowersFromProject(
         string $projectGid,
@@ -1374,6 +1394,7 @@ class ProjectApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid project GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function createProjectTemplateFromProject(
         string $projectGid,

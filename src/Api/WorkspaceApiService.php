@@ -50,6 +50,7 @@ class WorkspaceApiService extends BaseApiService
      *                 Additional fields as specified in opt_fields
      *
      * @throws ApiException If permission errors, network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getWorkspaces(array $options = [], int $responseType = HttpClientInterface::RESPONSE_DATA): array
     {
@@ -101,6 +102,7 @@ class WorkspaceApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid workspace GID provided, permission errors,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getWorkspace(
         string $workspaceGid,
@@ -160,6 +162,7 @@ class WorkspaceApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid workspace GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
      */
     public function updateWorkspace(
         string $workspaceGid,

@@ -78,6 +78,7 @@ class TaskApiService extends BaseApiService
      * - Insufficient permissions
      * - Rate limiting
      * - Network connectivity issues
+     * @throws RateLimitException
      */
     public function getTasks(array $options, int $responseType = HttpClientInterface::RESPONSE_DATA): array
     {
@@ -154,6 +155,7 @@ class TaskApiService extends BaseApiService
      * - Insufficient permissions
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException
      */
     public function createTask(
         array $data,
@@ -220,6 +222,7 @@ class TaskApiService extends BaseApiService
      * @throws ApiException If invalid task GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
      * @throws ValidationException If task GID is empty
+     * @throws RateLimitException
      */
     public function getTask(
         string $taskGid,
@@ -300,6 +303,7 @@ class TaskApiService extends BaseApiService
      * @throws ApiException If invalid task GID provided, malformed data,
      *                         insufficient permissions, or network issues occur
      * @throws ValidationException If task GID is empty
+     * @throws RateLimitException
      */
     public function updateTask(
         string $taskGid,
@@ -351,6 +355,7 @@ class TaskApiService extends BaseApiService
      * - Network connectivity issues
      * - Rate limiting
      * @throws ValidationException If task GID is empty
+     * @throws RateLimitException
      */
     public function deleteTask(string $taskGid, int $responseType = HttpClientInterface::RESPONSE_DATA): array
     {
@@ -1841,6 +1846,7 @@ class TaskApiService extends BaseApiService
      *
      * @throws ApiException If the API request fails.
      * @throws ValidationException
+     * @throws RateLimitException
      */
     public function reassignTask(
         string $taskGid,
@@ -1902,6 +1908,7 @@ class TaskApiService extends BaseApiService
      *
      * @throws ApiException If the API request fails due to connectivity issues or invalid query parameters.
      * @throws ValidationException
+     * @throws RateLimitException
      */
     public function getOverdueTasks(
         string $workspaceGid,

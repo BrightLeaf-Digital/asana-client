@@ -228,6 +228,7 @@ class GoalsApiService extends BaseApiService
      *                 Additional fields as specified in opt_fields
      *
      * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getGoals(
         array $options = [],
@@ -292,6 +293,7 @@ class GoalsApiService extends BaseApiService
      * - Insufficient permissions
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException
      */
     public function createGoal(
         array $data,

@@ -46,6 +46,7 @@ class AttachmentApiService extends BaseApiService
      * - Just the data object containing the attachment details
      * @throws ApiException If the API request fails due to invalid attachment GID,
      *                          insufficient permissions, network issues, or rate limiting
+     * @throws RateLimitException If the rate limit is exceeded and retries are exhausted
      * @throws ValidationException If attachment GID is empty or not numeric
      */
     public function getAttachment(
@@ -94,6 +95,7 @@ class AttachmentApiService extends BaseApiService
      * - Insufficient permissions to delete the attachment
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException If the rate limit is exceeded and retries are exhausted
      * @throws ValidationException If attachment GID is empty or not numeric
      */
     public function deleteAttachment(
@@ -193,6 +195,7 @@ class AttachmentApiService extends BaseApiService
      * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException If parent GID is empty or not numeric
+     * @throws RuntimeException If the file does not exist or is not readable
      */
     public function uploadAttachment(
         string $parentGid,
@@ -268,6 +271,7 @@ class AttachmentApiService extends BaseApiService
      * @throws ApiException
      * @throws RateLimitException
      * @throws ValidationException If parent GID is empty or not numeric
+     * @throws RuntimeException If the temporary stream cannot be created or written to
      */
     public function uploadAttachmentFromContents(
         string $parentGid,

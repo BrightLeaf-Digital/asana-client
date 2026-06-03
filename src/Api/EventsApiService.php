@@ -72,6 +72,7 @@ class EventsApiService extends BaseApiService
      * @throws ValidationException If the resource GID is empty or not numeric
      * @throws ApiException If the sync token is invalid/expired (412 Precondition Failed),
      *                          insufficient permissions, network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getEvents(
         string $resourceGid,

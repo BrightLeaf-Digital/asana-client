@@ -71,6 +71,7 @@ class MembershipApiService extends BaseApiService
      * - Insufficient permissions
      * - Rate limiting
      * - Network connectivity issues
+     * @throws RateLimitException
      */
     public function getMemberships(array $options = [], int $responseType = HttpClientInterface::RESPONSE_DATA): array
     {
@@ -139,6 +140,7 @@ class MembershipApiService extends BaseApiService
      * - Insufficient permissions
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException
      */
     public function createMembership(
         array $data,

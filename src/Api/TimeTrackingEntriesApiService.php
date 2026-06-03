@@ -51,6 +51,7 @@ class TimeTrackingEntriesApiService extends BaseApiService
      * - Just the data array containing the list of time tracking entries
      * @throws ApiException|ValidationException If invalid task GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getTimeTrackingEntriesForTask(
         string $taskGid,
@@ -188,6 +189,7 @@ class TimeTrackingEntriesApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getTimeTrackingEntry(
         string $timeTrackingEntryGid,
@@ -247,6 +249,7 @@ class TimeTrackingEntriesApiService extends BaseApiService
      * - Just the data object containing the updated entry details
      * @throws ApiException|ValidationException If invalid GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
      */
     public function updateTimeTrackingEntry(
         string $timeTrackingEntryGid,
@@ -294,6 +297,7 @@ class TimeTrackingEntriesApiService extends BaseApiService
      * - Insufficient permissions to delete the entry
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException
      */
     public function deleteTimeTrackingEntry(
         string $timeTrackingEntryGid,
@@ -349,6 +353,7 @@ class TimeTrackingEntriesApiService extends BaseApiService
      * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of time tracking entries
      * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getTimeTrackingEntries(
         array $options = [],

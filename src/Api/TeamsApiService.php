@@ -65,6 +65,7 @@ class TeamsApiService extends BaseApiService
      *
      * @throws ValidationException If required fields (name, organization) are missing
      * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function createTeam(
         array $data,

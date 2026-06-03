@@ -53,6 +53,7 @@ class ProjectTemplatesApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getProjectTemplate(
         string $projectTemplateGid,
@@ -100,6 +101,7 @@ class ProjectTemplatesApiService extends BaseApiService
      * - Insufficient permissions to delete the template
      * - Network connectivity issues
      * - Rate limiting
+     * @throws RateLimitException
      */
     public function deleteProjectTemplate(
         string $projectTemplateGid,
@@ -151,6 +153,7 @@ class ProjectTemplatesApiService extends BaseApiService
      * If $responseType is HttpClientInterface::RESPONSE_DATA (default):
      * - Just the data array containing the list of project templates
      * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getProjectTemplates(
         array $options = [],
@@ -202,6 +205,7 @@ class ProjectTemplatesApiService extends BaseApiService
      * - Just the data array containing the list of project templates for the team
      * @throws ApiException|ValidationException If invalid team GID provided, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function getProjectTemplatesForTeam(
         string $teamGid,

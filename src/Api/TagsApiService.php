@@ -60,12 +60,14 @@ class TagsApiService extends BaseApiService
      * - created_at: Creation timestamp
      *                 Additional fields as specified in opt_fields
      *
-     * @throws ApiException|ValidationException If the API request fails due to:*@throws ValidationException
+     * @throws ApiException If the API request fails due to:
      *
      * - Invalid parameter values
      * - Insufficient permissions
      * - Rate limiting
      * - Network connectivity issues
+     * @throws ValidationException
+     * @throws RateLimitException
      */
     public function getTags(
         string $workspace,
@@ -133,6 +135,7 @@ class TagsApiService extends BaseApiService
      *
      * @throws ApiException If missing required fields, invalid field values,
      *                          insufficient permissions, network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function createTag(
         array $data,
@@ -250,6 +253,7 @@ class TagsApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If invalid tag GID provided, malformed data,
      *                          insufficient permissions, or network issues occur
+     * @throws RateLimitException
      */
     public function updateTag(
         string $tagGid,

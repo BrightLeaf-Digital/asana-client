@@ -124,6 +124,7 @@ class PortfoliosApiService extends BaseApiService
      * - Just the data object containing the created portfolio details
      * @throws ValidationException If required fields (name, workspace) are missing
      * @throws ApiException If insufficient permissions, network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function createPortfolio(
         array $data,

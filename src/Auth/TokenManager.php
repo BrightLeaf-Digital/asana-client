@@ -5,8 +5,7 @@ namespace BrightleafDigital\Auth;
 use BrightleafDigital\Exceptions\AuthException;
 use BrightleafDigital\Exceptions\TokenInvalidException;
 use BrightleafDigital\Storage\TokenStorageInterface;
-use GuzzleHttp\Exception\GuzzleException;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use Exception;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -41,6 +40,7 @@ class TokenManager
      *
      * @return string
      * @throws TokenInvalidException
+     * @throws Exception If token encryption fails while saving a refreshed token to storage
      */
     public function getAccessTokenString(): string
     {
@@ -66,6 +66,7 @@ class TokenManager
      *
      * @param AccessToken $token
      * @return void
+     * @throws Exception If token encryption fails while saving to storage
      */
     public function setAccessToken(AccessToken $token): void
     {
@@ -78,6 +79,7 @@ class TokenManager
      * Ensures the token is loaded and valid.
      *
      * @throws TokenInvalidException
+     * @throws Exception If token encryption fails while saving a refreshed token to storage
      */
     public function ensureValidToken(): void
     {
@@ -98,6 +100,7 @@ class TokenManager
      * Refreshes the token using the refresh token.
      *
      * @throws TokenInvalidException
+     * @throws Exception If token encryption fails while saving the refreshed token to storage
      */
     public function refreshToken(): void
     {

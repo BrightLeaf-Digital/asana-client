@@ -148,6 +148,7 @@ class WebhooksApiService extends BaseApiService
      * @throws ValidationException If required fields (resource, target) are missing
      * @throws ApiException If the target URL fails the handshake, insufficient permissions,
      *                          network issues, or rate limiting occurs
+     * @throws RateLimitException
      */
     public function createWebhook(
         array $data,

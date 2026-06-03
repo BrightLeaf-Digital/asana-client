@@ -65,6 +65,7 @@ class UserApiService extends BaseApiService
      * @throws ApiException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
      * @throws ValidationException If neither workspace nor team is provided
+     * @throws RateLimitException
      */
     public function getUsers(
         ?string $workspace = null,
@@ -134,6 +135,7 @@ class UserApiService extends BaseApiService
      *
      * @throws ApiException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
+     * @throws RateLimitException
      */
     public function getUser(
         string $userGid,
@@ -254,6 +256,7 @@ class UserApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
+     * @throws RateLimitException
      */
     public function getUsersForTeam(
         string $teamGid,
@@ -315,6 +318,7 @@ class UserApiService extends BaseApiService
      *
      * @throws ApiException|ValidationException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
+     * @throws RateLimitException
      */
     public function getUsersForWorkspace(
         string $workspaceGid,
@@ -369,6 +373,7 @@ class UserApiService extends BaseApiService
      *
      * @throws ApiException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
+     * @throws RateLimitException
      */
     public function getCurrentUser(array $options = [], int $responseType = HttpClientInterface::RESPONSE_DATA): array
     {
@@ -424,6 +429,7 @@ class UserApiService extends BaseApiService
      *
      * @throws ApiException If the API request fails due to authentication, validation,
      *                          network issues, or other API-related errors
+     * @throws RateLimitException
      */
     public function getCurrentUserFavorites(
         array $options = [],

@@ -74,8 +74,7 @@ class AsanaOAuthHandler implements AuthHandlerInterface
      *
      * @return AccessToken
      *
-     * @throws AuthException
-     * @throws GuzzleException
+     * @throws AuthException If the OAuth provider request fails or returns an error
      */
     public function handleCallback(string $authorizationCode, ?string $codeVerifier = null): AccessToken
     {
@@ -92,7 +91,7 @@ class AsanaOAuthHandler implements AuthHandlerInterface
             ]);
 
             return new AccessToken($token->jsonSerialize());
-        } catch (Exception $e) {
+        } catch (GuzzleException | Exception $e) {
             $this->logger->error('OAuth callback failed', [
                 'error' => $e->getMessage()
             ]);
@@ -120,8 +119,7 @@ class AsanaOAuthHandler implements AuthHandlerInterface
      * @param string $authorizationCode The authorization code received from the authorization server.
      *
      * @return AccessToken The access token details, typically including token type, expiry, and other information.
-     * @throws AuthException
-     * @throws GuzzleException
+     * @throws AuthException If the OAuth provider request fails or returns an error
      */
     public function getAccessToken(string $authorizationCode): AccessToken
     {
@@ -137,7 +135,7 @@ class AsanaOAuthHandler implements AuthHandlerInterface
             ]);
 
             return new AccessToken($token->jsonSerialize());
-        } catch (Exception $e) {
+        } catch (GuzzleException | Exception $e) {
             $this->logger->error('Failed to retrieve access token', [
                 'error' => $e->getMessage()
             ]);
@@ -151,8 +149,7 @@ class AsanaOAuthHandler implements AuthHandlerInterface
      * @param AccessToken $token The current access token that contains the refresh token needed for renewal.
      *
      * @return AccessToken The newly refreshed access token.
-     * @throws AuthException
-     * @throws GuzzleException
+     * @throws AuthException If the OAuth provider request fails or returns an error
      */
     public function refreshToken(AccessToken $token): AccessToken
     {
@@ -174,7 +171,7 @@ class AsanaOAuthHandler implements AuthHandlerInterface
 
             // Return a new AccessToken instance with the updated data
             return new AccessToken($tokenData);
-        } catch (Exception $e) {
+        } catch (GuzzleException | Exception $e) {
             $this->logger->error('Failed to refresh access token', [
                 'error' => $e->getMessage()
             ]);

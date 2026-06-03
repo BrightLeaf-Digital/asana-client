@@ -67,6 +67,7 @@ class CustomFieldApiService extends BaseApiService
      *
      * @throws ApiException If the API request fails due to invalid data, insufficient permissions,
      *                          network issues, or rate limiting
+     * @throws RateLimitException
      */
     public function createCustomField(
         array $data,

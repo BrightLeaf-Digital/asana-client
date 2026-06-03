@@ -52,6 +52,8 @@ use BrightleafDigital\Api\TimesheetApprovalStatusesApiService;
 use BrightleafDigital\Api\TimeTrackingCategoriesApiService;
 use BrightleafDigital\Auth\AsanaOAuthHandler;
 use BrightleafDigital\Auth\AuthHandlerInterface;
+use BrightleafDigital\Exceptions\AuthException;
+use BrightleafDigital\Exceptions\TokenInvalidException;
 use BrightleafDigital\Auth\TokenManager;
 use BrightleafDigital\Container\ServiceContainer;
 use BrightleafDigital\Http\AsanaApiClient;
@@ -59,6 +61,7 @@ use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Storage\FileTokenStorage;
 use BrightleafDigital\Storage\MemoryTokenStorage;
 use BrightleafDigital\Storage\TokenStorageInterface;
+use Exception;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -157,6 +160,7 @@ class AsanaClient implements AsanaClientInterface
      * @return self The configured AsanaClient instance.
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws Exception If token encryption fails while saving the token to storage
      */
     public static function withPAT(
         string $personalAccessToken,
@@ -184,6 +188,7 @@ class AsanaClient implements AsanaClientInterface
      * @return self The configured AsanaClient instance.
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws Exception If token encryption fails while saving the token to storage
      */
     public static function withAccessToken(
         string $clientId,
@@ -744,6 +749,7 @@ class AsanaClient implements AsanaClientInterface
      * @return array ['url' => string, 'state' => string|null, 'codeVerifier' => string|null]
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws Exception If secure parameter generation (random_bytes) fails
      */
     public function getSecureAuthorizationUrl(array $options, bool $enableState = true, bool $enablePKCE = true): array
     {
@@ -760,6 +766,8 @@ class AsanaClient implements AsanaClientInterface
      * @return AccessToken The retrieved access token.
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws AuthException If the OAuth callback fails to obtain a token
+     * @throws Exception If token encryption fails while saving the token to storage
      */
     public function handleCallback(string $code, ?string $codeVerifier = null): AccessToken
     {
@@ -775,6 +783,8 @@ class AsanaClient implements AsanaClientInterface
      *
      * @return void
      * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws Exception If token encryption fails while saving the token to storage
      */
     public function setAccessToken(AccessToken $token): void
     {
@@ -799,6 +809,8 @@ class AsanaClient implements AsanaClientInterface
      * @return void
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws TokenInvalidException If no token is available or the refresh fails
+     * @throws Exception If token encryption fails while saving the refreshed token to storage
      */
     public function refreshToken(): void
     {

@@ -43,6 +43,7 @@ class ServiceContainer implements ContainerInterface
 
     /**
      * @inheritDoc
+     * @throws NotFoundExceptionInterface If no service is registered for the given id.
      */
     public function get(string $id)
     {
