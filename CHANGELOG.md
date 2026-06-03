@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## v0.2.4 - 2026-06-03
+
+### Added
+- add missing scopes and fix typeahead scope value (ec49974)
+- add AgentApiService and feature flag support for AI Teammates API (f330de3)
+
+### Changed
+- replace switch-case with match expression in AsanaApiClient for cleaner response handling (beed0d9)
+
+### Chore
+- add RateLimitException handling and missing exceptions across services (4cf9b4d)
+
+
 ## v0.2.3 - 2026-05-28
 
 ### Added
