@@ -1445,9 +1445,12 @@ class ProjectApiService extends BaseApiService
      *   Example: "custom_fields.12345.value.contains=launch"
      *
      * Sorting:
-     * - sort_by (string): Field to sort results by.
-     *   Allowed values: "due_date", "created_at", "completed_at", "modified_at"
+     * - sort_by (string): Field to sort results by. Default is "modified_at".
+     *   Allowed values: "due_date", "created_at", "completed_at", "modified_at", "relevance"
+     *   Note: "relevance" ranks results by how closely they match the search query
+     *   (parity with the task search endpoint and the Asana web UI).
      * - sort_ascending (bool): Sort in ascending order when true. Default is false.
+     *   Ignored when sort_by is "relevance".
      *
      * Display parameters:
      * - opt_fields (string): Comma-separated fields to include in the response
