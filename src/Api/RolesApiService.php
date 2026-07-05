@@ -122,9 +122,23 @@ class RolesApiService extends BaseApiService
      * - base_role_type (string): The base role type to derive permissions from.
      *   Example: "member"
      *                    Optional:
-     * - permissions (object): Fine-grained permission overrides for the role.
+     * - permissions (object): Fine-grained permission overrides for the role. Each key is a
+     *   boolean granular permission. No new endpoints are required to use these; they are set
+     *   directly on the `permissions` object of the role record.
+     *   Creation permissions:
+     *   - create_project (bool): Allow creating projects
+     *   - create_goal (bool): Allow creating goals
+     *   - create_portfolio (bool): Allow creating portfolios
+     *   - create_read_only_link (bool): Allow generating read-only links
+     *   - share_teams_with_org (bool): Allow creating/sharing public teams with the org
+     *   Visibility permissions:
+     *   - view_shared_with_org_projects (bool): See projects shared with the org
+     *   - view_public_teams (bool): See public teams
+     *   - view_shared_with_org_tasks (bool): See tasks shared with the org
+     *   - view_shared_with_org_portfolios (bool): See portfolios shared with the org
      *   Example: ["workspace" => "12345", "name" => "Project Reviewer",
-     *             "description" => "...", "base_role_type" => "member"]
+     *             "description" => "...", "base_role_type" => "member",
+     *             "permissions" => ["create_project" => false, "create_goal" => true]]
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): Comma-separated fields to include in the response
      * - opt_pretty (bool): Returns formatted JSON if true
@@ -164,8 +178,12 @@ class RolesApiService extends BaseApiService
      * @param array $data Properties to update. Can include:
      * - name (string): New name for the role
      * - description (string): New description for the role
-     * - permissions (object): Updated fine-grained permission overrides
-     *   Example: ["name" => "Updated Role Name"]
+     * - permissions (object): Updated fine-grained (granular) permission overrides. Boolean keys:
+     *   Creation: create_project, create_goal, create_portfolio, create_read_only_link,
+     *             share_teams_with_org.
+     *   Visibility: view_shared_with_org_projects, view_public_teams,
+     *               view_shared_with_org_tasks, view_shared_with_org_portfolios.
+     *   Example: ["permissions" => ["create_project" => false]]
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): Comma-separated fields to include in the response
      * - opt_pretty (bool): Returns formatted JSON if true
