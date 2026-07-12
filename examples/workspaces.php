@@ -27,7 +27,8 @@ try {
     <?php
     $workspaces = $asanaClient->workspaces()->getWorkspaces();
     foreach ($workspaces as $workspace) {
-        echo '<a href="projects.php?workspace=' . $workspace['gid'] . '">' . $workspace['name'] . '</a><br>';
+        echo '<a href="projects.php?workspace=' . $workspace['gid'] . '">' . $workspace['name'] . '</a>';
+        echo ' (<a href="myTasksExport.php?workspace=' . $workspace['gid'] . '">My Tasks &rarr; CSV</a>)<br>';
     }
 } catch (ApiException $e) {
     echo 'Error: ' . $e->getMessage();
