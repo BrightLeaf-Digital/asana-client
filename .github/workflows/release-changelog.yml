@@ -14,7 +14,7 @@ jobs:
       RELEASE_TAG: v${{ inputs.version }}
     steps:
       - name: Checkout repository with SSH
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           ssh-key: ${{ secrets.DEPLOY_KEY }}
           fetch-depth: 0
@@ -36,7 +36,7 @@ jobs:
           fi
 
       - name: Generate release notes
-        uses: orhun/git-cliff-action@v4
+        uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4.8.0
         with:
           config: cliff.release.toml
           args: --unreleased --tag "${{ env.RELEASE_TAG }}" -vv -o new_notes.md

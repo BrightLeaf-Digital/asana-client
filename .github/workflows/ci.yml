@@ -39,11 +39,11 @@ jobs:
     steps:
       # Download the repository source code to the runner
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       # Install PHP with required extensions and configure memory limit
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: '8.3'
           extensions: openssl, mbstring  # Required extensions for the project
@@ -56,7 +56,7 @@ jobs:
 
       # Install project dependencies using cached composer packages for speed
       - name: Install dependencies (with cache)
-        uses: ramsey/composer-install@v3
+        uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
         with:
           composer-options: --prefer-dist --no-progress --no-interaction
 
@@ -78,10 +78,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: '8.3'
           extensions: openssl, mbstring
@@ -89,7 +89,7 @@ jobs:
           ini-values: memory_limit=-1
 
       - name: Install dependencies (with cache)
-        uses: ramsey/composer-install@v3
+        uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
         with:
           composer-options: --prefer-dist --no-progress --no-interaction
 
@@ -119,12 +119,12 @@ jobs:
     steps:
       # Download the repository source code to the runner
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       # Install PHP with conditional coverage (Xdebug only on PHP 8.3)
       - name: Setup PHP (no coverage)
         if: ${{ matrix.php-version != '8.3' }}
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php-version }}
           extensions: openssl, mbstring  # Required extensions for the project
@@ -133,7 +133,7 @@ jobs:
 
       - name: Setup PHP (with Xdebug)
         if: ${{ matrix.php-version == '8.3' }}
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php-version }}
           extensions: openssl, mbstring  # Required extensions for the project
@@ -142,7 +142,7 @@ jobs:
 
       # Install project dependencies using cached composer packages for speed
       - name: Install dependencies (with cache)
-        uses: ramsey/composer-install@v3
+        uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
         with:
           composer-options: --prefer-dist --no-progress --no-interaction
 
@@ -159,7 +159,7 @@ jobs:
       # Upload test results and coverage data as artifacts (PHP 8.3 only)
       - name: Upload coverage artifacts
         if: ${{ always() && matrix.php-version == '8.3' }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: coverage-php-${{ matrix.php-version }}
           path: |
@@ -178,11 +178,11 @@ jobs:
     steps:
       # Download the repository source code to the runner
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       # Install PHP without coverage since we only need basic functionality testing
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: '8.3'
           extensions: openssl, mbstring  # Required extensions for the project
@@ -209,10 +209,10 @@ jobs:
     needs: lint
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: '8.3'
           extensions: openssl, mbstring
@@ -220,7 +220,7 @@ jobs:
           ini-values: memory_limit=-1
 
       - name: Install dependencies (with cache)
-        uses: ramsey/composer-install@v3
+        uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
         with:
           composer-options: --prefer-dist --no-progress --no-interaction
 
