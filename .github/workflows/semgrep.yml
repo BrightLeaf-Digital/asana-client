@@ -1,24 +1,15 @@
 name: semgrep (php)
 
+# Deliberately NO paths filters here. "semgrep" is a required status check on
+# main, and a workflow skipped by a path filter never reports its check, leaving
+# the pull request stuck at "Expected - waiting for status to be reported".
+# The previous filter list also had to be kept in sync by hand with every new
+# scanned path, which is its own failure mode. A scan is ~40s; just always run.
 on:
   push:
     branches: [ main ]
-    paths:
-      - "**/*.php"
-      - "composer.*"
-      - ".semgrep*"
-      - ".github/workflows/**/*.yml"
-      # So a Dependabot bump of the pinned Semgrep version is validated by a scan.
-      - ".github/semgrep/requirements.txt"
   pull_request:
     branches: [ main ]
-    paths:
-      - "**/*.php"
-      - "composer.*"
-      - ".semgrep*"
-      - ".github/workflows/**/*.yml"
-      # So a Dependabot bump of the pinned Semgrep version is validated by a scan.
-      - ".github/semgrep/requirements.txt"
   schedule:
     - cron: '0 3 * * 1'   # Every Monday at 03:00 UTC
   workflow_dispatch:       # Manual trigger from the Actions tab
