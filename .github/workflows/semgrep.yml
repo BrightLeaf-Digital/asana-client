@@ -36,9 +36,15 @@ jobs:
         with:
           python-version: '3.x'
 
+      # Pinned so a new Semgrep release cannot silently change scan behaviour.
+      # Note: the p/* rule packs below are still resolved from the registry at run time,
+      # so newly published upstream rules can introduce findings without a repo change.
       - name: Install Semgrep
-        run: pip install semgrep
+        run: pip install semgrep==1.171.0
 
+      # --text keeps the human-readable findings in the job log (the default --sarif
+      # output swallows them), while --sarif-output/--text-output write the files the
+      # later steps consume. --error still fails the job on any blocking finding.
       - name: Run Semgrep and generate SARIF
         run: |
           semgrep scan \
@@ -47,10 +53,29 @@ jobs:
             --config=p/github-actions \
             --config=p/security-audit \
             --exclude-rule=php.lang.security.injection.tainted-sql-string.tainted-sql-string \
-            --sarif --output=semgrep.sarif \
+            --text \
+            --text-output=semgrep.txt \
+            --sarif-output=semgrep.sarif \
             --error \
             --timeout 600 \
             .
+
+      # Mirror the findings onto the run summary page so a failure can be triaged
+      # without opening the job log or cross-referencing the Security tab.
+      - name: Publish findings to run summary
+        if: always()
+        run: |
+          {
+            echo '## Semgrep'
+            echo
+            if [ -s semgrep.txt ]; then
+              echo '````'
+              head -c 900000 semgrep.txt
+              echo '````'
+            else
+              echo '_Semgrep produced no output._'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload SARIF to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v4
