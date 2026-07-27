@@ -1,44 +1,47 @@
 version: 2
 updates:
-  # Production dependencies - MAJOR UPDATES ONLY
-  - package-ecosystem: "composer"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-    open-pull-requests-limit: 3
-    rebase-strategy: auto
-    labels: ["dependencies", "production", "major-update"]
-    commit-message:
-      prefix: "deps(prod)"
-    # Only include production dependencies (require section)
-    allow:
-      - dependency-type: "direct:production"
-    # Ignore minor and patch updates for production dependencies
-    ignore:
-      - dependency-name: "guzzlehttp/guzzle"
-        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
-      - dependency-name: "league/oauth2-client"
-        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
-
-  # Dev dependencies - ALL UPDATES
+  # Composer - ONE entry only.
+  #
+  # Dependabot requires a unique (package-ecosystem, directory, target-branch)
+  # triple per update config. Production and development dependencies therefore
+  # cannot be split into two composer entries pointing at "/" - doing so makes
+  # Dependabot reject the whole file, which silently disables every ecosystem
+  # here, github-actions included. Use `groups` to separate them instead: each
+  # group still opens its own pull request.
   - package-ecosystem: "composer"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
     rebase-strategy: auto
-    labels: ["dependencies", "dev-only"]
+    # Only "dependencies" here: Dependabot creates its own default labels but
+    # silently ignores custom ones that do not already exist in the repository,
+    # so nothing in CI may key off a label that is not created by hand first.
+    labels: ["dependencies"]
     commit-message:
-      prefix: "deps(dev)"
-    # Only include dev dependencies (require-dev section)
+      prefix: "deps"
+    # Direct requirements only; transitive packages ride along with them.
     allow:
-      - dependency-type: "direct:development"
+      - dependency-type: "direct"
+    # Runtime HTTP and OAuth clients: major bumps only. Consumers of this
+    # library pin these themselves, so minor/patch churn adds no value here.
+    ignore:
+      - dependency-name: "guzzlehttp/guzzle"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+      - dependency-name: "league/oauth2-client"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+    # Matched in order: a dependency lands in the first group it matches.
     groups:
+      production-dependencies:
+        dependency-type: "production"
+        patterns: ["*"]
       dev-dependencies:
-        patterns:
-          - "*"
+        dependency-type: "development"
+        patterns: ["*"]
 
-  # GitHub Actions - ALL UPDATES  
+  # GitHub Actions - all updates, collapsed into a single pull request.
+  # Refs are pinned to commit SHAs in the workflows; Dependabot reads the
+  # trailing `# vX.Y.Z` comment on each `uses:` line to bump them.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -49,5 +52,4 @@ updates:
       prefix: "ci"
     groups:
       github-actions:
-        patterns:
-          - "*"
+        patterns: ["*"]

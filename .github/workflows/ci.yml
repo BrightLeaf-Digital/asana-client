@@ -100,14 +100,13 @@ jobs:
   tests:
     name: Tests (PHP ${{ matrix.php-version }})
     runs-on: ubuntu-latest
-    # Run full tests on:
-    # 1. Non-Dependabot PRs
-    # 2. Dependabot PRs with "major-update" or "production" labels (production deps)
-    # Skip full tests on dev-only and ci updates to save resources
+    # Run full tests on everything except Dependabot's action-only updates,
+    # which carry the "ci" label and are covered by quick-check instead.
+    # Keyed on the absence of "ci" rather than the presence of a Composer label,
+    # because Dependabot drops custom labels that do not exist in the repo.
     if: |
-      github.actor != 'dependabot[bot]' || 
-      contains(github.event.pull_request.labels.*.name, 'major-update') ||
-      contains(github.event.pull_request.labels.*.name, 'production')
+      github.actor != 'dependabot[bot]' ||
+      !contains(github.event.pull_request.labels.*.name, 'ci')
     needs: [lint, analyse]
     strategy:
       # Continue running all matrix jobs even if one fails to get full coverage of results.
@@ -170,10 +169,10 @@ jobs:
   lowest-deps:
     name: Lowest Deps (PHP 8.3)
     runs-on: ubuntu-latest
-    # Only run on non-Dependabot or production dependency updates
+    # Only run on non-Dependabot PRs or Dependabot's Composer updates
     if: |
-      github.actor != 'dependabot[bot]' || 
-      contains(github.event.pull_request.labels.*.name, 'production')
+      github.actor != 'dependabot[bot]' ||
+      !contains(github.event.pull_request.labels.*.name, 'ci')
     needs: lint
     steps:
       # Download the repository source code to the runner
@@ -197,15 +196,14 @@ jobs:
       - name: Run PHPUnit (no coverage)
         run: composer test
 
-  # Lightweight check for dev-only and CI updates
+  # Lightweight check for GitHub Actions updates
   quick-check:
-    name: Quick Check (Dev/CI Updates)
+    name: Quick Check (CI Updates)
     runs-on: ubuntu-latest
-    # Only run on Dependabot PRs that are dev-only or ci updates
+    # Only run on Dependabot PRs that bump actions
     if: |
-      github.actor == 'dependabot[bot]' && 
-      (contains(github.event.pull_request.labels.*.name, 'dev-only') || 
-       contains(github.event.pull_request.labels.*.name, 'ci'))
+      github.actor == 'dependabot[bot]' &&
+      contains(github.event.pull_request.labels.*.name, 'ci')
     needs: lint
     steps:
       - name: Checkout repository
