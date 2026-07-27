@@ -1,0 +1,10 @@
+# Semgrep CLI used by .github/workflows/semgrep.yml.
+#
+# Pinned so a new Semgrep release cannot change scan behaviour without a commit,
+# and kept in a requirements.txt so Dependabot's pip ecosystem can bump it - a
+# bare `pip install semgrep==...` in a workflow step is invisible to Dependabot.
+#
+# Note this pins the engine only. The --config=p/* rule packs are resolved from
+# the Semgrep registry at scan time, so new upstream rules can still surface
+# findings on a scheduled run against unchanged code.
+semgrep==1.171.0

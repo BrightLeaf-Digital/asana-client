@@ -39,6 +39,20 @@ updates:
         dependency-type: "development"
         patterns: ["*"]
 
+  # Semgrep CLI pin used by the semgrep workflow. Lives in its own directory
+  # because Dependabot's pip ecosystem reliably detects a file named exactly
+  # requirements.txt. Labelled "ci" so ci.yml routes it to quick-check, while
+  # the semgrep workflow's paths filter re-runs the scan on the new version.
+  - package-ecosystem: "pip"
+    directory: "/.github/semgrep"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 2
+    rebase-strategy: auto
+    labels: ["ci", "dependencies"]
+    commit-message:
+      prefix: "ci"
+
   # GitHub Actions - all updates, collapsed into a single pull request.
   # Refs are pinned to commit SHAs in the workflows; Dependabot reads the
   # trailing `# vX.Y.Z` comment on each `uses:` line to bump them.
