@@ -39,7 +39,7 @@ jobs:
     steps:
       # Download the repository source code to the runner
       - name: Checkout repository
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Install PHP with required extensions and configure memory limit
       - name: Setup PHP
@@ -56,7 +56,7 @@ jobs:
 
       # Install project dependencies using cached composer packages for speed
       - name: Install dependencies (with cache)
-        uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
         with:
           composer-options: --prefer-dist --no-progress --no-interaction
 
@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup PHP
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
@@ -89,7 +89,7 @@ jobs:
           ini-values: memory_limit=-1
 
       - name: Install dependencies (with cache)
-        uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
         with:
           composer-options: --prefer-dist --no-progress --no-interaction
 
@@ -119,7 +119,7 @@ jobs:
     steps:
       # Download the repository source code to the runner
       - name: Checkout repository
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Install PHP with conditional coverage (Xdebug only on PHP 8.3)
       - name: Setup PHP (no coverage)
@@ -142,7 +142,7 @@ jobs:
 
       # Install project dependencies using cached composer packages for speed
       - name: Install dependencies (with cache)
-        uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
         with:
           composer-options: --prefer-dist --no-progress --no-interaction
 
@@ -159,7 +159,7 @@ jobs:
       # Upload test results and coverage data as artifacts (PHP 8.3 only)
       - name: Upload coverage artifacts
         if: ${{ always() && matrix.php-version == '8.3' }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: coverage-php-${{ matrix.php-version }}
           path: |
@@ -178,7 +178,7 @@ jobs:
     steps:
       # Download the repository source code to the runner
       - name: Checkout repository
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Install PHP without coverage since we only need basic functionality testing
       - name: Setup PHP
@@ -209,7 +209,7 @@ jobs:
     needs: lint
     steps:
       - name: Checkout repository
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup PHP
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
@@ -220,7 +220,7 @@ jobs:
           ini-values: memory_limit=-1
 
       - name: Install dependencies (with cache)
-        uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
         with:
           composer-options: --prefer-dist --no-progress --no-interaction
 
