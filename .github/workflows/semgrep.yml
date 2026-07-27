@@ -8,6 +8,8 @@ on:
       - "composer.*"
       - ".semgrep*"
       - ".github/workflows/**/*.yml"
+      # So a Dependabot bump of the pinned Semgrep version is validated by a scan.
+      - ".github/semgrep/requirements.txt"
   pull_request:
     branches: [ main ]
     paths:
@@ -15,6 +17,8 @@ on:
       - "composer.*"
       - ".semgrep*"
       - ".github/workflows/**/*.yml"
+      # So a Dependabot bump of the pinned Semgrep version is validated by a scan.
+      - ".github/semgrep/requirements.txt"
   schedule:
     - cron: '0 3 * * 1'   # Every Monday at 03:00 UTC
   workflow_dispatch:       # Manual trigger from the Actions tab
@@ -36,11 +40,10 @@ jobs:
         with:
           python-version: '3.x'
 
-      # Pinned so a new Semgrep release cannot silently change scan behaviour.
-      # Note: the p/* rule packs below are still resolved from the registry at run time,
-      # so newly published upstream rules can introduce findings without a repo change.
+      # Version is pinned in the requirements file so Dependabot can bump it.
+      # That pins the engine only - see the note in that file about rule packs.
       - name: Install Semgrep
-        run: pip install semgrep==1.171.0
+        run: pip install -r .github/semgrep/requirements.txt
 
       # --text keeps the human-readable findings in the job log (the default --sarif
       # output swallows them), while --sarif-output/--text-output write the files the
