@@ -10,23 +10,23 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Deliberately NO paths / paths-ignore filters here.
+#
+# Lint, Analyse and Tests are required status checks on main. When a workflow is
+# skipped by a path filter its checks are never reported, so they sit at
+# "Expected - waiting for status to be reported" and the pull request can never
+# be merged. A docs-only change would deadlock. (A job skipped by an `if:`
+# condition is different - that reports Success and does not block.)
+#
+# The saving was roughly a minute of runner time on docs-only changes, which is
+# not worth an unmergeable pull request. If it ever becomes worth it, gate the
+# individual jobs with `if:` on a changed-files step rather than filtering the
+# workflow trigger.
 on:
-  # Trigger on pushes to main, but ignore docs/markdown-only changes to save CI minutes.
   push:
     branches: [ main ]
-    paths-ignore:
-      - 'README.md'
-      - 'readme.md'
-      - 'CHANGELOG.md'
-      - 'docs/**'
-  # Trigger on PRs targeting the main with the same path ignores.
   pull_request:
     branches: [ main ]
-    paths-ignore:
-      - 'README.md'
-      - 'readme.md'
-      - 'CHANGELOG.md'
-      - 'docs/**'
   # Allow manual runs from the Actions UI.
   workflow_dispatch:
 
