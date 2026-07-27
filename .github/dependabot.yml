@@ -14,10 +14,11 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 5
     rebase-strategy: auto
-    # Only "dependencies" here: Dependabot creates its own default labels but
-    # silently ignores custom ones that do not already exist in the repository,
-    # so nothing in CI may key off a label that is not created by hand first.
-    labels: ["dependencies"]
+    # "composer" exists purely for filtering and triage. Nothing in CI gates on
+    # it: Dependabot silently drops custom labels missing from the repository,
+    # so a job keyed off one would skip itself with no visible cause. ci.yml
+    # gates on the absence of "ci" instead, which fails towards more testing.
+    labels: ["dependencies", "composer"]
     commit-message:
       prefix: "deps"
     # Direct requirements only; transitive packages ride along with them.
