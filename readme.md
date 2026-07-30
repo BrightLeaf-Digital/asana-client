@@ -33,12 +33,6 @@ As we approach v1.0, several foundational changes have been made:
 - **Token Persistence**: `withAccessToken` no longer writes the token you pass it back to storage. Callers normally pass a token they just loaded from that same storage, so the write was redundant on every request and could overwrite a fresher token refreshed by a concurrent request. Tokens the library obtains itself (`handleCallback()`, a refresh) are still saved, and so are tokens passed to `setAccessToken()` - use that if you want a token persisted immediately.
 - **Webhook Handshake**: `WebhooksApiService::handleHandshake` (and `AsanaClient::handleHandshake`) signature changed to remove redundant arguments.
 
-This is my first library of this kind, and I am still developing my skills as a junior developer. Any reviews, comments, contributions, or suggestions are highly welcome - especially since my only peer review so far has been from AI. I would particularly appreciate help with:
-
-- Writing tests
-- Reviewing documentation
-- Identifying improvements
-
 ## OAuth Scopes
 
 This library now supports Asana's new OAuth permission scopes. These scopes provide more granular control over what 
