@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## v0.2.5 - 2026-07-30
+
+### Added
+- enhance sorting options in ProjectApiService for improved search flexibility (3ed8cb7)
+- add My Tasks CSV export example and link to it (baf7899)
+
+### Documentation
+- expand RolesApiService docblocks (76b877c)
+
+### Fixed
+- don't persist a token that was just loaded from storage (5912d5f)
+
+
 ## v0.2.4 - 2026-06-03
 
 ### Added
