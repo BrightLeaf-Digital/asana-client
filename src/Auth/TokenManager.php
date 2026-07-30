@@ -62,15 +62,27 @@ class TokenManager
     }
 
     /**
-     * Sets the current access token and saves it to storage.
+     * Sets the current access token and, by default, saves it to storage.
+     *
+     * Pass $persist = false to hydrate the in-memory token without touching storage. That is the correct
+     * mode for a token that was just read out of storage: persisting it there would be a redundant write
+     * on every request, and - if another request refreshed the token in the meantime - would clobber the
+     * fresher stored token with this stale one. Subscribers are not notified in that mode either, since
+     * nothing about the token actually changed.
      *
      * @param AccessToken $token
+     * @param bool $persist Whether to write the token to storage and notify refresh subscribers.
      * @return void
      * @throws Exception If token encryption fails while saving to storage
      */
-    public function setAccessToken(AccessToken $token): void
+    public function setAccessToken(AccessToken $token, bool $persist = true): void
     {
         $this->accessToken = $token;
+
+        if (!$persist) {
+            return;
+        }
+
         $this->storage->save($token->jsonSerialize());
         $this->notifySubscribers($token);
     }

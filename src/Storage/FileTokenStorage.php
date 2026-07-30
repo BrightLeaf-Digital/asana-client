@@ -71,6 +71,10 @@ class FileTokenStorage implements TokenStorageInterface
      */
     public function save(array $token): void
     {
+        if ($this->matchesStoredToken($token)) {
+            return;
+        }
+
         if ($this->password) {
             if (isset($token['access_token'])) {
                 $token['access_token'] = CryptoUtils::encrypt($token['access_token'], $this->password);
@@ -81,6 +85,28 @@ class FileTokenStorage implements TokenStorageInterface
         }
 
         file_put_contents($this->path, json_encode($token, JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * Whether the stored token is already identical to the given one.
+     *
+     * Encryption uses a fresh IV per write, so the file contents differ even for an unchanged token; the
+     * comparison therefore has to be against the decrypted data.
+     *
+     * @param array $token
+     * @return bool
+     */
+    private function matchesStoredToken(array $token): bool
+    {
+        $stored = $this->load();
+        if ($stored === null) {
+            return false;
+        }
+
+        ksort($stored);
+        ksort($token);
+
+        return $stored == $token;
     }
 
     /**

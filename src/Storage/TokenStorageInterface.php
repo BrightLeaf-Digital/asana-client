@@ -19,6 +19,11 @@ interface TokenStorageInterface
     /**
      * Saves the token to storage.
      *
+     * Implementations MAY skip the write when the token is identical to what is already stored; the library
+     * never relies on save() producing a distinct write. This matters for backends where a write is expensive
+     * or where encryption makes the stored bytes differ even for an unchanged token (so the backend cannot
+     * detect the no-op itself).
+     *
      * @param array $token The token data to save.
      * @return void
      * @throws Exception If an implementation that encrypts tokens fails to encrypt before saving.

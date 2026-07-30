@@ -102,6 +102,24 @@ class TokenManagerTest extends TestCase
         $this->assertSame('manual-token', $this->tokenManager->getAccessTokenString());
     }
 
+    public function testSetAccessTokenWithoutPersistDoesNotTouchStorage(): void
+    {
+        $token = new AccessToken(['access_token' => 'hydrated-token', 'expires' => time() + 3600]);
+        $storageMock = $this->mockStorage();
+        $storageMock->expects($this->never())->method('save');
+        $storageMock->expects($this->never())->method('load');
+
+        $notified = false;
+        $this->tokenManager->subscribeToRefresh(function () use (&$notified) {
+            $notified = true;
+        });
+
+        $this->tokenManager->setAccessToken($token, false);
+
+        $this->assertSame('hydrated-token', $this->tokenManager->getAccessTokenString());
+        $this->assertFalse($notified, 'Hydrating a token is not a refresh and must not notify subscribers');
+    }
+
     public function testRefreshSubscribersAreNotified(): void
     {
         $token = new AccessToken(['access_token' => 'refreshed-token', 'expires' => time() + 3600]);

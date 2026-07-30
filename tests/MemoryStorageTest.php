@@ -48,6 +48,18 @@ class MemoryStorageTest extends TestCase
         );
     }
 
+    public function testWithAccessTokenDoesNotCreateFileByDefault(): void
+    {
+        $tokenData = ['access_token' => 'abc', 'expires' => time() + 3600];
+        $client = AsanaClient::withAccessToken('id', 'secret', $tokenData);
+
+        $this->assertSame('abc', $client->getAccessToken()->getToken());
+        $this->assertFileDoesNotExist(
+            $this->tokenFile,
+            'withAccessToken() hydrates the client and must not write the caller-supplied token to storage'
+        );
+    }
+
     public function testWithPATCreatesFileByDefault(): void
     {
         // This test ensures we didn't break backward compatibility

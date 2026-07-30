@@ -118,6 +118,10 @@ class AsanaClientTest extends TestCase
         $tokenData = ['access_token' => 'abc', 'expires' => time() + 3600];
         $client = AsanaClient::withAccessToken('id', 'secret', $tokenData, $path);
         $this->assertSame('abc', $client->getAccessToken()->getToken());
+        $this->assertFileDoesNotExist(
+            $path,
+            'A token passed to withAccessToken() comes from the caller and must not be written back to storage'
+        );
         @unlink($path);
     }
 

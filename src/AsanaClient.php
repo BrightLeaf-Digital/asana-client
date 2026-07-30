@@ -150,7 +150,9 @@ class AsanaClient implements AsanaClientInterface
 
     /**
      * Bootstraps a default AsanaClient with a Personal Access Token (PAT).
-     * The token will be automatically saved to the configured storage.
+     * The token will be automatically saved to the configured storage. Storage implementations are free to
+     * treat a save of an unchanged token as a no-op, so repeatedly constructing a client from the same PAT
+     * need not mean repeatedly writing it (FileTokenStorage does not).
      *
      * @param string $personalAccessToken The Personal Access Token (PAT) to use for authentication.
      * @param string|TokenStorageInterface|bool|null $tokenStorage
@@ -176,7 +178,12 @@ class AsanaClient implements AsanaClientInterface
 
     /**
      * Bootstraps a default AsanaClient with an existing access token.
-     * The token will be automatically saved to the configured storage.
+     *
+     * The token is only hydrated into the client, not written to storage: callers typically pass a token they
+     * just read out of that same storage, so saving it again would be a redundant write on every request and
+     * could overwrite a fresher token that another request refreshed in the meantime. Tokens the library
+     * obtains itself (handleCallback(), a refresh) are still persisted, as are tokens passed to
+     * setAccessToken() - use that if you do want a token written to storage immediately.
      *
      * @param string $clientId The client ID for the OAuth application.
      * @param string $clientSecret The client secret for the OAuth application.
@@ -188,7 +195,6 @@ class AsanaClient implements AsanaClientInterface
      * @return self The configured AsanaClient instance.
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @throws Exception If token encryption fails while saving the token to storage
      */
     public static function withAccessToken(
         string $clientId,
@@ -200,7 +206,7 @@ class AsanaClient implements AsanaClientInterface
     ): self {
         $client = self::OAuth($clientId, $clientSecret, '', $tokenStorage, $logger, $salt);
         $tokenManager = $client->getContainer()->get(TokenManager::class);
-        $tokenManager->setAccessToken(new AccessToken($token));
+        $tokenManager->setAccessToken(new AccessToken($token), false);
         return $client;
     }
 
