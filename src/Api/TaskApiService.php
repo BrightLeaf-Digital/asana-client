@@ -143,6 +143,9 @@ class TaskApiService extends BaseApiService
      * - due_on: Due date of the task
      * - notes: Task description/notes
      * - projects: Array of project objects this task belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
      * - modified_at: Last modification timestamp
@@ -211,11 +214,16 @@ class TaskApiService extends BaseApiService
      * - due_on: Due date of the task
      * - notes: Task description/notes
      * - projects: Array of project objects this task belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - tags: Array of tag objects associated with the task
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
      * - modified_at: Last modification timestamp
-     * - custom_fields: Array of custom field values
+     * - custom_fields: Array of custom field values. For a subtask this reflects the task's full
+     *   effective project set (its direct projects plus the entire ancestor chain), so subtasks
+     *   nested two or more levels deep may include entries that were previously absent
      * - followers: Array of follower objects
      *                 Additional fields as specified in opt_fields
      *
@@ -295,6 +303,9 @@ class TaskApiService extends BaseApiService
      * - due_on: Updated due date of the task
      * - notes: Updated task description/notes
      * - projects: Array of project objects this task belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
      * - modified_at: Last modification timestamp (updated)
@@ -487,6 +498,9 @@ class TaskApiService extends BaseApiService
      * - completed: Boolean indicating if task is completed
      * - due_on: Due date of the task
      * - projects: Array of project objects this task belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
      * - modified_at: Last modification timestamp
@@ -557,6 +571,9 @@ class TaskApiService extends BaseApiService
      * - completed: Boolean indicating if task is completed
      * - due_on: Due date of the task
      * - projects: Array of project objects this task belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
      * - modified_at: Last modification timestamp
@@ -627,6 +644,9 @@ class TaskApiService extends BaseApiService
      * - completed: Boolean indicating if task is completed
      * - due_on: Due date of the task
      * - projects: Array of project objects this task belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - tags: Array of tag objects associated with the task
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
@@ -693,6 +713,9 @@ class TaskApiService extends BaseApiService
      * - completed: Boolean indicating if task is completed
      * - due_on: Due date of the task
      * - projects: Array of project objects this task belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
      * - modified_at: Last modification timestamp
@@ -723,6 +746,9 @@ class TaskApiService extends BaseApiService
      * Retrieves a compact list of all subtasks associated with the given task. A subtask is a task that
      * represents a breakdown of a larger task and maintains a parent-child relationship with its parent task.
      * API Documentation: https://developers.asana.com/reference/getsubtasksfortask
+     *
+     * Subtasks inherit the projects of their ancestor tasks. The projects and memberships fields
+     * still return direct memberships only; opt into effective_memberships to see inherited ones.
      *
      * @param string $taskGid The unique global ID of the parent task for which to retrieve subtasks.
      *                        This identifier can be found in the task URL or returned from
@@ -762,6 +788,9 @@ class TaskApiService extends BaseApiService
      * - due_on: Due date of the subtask
      * - parent: Object containing parent task details
      * - projects: Array of project objects this subtask belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
      * - modified_at: Last modification timestamp
@@ -839,6 +868,9 @@ class TaskApiService extends BaseApiService
      * - due_on: Due date of the subtask
      * - parent: Object containing parent task details
      * - projects: Array of project objects this subtask belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
      * - modified_at: Last modification timestamp
@@ -916,6 +948,9 @@ class TaskApiService extends BaseApiService
      * - assignee: Object containing assignee details
      * - completed: Boolean indicating if task is completed
      * - projects: Array of project objects this task belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
      * - modified_at: Last modification timestamp
@@ -986,6 +1021,9 @@ class TaskApiService extends BaseApiService
      * - completed: Boolean indicating if dependency task is completed
      * - due_on: Due date of the dependency task
      * - projects: Array of project objects this dependency task belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
      * - modified_at: Last modification timestamp
@@ -1164,6 +1202,9 @@ class TaskApiService extends BaseApiService
      * - completed: Boolean indicating if dependent task is completed
      * - due_on: Due date of the dependent task
      * - projects: Array of project objects this dependent task belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
      * - modified_at: Last modification timestamp
@@ -1680,7 +1721,9 @@ class TaskApiService extends BaseApiService
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
      * - modified_at: Last modification timestamp
-     * - custom_fields: Array of custom field values
+     * - custom_fields: Array of custom field values. For a subtask this reflects the task's full
+     *   effective project set (its direct projects plus the entire ancestor chain), so subtasks
+     *   nested two or more levels deep may include entries that were previously absent
      * - followers: Array of follower objects
      *                 Additional fields as specified in opt_fields
      *
@@ -1733,6 +1776,8 @@ class TaskApiService extends BaseApiService
      *   - `assignee.not` (array): A list of user GIDs; excludes tasks assigned to any of the specified users.
      *   - `projects.any` (array): A list of project GIDs; retrieves tasks in any of the specified projects.
      *   - `projects.not` (array): A list of project GIDs; excludes tasks in any of the specified projects.
+     *     Note: both project filters match projects a task inherits from its ancestor tasks as well
+     *     as its direct projects.
      *   - `tags.any` (array): A list of tag GIDs; retrieves tasks tagged with any of the specified tags.
      *   - `tags.not` (array): A list of tag GIDs; excludes tasks tagged with any of the specified tags.
      *   - `opt_fields` (string): A comma-separated list of fields to include in the results.
@@ -1778,6 +1823,9 @@ class TaskApiService extends BaseApiService
      * - completed: Boolean indicating if task is completed
      * - due_on: Due date of the task
      * - projects: Array of project objects this task belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - tags: Array of tag objects associated with the task
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
@@ -1839,6 +1887,9 @@ class TaskApiService extends BaseApiService
      * - due_on: Due date of the task
      * - notes: Task description/notes
      * - projects: Array of project objects this task belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp
      * - modified_at: Last modification timestamp (updated)
@@ -1900,6 +1951,9 @@ class TaskApiService extends BaseApiService
      * - completed: Boolean indicating if task is completed (always false for overdue tasks)
      * - due_on: Due date of the task (past date)
      * - projects: Array of project objects this task belongs to
+     * - effective_memberships: Opt-in, read-only. The union of direct and inherited project
+     *   memberships. Each entry contains project, section and is_inherited. Request it through
+     *   opt_fields; requires the projects:read and/or project_sections:read scopes
      * - tags: Array of tag objects associated with the task
      * - workspace: Object containing workspace details
      * - created_at: Creation timestamp

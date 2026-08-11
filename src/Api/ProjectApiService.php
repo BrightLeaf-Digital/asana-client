@@ -450,7 +450,9 @@ class ProjectApiService extends BaseApiService
      * Get projects a task is in
      * GET /tasks/{task_gid}/projects
      * Returns a list of projects that the specified task is a member of. A task can
-     * be associated with multiple projects.
+     * be associated with multiple projects. By default only direct memberships are returned;
+     * subtasks inherit the projects of their ancestor tasks, and those can be included with the
+     * include_inherited_projects parameter.
      * API Documentation: https://developers.asana.com/reference/getprojectsfortask
      *
      * @param string $taskGid The unique global ID of the task to get projects for.
@@ -462,6 +464,9 @@ class ProjectApiService extends BaseApiService
      * Filtering parameters:
      * - limit (int): Maximum number of projects to return. Default is 20, max is 100
      * - offset (string): Offset token for pagination
+     * - include_inherited_projects (bool): Opt-in, read-only. When true the response also includes
+     *   projects the task inherits from its ancestor tasks, alongside its direct projects. Defaults
+     *   to false. The response shape is unchanged either way
      *
      * Display parameters:
      * - opt_fields (string): A comma-separated list of fields to include in the response

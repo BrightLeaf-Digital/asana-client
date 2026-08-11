@@ -138,6 +138,9 @@ class Scopes
      * - GET /teams/{team_gid}/projects
      * - GET /workspaces/{workspace_gid}/projects
      * - GET /projects/{project_gid}/task_counts
+     *
+     * Also required for the opt-in `effective_memberships` field on tasks, together with
+     * `project_sections:read`.
      */
     public const PROJECTS_READ = 'projects:read';
 
@@ -213,7 +216,7 @@ class Scopes
 
     // 🔹 Project Sections
     /**
-     * Field-level scope for the `memberships` field on tasks.
+     * Field-level scope for the `memberships` and `effective_memberships` fields on tasks.
      * Required alongside `projects:read` to access task membership data.
      */
     public const PROJECT_SECTIONS_READ = 'project_sections:read';

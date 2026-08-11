@@ -193,6 +193,21 @@ class ProjectApiServiceTest extends TestCase
     }
 
     /**
+     * Test getProjectsForTask forwards the include_inherited_projects option.
+     */
+    public function testGetProjectsForTaskWithInheritedProjects(): void
+    {
+        $options = ['include_inherited_projects' => true, 'opt_fields' => 'name'];
+
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with('GET', 'tasks/67890/projects', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
+            ->willReturn([]);
+
+        $this->service->getProjectsForTask('67890', $options);
+    }
+
+    /**
      * Test getProjectsForTeam calls client with correct parameters.
      */
     public function testGetProjectsForTeam(): void
