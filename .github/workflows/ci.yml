@@ -96,17 +96,25 @@ jobs:
       - name: Run PHPStan
         run: composer analyse
 
-  # Full test matrix - conditional based on PR type
+  # Full test matrix - runs on every pull request, unconditionally.
+  #
+  # Deliberately NO `if:` gate here, for the same reason the workflow has no
+  # paths filter. "Tests (PHP 8.3)" is a required status check on main, and this
+  # is a matrix job: when a matrix job is skipped, GitHub cannot expand
+  # `matrix.php-version`, so the check is reported under the literal name
+  # "Tests (PHP ${{ matrix.php-version }})". The required check never appears at
+  # all and the pull request deadlocks on "Expected - waiting for status to be
+  # reported". A previous `if:` here excluded Dependabot's action-only updates
+  # and made every one of those pull requests unmergeable without bypassing the
+  # ruleset.
+  #
+  # The saving was a few tens of seconds of runner time on the handful of
+  # Dependabot CI bumps per week. Any future gating of a required check must use
+  # an aggregate job (`needs:` everything, `if: always()`, inspect results) that
+  # always reports under a fixed name - never an `if:` on the required job.
   tests:
     name: Tests (PHP ${{ matrix.php-version }})
     runs-on: ubuntu-latest
-    # Run full tests on everything except Dependabot's action-only updates,
-    # which carry the "ci" label and are covered by quick-check instead.
-    # Keyed on the absence of "ci" rather than the presence of a Composer label,
-    # because Dependabot drops custom labels that do not exist in the repo.
-    if: |
-      github.actor != 'dependabot[bot]' ||
-      !contains(github.event.pull_request.labels.*.name, 'ci')
     needs: [lint, analyse]
     strategy:
       # Continue running all matrix jobs even if one fails to get full coverage of results.
@@ -169,7 +177,14 @@ jobs:
   lowest-deps:
     name: Lowest Deps (PHP 8.3)
     runs-on: ubuntu-latest
-    # Only run on non-Dependabot PRs or Dependabot's Composer updates
+    # Skipped for Dependabot's CI-only updates (the "ci" label): resolving the
+    # lowest allowed Composer versions says nothing about an Actions SHA or a
+    # Semgrep pin. Keyed on the absence of "ci" rather than the presence of a
+    # Composer label, because Dependabot drops custom labels that do not exist
+    # in the repository - so the fallback is more testing, not less.
+    #
+    # Safe to gate because this is NOT a required status check. Do not make it
+    # one without reading the note on the tests job first.
     if: |
       github.actor != 'dependabot[bot]' ||
       !contains(github.event.pull_request.labels.*.name, 'ci')
@@ -194,34 +209,4 @@ jobs:
 
       # Run tests without coverage to verify functionality with minimum dependency versions
       - name: Run PHPUnit (no coverage)
-        run: composer test
-
-  # Lightweight check for GitHub Actions updates
-  quick-check:
-    name: Quick Check (CI Updates)
-    runs-on: ubuntu-latest
-    # Only run on Dependabot PRs that bump actions
-    if: |
-      github.actor == 'dependabot[bot]' &&
-      contains(github.event.pull_request.labels.*.name, 'ci')
-    needs: lint
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
-        with:
-          php-version: '8.3'
-          extensions: openssl, mbstring
-          coverage: none
-          ini-values: memory_limit=-1
-
-      - name: Install dependencies (with cache)
-        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
-        with:
-          composer-options: --prefer-dist --no-progress --no-interaction
-
-      # Just run tests on latest PHP - no coverage needed
-      - name: Run PHPUnit (quick check)
         run: composer test

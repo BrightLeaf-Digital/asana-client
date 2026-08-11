@@ -42,8 +42,9 @@ updates:
 
   # Semgrep CLI pin used by the semgrep workflow. Lives in its own directory
   # because Dependabot's pip ecosystem reliably detects a file named exactly
-  # requirements.txt. Labelled "ci" so ci.yml routes it to quick-check; the
-  # semgrep workflow has no path filters, so it validates the bump on every PR.
+  # requirements.txt. Labelled "ci" so ci.yml skips lowest-deps, which cannot say
+  # anything useful about a Semgrep pin; the semgrep workflow itself has no path
+  # filters, so it validates the bump on every pull request.
   - package-ecosystem: "pip"
     directory: "/.github/semgrep"
     schedule:
