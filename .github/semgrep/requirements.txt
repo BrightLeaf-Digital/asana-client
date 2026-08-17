@@ -7,4 +7,4 @@
 # Note this pins the engine only. The --config=p/* rule packs are resolved from
 # the Semgrep registry at scan time, so new upstream rules can still surface
 # findings on a scheduled run against unchanged code.
-semgrep==1.172.0
+semgrep==1.173.0
