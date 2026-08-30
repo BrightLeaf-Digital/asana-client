@@ -270,6 +270,50 @@ $client->subscribeToTokenRefresh(function($newToken) use ($db) {
 });
 ```
 
+### Feature Flags
+
+Some Asana features and deprecations are gated behind request headers. The client sends
+`Asana-Enable` and `Asana-Disable` on every request for the flags you register, so you set them
+once on the client rather than per call.
+
+```php
+use BrightleafDigital\Http\HttpClientInterface;
+
+// Opt in to an early-access feature (Asana-Enable)
+$client->enableFeatureFlag(HttpClientInterface::FLAG_AI_TEAMMATE_ACTORS);
+
+// Opt out of a deprecation whose default has already flipped (Asana-Disable)
+$client->disableFeatureFlag(HttpClientInterface::FLAG_INCLUDE_ASANA_CREATED_CUSTOM_TYPES);
+```
+
+Both methods are chainable and accept any flag string, so a flag that ships before this library
+adds a constant for it can be passed directly: `$client->enableFeatureFlag('some_new_flag')`.
+Enabling and disabling are mutually exclusive per flag -- the most recent call wins.
+
+#### Asana-created custom types
+
+`include_asana_created_custom_types` is the flag to know about right now. Since Asana rolled out
+custom types for projects and portfolios on 2026-08-18, `GET /tasks`, `GET /projects` and
+`GET /portfolios` have hidden objects whose custom type was created by an Asana product (Command
+tickets, Service queues, and so on). On **2027-01-13** that default flips and those objects start
+appearing in bulk collections.
+
+- To see them today: `$client->enableFeatureFlag(HttpClientInterface::FLAG_INCLUDE_ASANA_CREATED_CUSTOM_TYPES);`
+- To keep them out after the flip: `$client->disableFeatureFlag(HttpClientInterface::FLAG_INCLUDE_ASANA_CREATED_CUSTOM_TYPES);`
+
+Either way, an explicit `custom_type` filter always returns matching objects:
+
+```php
+// Only projects of one custom type
+$client->projects()->getProjects('12345', null, ['custom_type' => '67890']);
+
+// Only projects with no custom type assigned
+$client->projects()->getProjects('12345', null, ['custom_type' => '']);
+```
+
+See the [Asana announcement](https://forum.asana.com/t/upcoming-enhanced-custom-type-support-for-projects-and-portfolios-plus-new-custom-type-filtering/1153530)
+for the full deprecation timeline.
+
 ### Examples
 More examples are available in the `examples` folder, including:
 - OAuth flow setup with PKCE and state validation
