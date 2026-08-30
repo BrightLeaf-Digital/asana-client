@@ -67,6 +67,12 @@ class AsanaApiClient implements HttpClientInterface
     private array $featureFlags = [];
 
     /**
+     * Asana feature flags to include in every request via the Asana-Disable header.
+     * @var string[]
+     */
+    private array $disabledFeatureFlags = [];
+
+    /**
      * Creates a new Asana API client instance.
      * @param callable $tokenProvider Callable that returns the current access token
      * @param LoggerInterface|null $logger PSR-3 compatible logger instance
@@ -91,6 +97,9 @@ class AsanaApiClient implements HttpClientInterface
                 $request = $request->withHeader('Authorization', 'Bearer ' . $token);
                 if (!empty($this->featureFlags)) {
                     $request = $request->withHeader('Asana-Enable', implode(',', $this->featureFlags));
+                }
+                if (!empty($this->disabledFeatureFlags)) {
+                    $request = $request->withHeader('Asana-Disable', implode(',', $this->disabledFeatureFlags));
                 }
                 return $handler($request, $options);
             };
@@ -378,8 +387,25 @@ class AsanaApiClient implements HttpClientInterface
      */
     public function enableFeatureFlag(string $flag): static
     {
+        $this->disabledFeatureFlags = array_values(
+            array_filter($this->disabledFeatureFlags, fn ($disabled) => $disabled !== $flag)
+        );
         if (!in_array($flag, $this->featureFlags, true)) {
             $this->featureFlags[] = $flag;
+        }
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function disableFeatureFlag(string $flag): static
+    {
+        $this->featureFlags = array_values(
+            array_filter($this->featureFlags, fn ($enabled) => $enabled !== $flag)
+        );
+        if (!in_array($flag, $this->disabledFeatureFlags, true)) {
+            $this->disabledFeatureFlags[] = $flag;
         }
         return $this;
     }

@@ -152,6 +152,14 @@ interface AsanaClientInterface
     public function enableFeatureFlag(string $flag): static;
 
     /**
+     * @param string $flag
+     * @return static
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function disableFeatureFlag(string $flag): static;
+
+    /**
      * @return AgentApiService
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface

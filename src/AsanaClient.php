@@ -729,6 +729,24 @@ class AsanaClient implements AsanaClientInterface
         return $this;
     }
 
+    /**
+     * Disable an Asana feature flag sent via the Asana-Disable header on every request.
+     *
+     * Used to opt out of a deprecation whose default has already flipped on, e.g.
+     * `HttpClientInterface::FLAG_INCLUDE_ASANA_CREATED_CUSTOM_TYPES` after 2027-01-13 to keep
+     * bulk collections free of objects carrying Asana-created custom types.
+     *
+     * @param string $flag The feature flag value (e.g., 'include_asana_created_custom_types').
+     * @return $this
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function disableFeatureFlag(string $flag): static
+    {
+        $this->container->get(HttpClientInterface::class)->disableFeatureFlag($flag);
+        return $this;
+    }
+
     // --- Authentication & Helper Methods ---
 
     /**

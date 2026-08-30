@@ -8,11 +8,14 @@ use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Http\HttpClientInterface;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Uri;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -727,5 +730,136 @@ class AsanaApiClientTest extends TestCase
         // The options in the response should have Authorization redacted
         $this->assertSame('[REDACTED]', $result['request']['options']['headers']['Authorization']);
         $this->assertSame(['limit' => 10], $result['request']['options']['query']);
+    }
+
+    /**
+     * Send a request through the real handler stack and return the outbound request.
+     *
+     * Replaces only the terminal handler, so the client's own middleware (auth and feature
+     * flag headers) still runs.
+     */
+    private function captureOutboundRequest(AsanaApiClient $client): RequestInterface
+    {
+        $reflection = new ReflectionClass(AsanaApiClient::class);
+        $httpClientProperty = $reflection->getProperty('httpClient');
+        $httpClientProperty->setAccessible(true);
+        /** @var GuzzleClient $guzzle */
+        $guzzle = $httpClientProperty->getValue($client);
+
+        /** @var HandlerStack $stack */
+        $stack = $guzzle->getConfig('handler');
+        $stack->setHandler(new MockHandler([new Response(200, [], json_encode(['data' => []]))]));
+
+        $captured = null;
+        $stack->push(function (callable $handler) use (&$captured) {
+            return function (RequestInterface $request, array $options) use ($handler, &$captured) {
+                $captured = $request;
+
+                return $handler($request, $options);
+            };
+        }, 'capture');
+
+        $client->request('GET', 'tasks');
+
+        $this->assertInstanceOf(RequestInterface::class, $captured);
+
+        return $captured;
+    }
+
+    /**
+     * Test feature flag constants are defined correctly.
+     */
+    public function testFeatureFlagConstants(): void
+    {
+        $this->assertSame('ai_teammate_actors', HttpClientInterface::FLAG_AI_TEAMMATE_ACTORS);
+        $this->assertSame(
+            'include_asana_created_custom_types',
+            HttpClientInterface::FLAG_INCLUDE_ASANA_CREATED_CUSTOM_TYPES
+        );
+    }
+
+    /**
+     * Test no feature flag headers are sent when no flags are configured.
+     */
+    public function testNoFeatureFlagHeadersByDefault(): void
+    {
+        $request = $this->captureOutboundRequest(new AsanaApiClient(fn() => 'test-token'));
+
+        $this->assertFalse($request->hasHeader('Asana-Enable'));
+        $this->assertFalse($request->hasHeader('Asana-Disable'));
+    }
+
+    /**
+     * Test enabled flags are sent as a comma-separated Asana-Enable header, without duplicates.
+     */
+    public function testEnableFeatureFlagSendsAsanaEnableHeader(): void
+    {
+        $client = new AsanaApiClient(fn() => 'test-token');
+        $client->enableFeatureFlag('ai_teammate_actors')
+            ->enableFeatureFlag(HttpClientInterface::FLAG_INCLUDE_ASANA_CREATED_CUSTOM_TYPES)
+            ->enableFeatureFlag('ai_teammate_actors');
+
+        $request = $this->captureOutboundRequest($client);
+
+        $this->assertSame(
+            'ai_teammate_actors,include_asana_created_custom_types',
+            $request->getHeaderLine('Asana-Enable')
+        );
+        $this->assertFalse($request->hasHeader('Asana-Disable'));
+    }
+
+    /**
+     * Test disabled flags are sent as a comma-separated Asana-Disable header, without duplicates.
+     */
+    public function testDisableFeatureFlagSendsAsanaDisableHeader(): void
+    {
+        $client = new AsanaApiClient(fn() => 'test-token');
+        $client->disableFeatureFlag(HttpClientInterface::FLAG_INCLUDE_ASANA_CREATED_CUSTOM_TYPES)
+            ->disableFeatureFlag(HttpClientInterface::FLAG_INCLUDE_ASANA_CREATED_CUSTOM_TYPES);
+
+        $request = $this->captureOutboundRequest($client);
+
+        $this->assertSame(
+            'include_asana_created_custom_types',
+            $request->getHeaderLine('Asana-Disable')
+        );
+        $this->assertFalse($request->hasHeader('Asana-Enable'));
+    }
+
+    /**
+     * Test disabling a flag that is currently enabled moves it to the Asana-Disable header.
+     */
+    public function testDisableFeatureFlagOverridesPreviouslyEnabledFlag(): void
+    {
+        $client = new AsanaApiClient(fn() => 'test-token');
+        $client->enableFeatureFlag(HttpClientInterface::FLAG_INCLUDE_ASANA_CREATED_CUSTOM_TYPES)
+            ->enableFeatureFlag('ai_teammate_actors')
+            ->disableFeatureFlag(HttpClientInterface::FLAG_INCLUDE_ASANA_CREATED_CUSTOM_TYPES);
+
+        $request = $this->captureOutboundRequest($client);
+
+        $this->assertSame('ai_teammate_actors', $request->getHeaderLine('Asana-Enable'));
+        $this->assertSame(
+            'include_asana_created_custom_types',
+            $request->getHeaderLine('Asana-Disable')
+        );
+    }
+
+    /**
+     * Test enabling a flag that is currently disabled moves it back to the Asana-Enable header.
+     */
+    public function testEnableFeatureFlagOverridesPreviouslyDisabledFlag(): void
+    {
+        $client = new AsanaApiClient(fn() => 'test-token');
+        $client->disableFeatureFlag(HttpClientInterface::FLAG_INCLUDE_ASANA_CREATED_CUSTOM_TYPES)
+            ->enableFeatureFlag(HttpClientInterface::FLAG_INCLUDE_ASANA_CREATED_CUSTOM_TYPES);
+
+        $request = $this->captureOutboundRequest($client);
+
+        $this->assertSame(
+            'include_asana_created_custom_types',
+            $request->getHeaderLine('Asana-Enable')
+        );
+        $this->assertFalse($request->hasHeader('Asana-Disable'));
     }
 }
