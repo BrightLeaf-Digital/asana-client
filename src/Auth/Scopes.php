@@ -44,6 +44,16 @@ class Scopes
      */
     public const CUSTOM_FIELDS_WRITE = 'custom_fields:write';
 
+    // 🔹 Custom Types
+    /**
+     * - GET /custom_types
+     * - GET /custom_types/{custom_type_gid}
+     *
+     * Also required as a field-level scope for the `custom_type` field on tasks, projects and
+     * portfolios, and for `custom_type_status_option` on tasks.
+     */
+    public const CUSTOM_TYPES_READ = 'custom_types:read';
+
     /**
      * 🔹 Goals
      * - GET /goals/{goal_gid}/custom_field_settings
@@ -89,6 +99,8 @@ class Scopes
      * - GET /portfolios
      * - GET /portfolios/{portfolio_gid}
      * - GET /portfolios/{portfolio_gid}/items
+     *
+     * The `custom_type` field on portfolios additionally requires `custom_types:read`.
      */
     public const PORTFOLIOS_READ = 'portfolios:read';
 
@@ -140,7 +152,8 @@ class Scopes
      * - GET /projects/{project_gid}/task_counts
      *
      * Also required for the opt-in `effective_memberships` field on tasks, together with
-     * `project_sections:read`.
+     * `project_sections:read`. The `custom_type` field on projects additionally requires
+     * `custom_types:read`.
      */
     public const PROJECTS_READ = 'projects:read';
 
@@ -241,6 +254,9 @@ class Scopes
      * - GET /workspaces/{workspace_gid}/tasks/search
      * - GET /user_task_lists/{user_task_list_gid}
      * - GET /users/{user_gid}/user_task_list
+     *
+     * The `custom_type` and `custom_type_status_option` fields additionally require
+     * `custom_types:read`.
      */
     public const TASKS_READ = 'tasks:read';
 
