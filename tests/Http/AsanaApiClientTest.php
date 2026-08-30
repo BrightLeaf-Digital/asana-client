@@ -767,6 +767,40 @@ class AsanaApiClientTest extends TestCase
     }
 
     /**
+     * Test an empty string query value is sent as a valueless parameter rather than dropped.
+     *
+     * Asana's `custom_type` filter uses `custom_type=` to mean "objects with no custom type".
+     */
+    public function testEmptyStringQueryValueIsPreserved(): void
+    {
+        $client = new AsanaApiClient(fn() => 'test-token');
+
+        $reflection = new ReflectionClass(AsanaApiClient::class);
+        $httpClientProperty = $reflection->getProperty('httpClient');
+        $httpClientProperty->setAccessible(true);
+        /** @var GuzzleClient $guzzle */
+        $guzzle = $httpClientProperty->getValue($client);
+
+        /** @var HandlerStack $stack */
+        $stack = $guzzle->getConfig('handler');
+        $stack->setHandler(new MockHandler([new Response(200, [], json_encode(['data' => []]))]));
+
+        $captured = null;
+        $stack->push(function (callable $handler) use (&$captured) {
+            return function (RequestInterface $request, array $options) use ($handler, &$captured) {
+                $captured = $request;
+
+                return $handler($request, $options);
+            };
+        }, 'capture');
+
+        $client->request('GET', 'projects', ['query' => ['workspace' => '12345', 'custom_type' => '']]);
+
+        $this->assertInstanceOf(RequestInterface::class, $captured);
+        $this->assertSame('workspace=12345&custom_type=', $captured->getUri()->getQuery());
+    }
+
+    /**
      * Test feature flag constants are defined correctly.
      */
     public function testFeatureFlagConstants(): void
