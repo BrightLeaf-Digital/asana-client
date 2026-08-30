@@ -29,10 +29,20 @@ class ProjectApiService extends BaseApiService
      * - archived (boolean): Only return projects whose archived field takes this value
      * - limit (int): Maximum number of projects to return. Default is 20, max is 100
      * - offset (string): Offset token for pagination
+     * - custom_type (string): Filter by custom type. Pass a custom type GID to return only
+     *   projects of that custom type (an unknown GID returns HTTP 400), or an empty string to
+     *   return only projects with no custom type assigned. Omit to skip custom type filtering.
+     *   Until Asana flips the default on 2027-01-13, results that are not filtered by custom type
+     *   exclude projects whose custom type was created by an Asana product, unless the
+     *   `include_asana_created_custom_types` feature flag is enabled via
+     *   AsanaClient::enableFeatureFlag(). An explicit custom_type filter always returns matching
+     *   projects regardless of the flag
      *
      * Display parameters:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      *   (e.g., "name,owner.name,custom_field_settings,due_date,current_status")
+     *   `resource_subtype` and `custom_type` are opt-in fields; `custom_type` additionally
+     *   requires the `custom_types:read` scope
      * - opt_pretty (bool): Returns formatted JSON if true
      *
      * @param int $responseType The type of response to return:
@@ -58,6 +68,8 @@ class ProjectApiService extends BaseApiService
      * - Just the data array containing the list of projects with fields including:
      *   - gid: Unique identifier of the project
      * - resource_type: Always "project"
+     * - resource_subtype: "default_project" or "custom"
+     * - custom_type: Compact custom type record when one is assigned (opt-in field)
      * - name: Name of the project
      * - owner: Object containing project owner details
      * - workspace: Object containing workspace details
@@ -122,10 +134,17 @@ class ProjectApiService extends BaseApiService
      * - public (boolean): Whether the project is public to the organization
      * - default_view (string): Default view for the project. Options: "list", "board",
      *   "timeline", "calendar"
+     * - resource_subtype (string): "default_project" or "custom". Must be "custom" before a
+     *   custom type can be assigned
+     * - custom_type (string|null): GID of the project's custom type. Only settable while
+     *   resource_subtype is "custom". The type must be valid for projects, and Asana-created
+     *   types cannot be assigned through the API
      *                    Example: ["name" => "New Project", "workspace" => "12345", "notes" => "Project details"]
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      *   (e.g., "name,owner.name,custom_field_settings,due_date,current_status")
+     *   `resource_subtype` and `custom_type` are opt-in fields; `custom_type` additionally
+     *   requires the `custom_types:read` scope
      * - opt_pretty (bool): Returns formatted JSON if true
      *
      * @param int $responseType The type of response to return:
@@ -193,6 +212,8 @@ class ProjectApiService extends BaseApiService
      *   (e.g., "name,owner.name,custom_field_settings,due_date,current_status")
      *                        Common fields include: name, notes, owner, workspace, team, members, followers,
      *                        created_at, modified_at, due_date, current_status, color, public, archived
+     *                        `resource_subtype` and `custom_type` are also opt-in; `custom_type`
+     *                        additionally requires the `custom_types:read` scope
      * - opt_pretty (bool): Returns formatted JSON if true
      *
      * @param int $responseType The type of response to return:
@@ -218,6 +239,8 @@ class ProjectApiService extends BaseApiService
      * - Just the data object containing the project details including:
      *   - gid: Unique identifier of the project
      * - resource_type: Always "project"
+     * - resource_subtype: "default_project" or "custom"
+     * - custom_type: Compact custom type record when one is assigned (opt-in field)
      * - name: Name of the project
      * - notes: Project description/notes
      * - owner: Object containing project owner details
@@ -273,10 +296,17 @@ class ProjectApiService extends BaseApiService
      * - archived (boolean): Whether the project is archived
      * - default_view (string): Default view for the project. Options: "list", "board",
      *   "timeline", "calendar"
+     * - resource_subtype (string): "default_project" or "custom". Must be "custom" before a
+     *   custom type can be assigned
+     * - custom_type (string|null): GID of the project's custom type. Only settable while
+     *   resource_subtype is "custom". The type must be valid for projects, and Asana-created
+     *   types cannot be assigned through the API
      *                    Example: ["name" => "Updated Project", "notes" => "New description"]
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      *   (e.g., "name,owner.name,custom_field_settings,due_date,current_status")
+     *   `resource_subtype` and `custom_type` are opt-in fields; `custom_type` additionally
+     *   requires the `custom_types:read` scope
      * - opt_pretty (bool): Returns formatted JSON if true
      *
      * @param int $responseType The type of response to return:
@@ -540,6 +570,9 @@ class ProjectApiService extends BaseApiService
      * Display parameters:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      *   (e.g., "name,owner.name,custom_field_settings,due_date,current_status")
+     *   `resource_subtype` and `custom_type` are opt-in fields; `custom_type` additionally
+     *   requires the `custom_types:read` scope. This endpoint does not support the `custom_type`
+     *   filter -- use getProjects() to filter by custom type
      * - opt_pretty (bool): Returns formatted JSON if true
      *
      * @param int $responseType The type of response to return:
@@ -613,6 +646,11 @@ class ProjectApiService extends BaseApiService
      * - public (boolean): Whether the project is public to the organization
      * - default_view (string): Default view for the project. Options: "list", "board",
      *   "timeline", "calendar"
+     * - resource_subtype (string): "default_project" or "custom". Must be "custom" before a
+     *   custom type can be assigned
+     * - custom_type (string|null): GID of the project's custom type. Only settable while
+     *   resource_subtype is "custom". The type must be valid for projects, and Asana-created
+     *   types cannot be assigned through the API
      *                    Example: ["name" => "New Team Project", "notes" => "Project details"]
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
@@ -692,6 +730,9 @@ class ProjectApiService extends BaseApiService
      * Display parameters:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      *   (e.g., "name,owner.name,custom_field_settings,due_date,current_status")
+     *   `resource_subtype` and `custom_type` are opt-in fields; `custom_type` additionally
+     *   requires the `custom_types:read` scope. This endpoint does not support the `custom_type`
+     *   filter -- use getProjects() to filter by custom type
      * - opt_pretty (bool): Returns formatted JSON if true
      *
      * @param int $responseType The type of response to return:
@@ -764,6 +805,11 @@ class ProjectApiService extends BaseApiService
      * - public (boolean): Whether the project is public to the organization
      * - default_view (string): Default view for the project. Options: "list", "board",
      *   "timeline", "calendar"
+     * - resource_subtype (string): "default_project" or "custom". Must be "custom" before a
+     *   custom type can be assigned
+     * - custom_type (string|null): GID of the project's custom type. Only settable while
+     *   resource_subtype is "custom". The type must be valid for projects, and Asana-created
+     *   types cannot be assigned through the API
      *                    Example: ["name" => "New Workspace Project", "notes" => "Project details"]
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
@@ -1459,6 +1505,9 @@ class ProjectApiService extends BaseApiService
      *
      * Display parameters:
      * - opt_fields (string): Comma-separated fields to include in the response
+     *   `resource_subtype` and `custom_type` are opt-in fields; `custom_type` additionally
+     *   requires the `custom_types:read` scope. This endpoint does not support the `custom_type`
+     *   filter -- use getProjects() to filter by custom type
      * - opt_pretty (bool): Returns formatted JSON if true
      *
      * @param int $responseType The type of response to return:

@@ -26,10 +26,20 @@ class PortfoliosApiService extends BaseApiService
      * Filtering parameters:
      * - limit (int): Maximum number of portfolios to return. Default is 20, max is 100
      * - offset (string): Offset token for pagination
+     * - custom_type (string): Filter by custom type. Pass a custom type GID to return only
+     *   portfolios of that custom type (an unknown GID returns HTTP 400), or an empty string to
+     *   return only portfolios with no custom type assigned. Omit to skip custom type filtering.
+     *   Until Asana flips the default on 2027-01-13, results that are not filtered by custom type
+     *   exclude portfolios whose custom type was created by an Asana product, unless the
+     *   `include_asana_created_custom_types` feature flag is enabled via
+     *   AsanaClient::enableFeatureFlag(). An explicit custom_type filter always returns matching
+     *   portfolios regardless of the flag
      *
      * Display parameters:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      *   (e.g., "name,owner,workspace,members,color,created_at")
+     *   `resource_subtype` and `custom_type` are opt-in fields; `custom_type` additionally
+     *   requires the `custom_types:read` scope
      * - opt_pretty (bool): Returns formatted JSON if true
      *
      * @param int $responseType The type of response to return:
@@ -55,6 +65,8 @@ class PortfoliosApiService extends BaseApiService
      * - Just the data array containing the list of portfolios with fields including:
      *   - gid: Unique identifier of the portfolio
      * - resource_type: Always "portfolio"
+     * - resource_subtype: "default_portfolio" or "custom"
+     * - custom_type: Compact custom type record when one is assigned (opt-in field)
      * - name: Name of the portfolio
      *                 Additional fields as specified in opt_fields
      *
@@ -96,9 +108,16 @@ class PortfoliosApiService extends BaseApiService
      * - start_on (string): Start date in YYYY-MM-DD format
      * - members (array): Array of user GIDs to add as members
      * - public (bool): Whether the portfolio is public to the workspace
+     * - resource_subtype (string): "default_portfolio" or "custom". Must be "custom" before a
+     *   custom type can be assigned
+     * - custom_type (string|null): GID of the portfolio's custom type. Only settable while
+     *   resource_subtype is "custom". The type must be valid for portfolios, and Asana-created
+     *   types cannot be assigned through the API
      *   Example: ["name" => "Product Launches", "workspace" => "12345"]
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
+     *   `resource_subtype` and `custom_type` are opt-in fields; `custom_type` additionally
+     *   requires the `custom_types:read` scope
      * - opt_pretty (bool): Returns formatted JSON if true
      *
      * @param int $responseType The type of response to return:
@@ -181,6 +200,9 @@ class PortfoliosApiService extends BaseApiService
      * - due_on: Due date
      * - start_on: Start date
      * - permalink_url: URL to the portfolio in Asana
+     * - resource_subtype: "default_portfolio" or "custom"
+     * - custom_type: Compact custom type record when one is assigned (opt-in field, requires the
+     *   `custom_types:read` scope)
      *                 Additional fields as specified in opt_fields
      *
      * @throws ApiException If invalid portfolio GID provided, insufficient permissions,
@@ -213,9 +235,16 @@ class PortfoliosApiService extends BaseApiService
      * - due_on (string): Due date in YYYY-MM-DD format
      * - start_on (string): Start date in YYYY-MM-DD format
      * - public (bool): Whether the portfolio is public
+     * - resource_subtype (string): "default_portfolio" or "custom". Must be "custom" before a
+     *   custom type can be assigned
+     * - custom_type (string|null): GID of the portfolio's custom type. Only settable while
+     *   resource_subtype is "custom". The type must be valid for portfolios, and Asana-created
+     *   types cannot be assigned through the API
      *   Example: ["name" => "Updated Name", "color" => "light-green"]
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
+     *   `resource_subtype` and `custom_type` are opt-in fields; `custom_type` additionally
+     *   requires the `custom_types:read` scope
      * - opt_pretty (bool): Returns formatted JSON if true
      *
      * @param int $responseType The type of response to return:

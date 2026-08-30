@@ -448,7 +448,12 @@ class WorkspaceApiService extends BaseApiService
      * @param array $options Optional parameters to customize the request:
      * - archived (boolean): Only return projects whose archived field matches this value
      * - opt_fields (string): A comma-separated list of fields to include in the response
-     *   (e.g., "name,owner.name,custom_field_settings")
+     *   (e.g., "name,owner.name,custom_field_settings").
+     *   `resource_subtype` ("default_project" or "custom") and `custom_type` are opt-in;
+     *   `custom_type` additionally requires the `custom_types:read` scope
+     *
+     * Note: this endpoint does not support the `custom_type` filter. Use
+     *   ProjectApiService::getProjects() with a `custom_type` option to filter by custom type
      * - opt_pretty (bool): Returns formatted JSON if true
      * - limit (int): Results to return per page (1-100)
      * - offset (string): Pagination offset token
@@ -515,7 +520,8 @@ class WorkspaceApiService extends BaseApiService
      *                             Example: "12345"
      * @param array $options Query parameters to filter and customize search results. Supported keys include:
      * - text (string): Full-text search query
-     *   - resource_subtype (string): Filter by task type (e.g., "default_task", "milestone", "section")
+     *   - resource_subtype (string): Filter by task type. One of "default_task", "milestone",
+     *     "approval" or "custom".
      *   - assignee.any (array): GIDs of users tasks could be assigned to
      *   - assignee.not (array): GIDs of users tasks should not be assigned to
      *   - projects.any (array): GIDs of projects tasks could be in

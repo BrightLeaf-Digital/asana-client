@@ -33,10 +33,20 @@ class TaskApiService extends BaseApiService
      *   Example: "2024-01-01T00:00:00Z"
      * - limit (int): Maximum number of tasks to return. Default is 20, max is 100
      * - offset (string): Offset token for pagination
+     * - custom_type (string): Filter by custom type. Pass a custom type GID to return only tasks
+     *   of that custom type (an unknown GID returns HTTP 400), or an empty string to return only
+     *   tasks with no custom type assigned. Omit to skip custom type filtering.
+     *   Until Asana flips the default on 2027-01-13, results that are not filtered by custom type
+     *   exclude tasks whose custom type was created by an Asana product, unless the
+     *   `include_asana_created_custom_types` feature flag is enabled via
+     *   AsanaClient::enableFeatureFlag(). An explicit custom_type filter always returns matching
+     *   tasks regardless of the flag
      *
      * Display parameters:
      * - opt_fields (string): A comma-separated list of fields to include in the response
-     *   (e.g., "name,assignee.name,completed,due_on,projects.name")
+     *   (e.g., "name,assignee.name,completed,due_on,projects.name").
+     *   `custom_type` and `custom_type_status_option` are opt-in and additionally require the
+     *   `custom_types:read` scope
      * - opt_pretty (bool): Returns formatted JSON if true
      *
      * @param int $responseType The type of response to return:
@@ -62,6 +72,7 @@ class TaskApiService extends BaseApiService
      * - Just the data array containing the list of tasks with fields including:
      *   - gid: Unique identifier of the task
      *   - resource_type: Always "task"
+     *   - resource_subtype: "default_task", "milestone", "approval" or "custom"
      *   - name: Name of the task
      *   - assignee: Object containing assignee details
      *   - completed: Boolean indicating if task is completed
