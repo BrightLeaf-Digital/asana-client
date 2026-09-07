@@ -45,7 +45,7 @@
     "ci:audit": "composer audit --no-interaction --format plain",
     "deps:lowest": "composer update --prefer-lowest --prefer-stable --no-interaction --no-progress",
     "lint": "phpcs --standard=PSR12 src tests",
-    "lint:compat": "phpcs --standard=PHPCompatibility --runtime-set testVersion 8.1- src/",
+    "lint:compat": "phpcs --standard=PHPCompatibility --runtime-set testVersion 8.1-8.5 src/",
     "lint:fix": "phpcbf --standard=PSR12 src tests",
     "test": "phpunit --configuration phpunit.xml",
     "test:coverage": "php -r \"is_dir('build/logs') || mkdir('build/logs', 0777, true);\" && XDEBUG_MODE=coverage phpunit --configuration phpunit.xml --coverage-clover build/logs/clover.xml --log-junit build/logs/junit.xml",
