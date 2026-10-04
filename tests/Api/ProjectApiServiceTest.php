@@ -340,6 +340,33 @@ class ProjectApiServiceTest extends TestCase
     }
 
     /**
+     * Test rollupProject calls client with correct parameters.
+     */
+    public function testRollupProject(): void
+    {
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'projects/12345/rollup',
+                ['query' => ['opt_fields' => 'dates_rollup_progress']],
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $this->service->rollupProject('12345', ['opt_fields' => 'dates_rollup_progress']);
+    }
+
+    /**
+     * Test rollupProject rejects an invalid project GID.
+     */
+    public function testRollupProjectInvalidGid(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->service->rollupProject('');
+    }
+
+    /**
      * Test addMembersToProject calls client with correct parameters.
      */
     public function testAddMembersToProject(): void

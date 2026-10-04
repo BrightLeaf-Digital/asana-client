@@ -17,7 +17,10 @@ class JobsApiService extends BaseApiService
     /**
      * Get a job by id
      * GET /jobs/{job_gid}
-     * Returns the full record for a single job.
+     * Returns the full record for a single job. For subtask date rollup jobs
+     * (resource_subtype "rollup_task" or "rollup_project"), request the dates_rollup_progress
+     * opt_field to get the updated_tasks and total_tasks counts. total_tasks may grow while the
+     * job is running and is final once it completes.
      * API Documentation: https://developers.asana.com/reference/getjob
      *
      * @param string $jobGid Globally unique identifier for the job.

@@ -477,6 +477,55 @@ class ProjectApiService extends BaseApiService
     }
 
     /**
+     * Roll up subtask dates for a project
+     * POST /projects/{project_gid}/rollup
+     * Creates and returns a job that asynchronously reconciles subtask dates for tasks in the project
+     * whose descendants' dates fall outside the task's own date range (has_subtasks_date_mismatch is true).
+     * Parent start and due dates are expanded to the earliest and latest descendant boundaries.
+     * Requires the projects:write scope and edit permission on the tasks' scheduling fields.
+     * API Documentation: https://developers.asana.com/reference/rollupproject
+     *
+     * @param string $projectGid The unique global ID of the project to roll up.
+     *                           Example: "12345"
+     * @param array $options Optional parameters to customize the request:
+     * - opt_fields (string): A comma-separated list of fields to include in the response
+     *   (e.g., "status,resource_subtype,dates_rollup_progress.updated_tasks,dates_rollup_progress.total_tasks")
+     * - opt_pretty (bool): Returns formatted JSON if true
+     *
+     * @param int $responseType The type of response to return:
+     *
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * @return array The response data based on the specified response type. By default, the job object:
+     * - gid: Unique identifier of the rollup job (poll it with JobsApiService::getJob)
+     * - resource_type: Always "job"
+     * - resource_subtype: "rollup_project"
+     * - status: Current status of the job ("not_started", "in_progress", "succeeded", "failed")
+     * - dates_rollup_progress: Object with updated_tasks and total_tasks counts (opt_fields)
+     *
+     * @throws ApiException If the API request fails (e.g., 403 when the caller lacks edit rights
+     *                      on the scheduling fields)
+     * @throws RateLimitException
+     * @throws ValidationException
+     */
+    public function rollupProject(
+        string $projectGid,
+        array $options = [],
+        int $responseType = HttpClientInterface::RESPONSE_DATA
+    ): array {
+        $this->validateGid($projectGid, 'Project GID');
+
+        return $this->client->request(
+            'POST',
+            "projects/$projectGid/rollup",
+            ['query' => $options],
+            $responseType
+        );
+    }
+
+    /**
      * Get projects a task is in
      * GET /tasks/{task_gid}/projects
      * Returns a list of projects that the specified task is a member of. A task can

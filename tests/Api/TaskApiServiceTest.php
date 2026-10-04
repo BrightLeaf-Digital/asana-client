@@ -428,6 +428,33 @@ class TaskApiServiceTest extends TestCase
     }
 
     /**
+     * Test rollupTask calls client with correct parameters.
+     */
+    public function testRollupTask(): void
+    {
+        $this->mockClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'tasks/12345/rollup',
+                ['query' => ['opt_fields' => 'status,resource_subtype']],
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $this->service->rollupTask('12345', ['opt_fields' => 'status,resource_subtype']);
+    }
+
+    /**
+     * Test rollupTask rejects an invalid task GID.
+     */
+    public function testRollupTaskInvalidGid(): void
+    {
+        $this->expectException(\BrightleafDigital\Exceptions\ValidationException::class);
+        $this->service->rollupTask('');
+    }
+
+    /**
      * Test getDependenciesFromTask calls client with correct parameters.
      */
     public function testGetDependenciesFromTask(): void

@@ -458,6 +458,55 @@ class TaskApiService extends BaseApiService
     }
 
     /**
+     * Roll up subtask dates for a task
+     * POST /tasks/{task_gid}/rollup
+     * Creates and returns a job that asynchronously reconciles the start and due dates of every parent
+     * task in the subtask tree rooted at the given task so they cover their descendants' date range.
+     * Runs bottom-up on nested hierarchies and includes completed subtasks. Undated parents are not
+     * given dates. Use has_subtasks_date_mismatch (opt_fields) to detect tasks that need a rollup.
+     * Requires the tasks:write scope and edit permission on the tasks' scheduling fields.
+     * API Documentation: https://developers.asana.com/reference/rolluptask
+     *
+     * @param string $taskGid The unique global ID of the root task of the subtask tree to roll up.
+     *                        Example: "12345"
+     * @param array $options Optional parameters to customize the request:
+     * - opt_fields (string): A comma-separated list of fields to include in the response
+     *   (e.g., "status,resource_subtype,dates_rollup_progress")
+     * - opt_pretty (bool): Returns formatted JSON if true
+     *
+     * @param int $responseType The type of response to return:
+     *
+     * - HttpClientInterface::RESPONSE_FULL (1): Full response with status, headers, etc.
+     * - HttpClientInterface::RESPONSE_NORMAL (2): Complete decoded JSON body
+     * - HttpClientInterface::RESPONSE_DATA (3): Only the data subset (default)
+     *
+     * @return array The response data based on the specified response type. By default, the job object:
+     * - gid: Unique identifier of the rollup job (poll it with JobsApiService::getJob)
+     * - resource_type: Always "job"
+     * - resource_subtype: "rollup_task"
+     * - status: Current status of the job ("not_started", "in_progress", "succeeded", "failed")
+     *
+     * @throws ApiException If the API request fails (e.g., 403 when the caller lacks edit rights
+     *                      on the scheduling fields)
+     * @throws RateLimitException
+     * @throws ValidationException
+     */
+    public function rollupTask(
+        string $taskGid,
+        array $options = [],
+        int $responseType = HttpClientInterface::RESPONSE_DATA
+    ): array {
+        $this->validateGid($taskGid, 'Task GID');
+
+        return $this->client->request(
+            'POST',
+            "tasks/$taskGid/rollup",
+            ['query' => $options],
+            $responseType
+        );
+    }
+
+    /**
      * Get tasks from a project
      * GET /projects/{project_gid}/tasks
      * Returns compact task records that are contained within the specified project. Tasks can exist
