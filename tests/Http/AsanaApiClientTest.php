@@ -7,7 +7,9 @@ use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Http\HttpClientInterface;
 use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
@@ -227,7 +229,7 @@ class AsanaApiClientTest extends TestCase
             new Uri('https://app.asana.com/api/1.0/tasks/invalid')
         );
 
-        $exception = new RequestException(
+        $exception = new ClientException(
             'Client error',
             $mockRequest,
             $mockResponse
@@ -251,10 +253,9 @@ class AsanaApiClientTest extends TestCase
         $mockHttpClient = $this->injectMockHttpClient();
         $mockRequest = $this->createStub(Request::class);
 
-        $exception = new RequestException(
+        $exception = new ConnectException(
             'Network error',
-            $mockRequest,
-            null
+            $mockRequest
         );
 
         $mockHttpClient->expects($this->once())
@@ -283,7 +284,7 @@ class AsanaApiClientTest extends TestCase
 
         $mockRequest = $this->createStub(Request::class);
 
-        $exception = new RequestException(
+        $exception = new ServerException(
             'Server error',
             $mockRequest,
             $mockResponse
@@ -443,7 +444,7 @@ class AsanaApiClientTest extends TestCase
             new Uri('https://app.asana.com/api/1.0/tasks')
         );
 
-        $exception = new RequestException(
+        $exception = new ClientException(
             'Client error',
             $mockRequest,
             $mockResponse
@@ -567,7 +568,7 @@ class AsanaApiClientTest extends TestCase
 
         $mockRequest = $this->createStub(Request::class);
 
-        $exception = new RequestException(
+        $exception = new ClientException(
             'Rate limit exceeded',
             $mockRequest,
             $mockResponse
@@ -606,7 +607,7 @@ class AsanaApiClientTest extends TestCase
 
         $mockRequest = $this->createStub(Request::class);
 
-        $exception = new RequestException(
+        $exception = new ClientException(
             'Rate limit exceeded',
             $mockRequest,
             $mockResponse
@@ -679,7 +680,7 @@ class AsanaApiClientTest extends TestCase
 
         $mockRequest = $this->createStub(Request::class);
 
-        $exception = new RequestException(
+        $exception = new ServerException(
             'Server error',
             $mockRequest,
             $mockResponse
@@ -746,8 +747,8 @@ class AsanaApiClientTest extends TestCase
         /** @var GuzzleClient $guzzle */
         $guzzle = $httpClientProperty->getValue($client);
 
-        /** @var HandlerStack $stack */
         $stack = $guzzle->getConfig('handler');
+        $this->assertInstanceOf(HandlerStack::class, $stack);
         $stack->setHandler(new MockHandler([new Response(200, [], json_encode(['data' => []]))]));
 
         $captured = null;
@@ -781,8 +782,8 @@ class AsanaApiClientTest extends TestCase
         /** @var GuzzleClient $guzzle */
         $guzzle = $httpClientProperty->getValue($client);
 
-        /** @var HandlerStack $stack */
         $stack = $guzzle->getConfig('handler');
+        $this->assertInstanceOf(HandlerStack::class, $stack);
         $stack->setHandler(new MockHandler([new Response(200, [], json_encode(['data' => []]))]));
 
         $captured = null;
