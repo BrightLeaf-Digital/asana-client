@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## v0.2.6 - 2026-10-04
+
+### Added
+- add Asana-Disable feature flag support (a015fe0)
+- support workspace-scoped custom type listing (66ea688)
+- add custom_types:read scope (d92e472)
+- add subtask date rollup endpoints (0ae9b33)
+
+### Documentation
+- remove personal commentary from README (a481ac7)
+- document subtask project inheritance API surfaces (aed3c55)
+- document custom type support on projects, portfolios and tasks (d47a596)
+- document feature flag helpers in readme (e79b845)
+
+### Tests
+- pin empty-string query parameter preservation (914be10)
+
+
 ## v0.2.5 - 2026-07-30
 
 ### Added
