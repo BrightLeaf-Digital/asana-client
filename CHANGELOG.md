@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## v0.2.7 - 2026-10-11
+
+### Added
+- support SCIM pagination and time entry assignees (bbce0d2)
+
+
 ## v0.2.6 - 2026-10-04
 
 ### Added
