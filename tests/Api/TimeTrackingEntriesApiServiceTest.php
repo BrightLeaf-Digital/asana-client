@@ -33,7 +33,8 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
     public function testGetTimeTrackingEntriesForTask(): void
     {
         $expectedResponse = [
-            ['gid' => '111', 'duration_minutes' => 30],
+            ['gid' => '111', 'duration_minutes' => 30,
+                'assignee' => ['gid' => '67890'], 'created_by' => ['gid' => '98765']],
             ['gid' => '222', 'duration_minutes' => 60],
         ];
 
@@ -175,15 +176,16 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
     }
 
     /**
-     * Test createTimeTrackingEntry with optional created_by field.
+     * Test creation attributes time to assignee while retaining the actual creator.
      */
     public function testCreateTimeTrackingEntryWithOptionalFields(): void
     {
         $data = [
             'entered_on' => '2026-02-05',
             'duration_minutes' => 120,
-            'created_by' => '67890',
+            'assignee' => '67890',
         ];
+        $expected = ['gid' => '99999', 'assignee' => ['gid' => '67890'], 'created_by' => ['gid' => '98765']];
 
         $this->mockClient()->expects($this->once())
             ->method('request')
@@ -193,9 +195,9 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 ['json' => ['data' => $data], 'query' => []],
                 HttpClientInterface::RESPONSE_DATA
             )
-            ->willReturn([]);
+            ->willReturn($expected);
 
-        $this->service->createTimeTrackingEntry('12345', $data);
+        $this->assertSame($expected, $this->service->createTimeTrackingEntry('12345', $data));
     }
 
     /**
@@ -313,6 +315,8 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
             'resource_type' => 'time_tracking_entry',
             'duration_minutes' => 60,
             'entered_on' => '2026-02-05',
+            'assignee' => ['gid' => '67890'],
+            'created_by' => ['gid' => '98765'],
         ];
 
         $this->mockClient()->expects($this->once())
@@ -399,6 +403,23 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
     }
 
     // ── updateTimeTrackingEntry ─────────────────────────────────────────
+
+    public function testReassignTimeTrackingEntry(): void
+    {
+        $data = ['assignee' => '67890'];
+        $expected = ['gid' => '12345', 'assignee' => ['gid' => '67890'], 'created_by' => ['gid' => '98765']];
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'PUT',
+                'time_tracking_entries/12345',
+                ['json' => ['data' => $data], 'query' => []],
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn($expected);
+
+        $this->assertSame($expected, $this->service->updateTimeTrackingEntry('12345', $data));
+    }
 
     /**
      * Test updateTimeTrackingEntry calls client with correct parameters.
@@ -607,10 +628,13 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
     {
         $options = [
             'workspace' => '12345',
-            'start_date' => '2026-01-01',
-            'end_date' => '2026-02-01',
-            'opt_fields' => 'duration_minutes,entered_on,task',
+            'assignee' => '67890',
+            'entered_on_start_date' => '2026-01-01',
+            'entered_on_end_date' => '2026-02-01',
+            'timesheet_approval_status' => '99999',
+            'opt_fields' => 'assignee,created_by,duration_minutes,entered_on,task',
         ];
+        $expected = [['gid' => '111', 'assignee' => ['gid' => '67890'], 'created_by' => ['gid' => '98765']]];
 
         $this->mockClient()->expects($this->once())
             ->method('request')
@@ -620,6 +644,17 @@ class TimeTrackingEntriesApiServiceTest extends TestCase
                 ['query' => $options],
                 HttpClientInterface::RESPONSE_DATA
             )
+            ->willReturn($expected);
+
+        $this->assertSame($expected, $this->service->getTimeTrackingEntries($options));
+    }
+
+    public function testDeprecatedUserFilterIsStillForwarded(): void
+    {
+        $options = ['user' => '67890', 'assignee' => '67890', 'task' => '12345'];
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with('GET', 'time_tracking_entries', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
             ->willReturn([]);
 
         $this->service->getTimeTrackingEntries($options);

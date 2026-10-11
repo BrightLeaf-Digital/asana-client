@@ -275,6 +275,9 @@ class AsanaApiClient implements HttpClientInterface
 
             // Try to decode it as JSON (Asana usually returns structured errors)
             $decoded = json_decode($body, true);
+            if (is_array($decoded)) {
+                $details = $decoded;
+            }
             if (is_array($decoded) && isset($decoded['errors'][0]['message'])) {
                 if (method_exists($e, 'getRequest')) {
                     $request = $e->getRequest();
@@ -285,9 +288,11 @@ class AsanaApiClient implements HttpClientInterface
                         $e->getCode() . ' ' . $response->getReasonPhrase() . '  : ' . PHP_EOL;
                 }
                 $message .= $decoded['errors'][0]['message'] . PHP_EOL . ($decoded['errors'][0]['help'] ?? '');
-                $details = $decoded;
+            } elseif (is_array($decoded) && isset($decoded['detail']) && is_string($decoded['detail'])) {
+                // SCIM errors use top-level detail and scimType rather than errors[].
+                $message = $decoded['detail'];
             } elseif ($body !== '') {
-                // If the body isn't JSON, fall back to plain string
+                // Fall back to the raw body when no recognized error message is present.
                 $message = $body;
             }
         }

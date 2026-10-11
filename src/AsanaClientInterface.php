@@ -29,6 +29,7 @@ use BrightleafDigital\Api\TagsApiService;
 use BrightleafDigital\Api\TaskApiService;
 use BrightleafDigital\Api\TeamsApiService;
 use BrightleafDigital\Api\TimeTrackingEntriesApiService;
+use BrightleafDigital\Api\ScimApiService;
 use BrightleafDigital\Api\UserApiService;
 use BrightleafDigital\Api\UserTaskListsApiService;
 use BrightleafDigital\Api\WebhooksApiService;
@@ -354,6 +355,14 @@ interface AsanaClientInterface
      * @throws NotFoundExceptionInterface
      */
     public function timeTrackingEntries(): TimeTrackingEntriesApiService;
+
+    /**
+     * List SCIM users and groups using a service account token.
+     * @return ScimApiService
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function scim(): ScimApiService;
 
     /**
      * @return UserTaskListsApiService

@@ -59,6 +59,29 @@ class TokenManagerTest extends TestCase
         $this->tokenManager->getAccessTokenString();
     }
 
+    public function testTokenWithoutExpiryLoadsWithoutRefresh(): void
+    {
+        $storage = $this->createMock(TokenStorageInterface::class);
+        $storage->expects($this->once())->method('load')->willReturn(['access_token' => 'service-account-token']);
+        $storage->expects($this->never())->method('save');
+        $auth = $this->createMock(AuthHandlerInterface::class);
+        $auth->expects($this->never())->method('refreshToken');
+        $manager = new TokenManager($storage, $auth);
+
+        $this->assertSame('service-account-token', $manager->getAccessTokenString());
+        $this->assertSame('service-account-token', $manager->getAccessTokenString());
+    }
+
+    public function testExpiredTokenWithoutOAuthCredentialsStillFails(): void
+    {
+        $manager = new TokenManager($this->mockStorage);
+        $manager->setAccessToken(new AccessToken(['access_token' => 'expired', 'expires' => time() - 60]), false);
+
+        $this->expectException(TokenInvalidException::class);
+        $this->expectExceptionMessage('OAuth credentials not provided. Cannot refresh token.');
+        $manager->getAccessTokenString();
+    }
+
     public function testEnsureValidTokenRefreshesIfExpired(): void
     {
         $expiredToken = new AccessToken([

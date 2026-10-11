@@ -7,6 +7,7 @@ use BrightleafDigital\Api\AllocationsApiService;
 use BrightleafDigital\Api\AuditLogApiService;
 use BrightleafDigital\Api\BudgetsApiService;
 use BrightleafDigital\Api\RulesApiService;
+use BrightleafDigital\Api\ScimApiService;
 use BrightleafDigital\Api\AttachmentApiService;
 use BrightleafDigital\Api\BatchApiService;
 use BrightleafDigital\Api\CustomFieldApiService;
@@ -219,6 +220,7 @@ class AsanaClient implements AsanaClientInterface
             AuditLogApiService::class,
             BudgetsApiService::class,
             RulesApiService::class,
+            ScimApiService::class,
             ProjectApiService::class,
             UserApiService::class,
             TagsApiService::class,
@@ -279,6 +281,15 @@ class AsanaClient implements AsanaClientInterface
     }
 
     // --- Service Accessors ---
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function scim(): ScimApiService
+    {
+        return $this->container->get(ScimApiService::class);
+    }
 
     /**
      * @throws ContainerExceptionInterface

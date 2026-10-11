@@ -103,7 +103,8 @@ class TokenManager
             throw new TokenInvalidException('No access token available. Please authenticate.');
         }
 
-        if ($this->accessToken->hasExpired()) {
+        // PATs and service account tokens have no local expiry metadata.
+        if ($this->accessToken->getExpires() !== null && $this->accessToken->hasExpired()) {
             $this->refreshToken();
         }
     }

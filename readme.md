@@ -89,6 +89,7 @@ This library provides comprehensive coverage of the Asana API, including:
 - **Portfolios** - Create and manage project portfolios
 - **Goals** - Track organizational goals and objectives
 - **Time Tracking** - Record and manage time entries on tasks
+- **SCIM Directory Lists** - List users and groups with optional pagination using a service account token
 - **Project Templates** - Create projects from templates
 - **Batch API** - Execute multiple API requests in a single call
 - **Status Updates** - Post and retrieve project status updates
@@ -119,9 +120,10 @@ $goals = $client->goals()->getGoals(['workspace' => $workspaceGid]);
 $goal = $client->goals()->createGoal(['name' => 'Increase Revenue', 'workspace' => $workspaceGid]);
 
 // Time Tracking - Log time entries
-$entry = $client->timeTrackingEntries()->createTimeTrackingEntry([
-    'task' => $taskGid,
-    'duration_minutes' => 120
+$entry = $client->timeTrackingEntries()->createTimeTrackingEntry($taskGid, [
+    'entered_on' => '2026-10-01',
+    'duration_minutes' => 120,
+    'assignee' => $userGid,
 ]);
 
 // Project Templates - Standardize workflows
@@ -144,6 +146,60 @@ $statusUpdate = $client->statusUpdates()->createStatusUpdate([
 // User Task Lists - Personal task management
 $myTasks = $client->userTaskLists()->getUserTaskList($userTaskListGid);
 ```
+
+### Time entry attribution
+
+`assignee` identifies whose time is logged; the read-only `created_by` identifies who created
+the entry. Use `$entry['assignee']['gid']` for attribution in reporting, billing, and payroll.
+Omitting `assignee` on creation attributes the entry to the authenticated user. To reassign an entry:
+
+```php
+$entry = $client->timeTrackingEntries()->updateTimeTrackingEntry($entryGid, ['assignee' => $userGid]);
+$entries = $client->timeTrackingEntries()->getTimeTrackingEntries([
+    'assignee' => $userGid,
+    'workspace' => $workspaceGid,
+    'entered_on_start_date' => '2026-10-01',
+    'entered_on_end_date' => '2026-10-31',
+    'opt_fields' => 'assignee,assignee.name,created_by,duration_minutes,entered_on',
+]);
+```
+
+You may assign time to yourself, someone whose time you review, or any user if you are a domain
+admin. Reviewer relationships require the Timesheets & Budgets add-on. Unauthorized assignment
+returns HTTP 403 through `ApiException`. The `user` list filter remains supported as a deprecated
+alias for `assignee`; passing different values for both returns HTTP 400. Workspace filtering
+requires at least one date boundary. Filter by approval status with `timesheet_approval_status`.
+See the [assignee announcement](https://forum.asana.com/t/new-time-tracking-entry-assignee-field/1158064).
+
+### SCIM users and groups
+
+SCIM requires a service account token in an Enterprise domain. Pass that token through the existing
+`withPAT()` factory; ordinary personal access tokens and OAuth tokens cannot access SCIM.
+Both list methods default to returning the complete SCIM envelope, including `Resources` and
+pagination metadata. They perform one request per call.
+
+```php
+$directoryClient = AsanaClient::withPAT($serviceAccountToken, tokenStorage: false);
+$page = $directoryClient->scim()->getUsers(['startIndex' => 1, 'count' => 100]);
+$users = $page['Resources'];
+if (!empty($page['nextCursor'])) {
+    $nextPage = $directoryClient->scim()->getUsers(['cursor' => $page['nextCursor'], 'count' => 100]);
+}
+$groups = $directoryClient->scim()->getGroups(['count' => 100]);
+$matchingUsers = $directoryClient->scim()->getUsers(['filter' => 'userName eq "user@example.com"']);
+```
+
+Pagination is opt-in: without `startIndex`, `count`, or `cursor`, Asana returns the full list and omits
+`startIndex`, `itemsPerPage`, and `nextCursor`. `startIndex` is 1-based (values below 1 become 1);
+`count` defaults to 100 and is capped at 1000. `cursor` overrides `startIndex`, and cursor responses
+omit `startIndex`. `totalResults` is the total matching directory size, not the page size. Equality
+filters (`userName` for users, `displayName` for groups) return matching resources without pagination.
+
+Malformed or expired cursors return HTTP 400 with `scimType: invalidCursor`; non-integer pagination
+parameters return `scimType: invalidValue`. Inspect these fields with
+`$exception->getResponseData()` on `ApiException`. `RESPONSE_FULL` additionally exposes HTTP metadata;
+`RESPONSE_DATA` also preserves the entire SCIM envelope because SCIM has no `data` wrapper.
+See the [SCIM reference](https://developers.asana.com/docs/scim).
 
 ## Design Decisions
 

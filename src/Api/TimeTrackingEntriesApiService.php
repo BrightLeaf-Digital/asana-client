@@ -7,6 +7,13 @@ use BrightleafDigital\Exceptions\ValidationException;
 use BrightleafDigital\Http\HttpClientInterface;
 use BrightleafDigital\Exceptions\ApiException;
 
+/**
+ * Time entry assignee identifies whose time is logged. created_by is the read-only creator
+ * and can differ from assignee when a reviewer or domain admin logs time for another user.
+ * Both fields are returned as compact user objects; use assignee for reporting and billing.
+ *
+ * @link https://forum.asana.com/t/new-time-tracking-entry-assignee-field/1158064
+ */
 class TimeTrackingEntriesApiService extends BaseApiService
 {
     /**
@@ -25,7 +32,7 @@ class TimeTrackingEntriesApiService extends BaseApiService
      *
      * Display parameters:
      * - opt_fields (string): A comma-separated list of fields to include
-     *   (e.g., "created_by,duration_minutes,entered_on")
+     *   (e.g., "assignee,assignee.name,created_by,duration_minutes,entered_on")
      * - opt_pretty (bool): Returns formatted JSON if true
      *
      * @param int $responseType The type of response to return:
@@ -84,8 +91,10 @@ class TimeTrackingEntriesApiService extends BaseApiService
      * - duration_minutes (int): Duration of the time entry in minutes.
      *   Example: 60
      *                    Optional:
-     * - created_by (string): GID of the user who created the entry.
-     *   Defaults to the authenticated user.
+     * - assignee (string): GID of the user whose time is logged; defaults to the authenticated user.
+     *   You may assign yourself, a user whose time you review, or any user as a domain admin.
+     *   Reviewer relationships require the Timesheets & Budgets add-on.
+     *   An unauthorized assignee returns HTTP 403 (time_tracking_entry_invalid_assignee).
      * - categories (array): Array containing at most one time tracking category GID to assign.
      *   Requires the Timesheets & Budgets Add-on (TBAO).
      *   Example: [["gid" => "99999"]]
@@ -155,7 +164,7 @@ class TimeTrackingEntriesApiService extends BaseApiService
      *                                     Example: "12345"
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include
-     *   (e.g., "created_by,duration_minutes,entered_on,task")
+     *   (e.g., "assignee,assignee.name,created_by,duration_minutes,entered_on,task")
      * - opt_pretty (bool): Returns formatted JSON if true
      *
      * @param int $responseType The type of response to return:
@@ -183,6 +192,7 @@ class TimeTrackingEntriesApiService extends BaseApiService
      * - resource_type: Always "time_tracking_entry"
      * - duration_minutes: Duration in minutes
      * - entered_on: Date the time was entered for
+     * - assignee: Compact user object identifying whose time is logged
      * - created_by: Object containing the creator details
      * - task: Object containing the associated task details
      *                 Additional fields as specified in opt_fields
@@ -212,6 +222,10 @@ class TimeTrackingEntriesApiService extends BaseApiService
      * @param array $data The properties to update. Can include:
      * - duration_minutes (int): Duration in minutes
      * - entered_on (string): Date in YYYY-MM-DD format
+     * - assignee (string): GID of the user whose time is logged; reassigns the entry.
+     *   You may assign yourself, a user whose time you review, or any user as a domain admin.
+     *   Reviewer relationships require the Timesheets & Budgets add-on.
+     *   An unauthorized assignee returns HTTP 403 (time_tracking_entry_invalid_assignee).
      * - categories (array): Array containing at most one time tracking category GID.
      *   Pass an empty array to remove the assigned category.
      *   Requires the Timesheets & Budgets Add-on (TBAO).
@@ -317,10 +331,16 @@ class TimeTrackingEntriesApiService extends BaseApiService
      *
      * Filtering parameters:
      * - workspace (string): GID of the workspace to filter entries from
-     * - user (string): GID of the user to filter entries by
-     * - start_date (string): Start date in YYYY-MM-DD format to filter entries
-     * - end_date (string): End date in YYYY-MM-DD format to filter entries
-     * - timesheet_approval_status_gid (string): Filter entries belonging to a specific
+     *   Requires at least one of entered_on_start_date or entered_on_end_date.
+     * - assignee (string): GID of the user whose time is logged
+     * - user (string): Deprecated alias for assignee; still supported by Asana.
+     *   Supplying user and assignee with different values returns HTTP 400.
+     * - task (string): GID of the task to filter entries by
+     * - attributable_to (string): GID of the project the time is attributed to
+     * - portfolio (string): GID of the portfolio to filter entries by
+     * - entered_on_start_date (string): Start date in YYYY-MM-DD format
+     * - entered_on_end_date (string): End date in YYYY-MM-DD format
+     * - timesheet_approval_status (string): Filter entries belonging to a specific
      *   timesheet approval status record. Requires the Timesheets & Budgeting add-on.
      * Pagination parameters:
      * - limit (int): Maximum number of entries to return. Default is 20, max is 100
@@ -328,7 +348,7 @@ class TimeTrackingEntriesApiService extends BaseApiService
      *
      * Display parameters:
      * - opt_fields (string): A comma-separated list of fields to include
-     *   (e.g., "created_by,duration_minutes,entered_on,task")
+     *   (e.g., "assignee,assignee.name,created_by,duration_minutes,entered_on,task")
      * - opt_pretty (bool): Returns formatted JSON if true
      *
      * @param int $responseType The type of response to return:

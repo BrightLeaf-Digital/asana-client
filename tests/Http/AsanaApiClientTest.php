@@ -3,6 +3,7 @@
 namespace BrightleafDigital\Tests\Http;
 
 use BrightleafDigital\Exceptions\ApiException;
+use BrightleafDigital\Api\TimeTrackingEntriesApiService;
 use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Http\AsanaApiClient;
 use BrightleafDigital\Http\HttpClientInterface;
@@ -11,6 +12,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Handler\MockHandler;
+use PHPUnit\Framework\Attributes\DataProvider;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -416,6 +418,74 @@ class AsanaApiClientTest extends TestCase
         $result = $this->apiClient->request('DELETE', 'tasks/12345');
 
         $this->assertSame([], $result);
+    }
+
+    #[DataProvider('timeTrackingErrors')]
+    public function testTimeTrackingErrorsPreserveStatusAndResponse(
+        int $status,
+        string $operation,
+        array $parameters,
+        array $body
+    ): void {
+        $mockHttpClient = $this->injectMockHttpClient();
+        $response = new Response($status, [], json_encode($body));
+        $method = $operation === 'update' ? 'PUT' : 'GET';
+        $endpoint = $operation === 'update' ? 'time_tracking_entries/12345' : 'time_tracking_entries';
+        $request = new Request($method, 'https://app.asana.com/api/1.0/' . $endpoint);
+        $mockHttpClient->expects($this->once())
+            ->method('request')
+            ->willThrowException(new ClientException('Client error', $request, $response));
+        $service = new TimeTrackingEntriesApiService($this->apiClient);
+
+        try {
+            if ($operation === 'update') {
+                $service->updateTimeTrackingEntry('12345', $parameters);
+            } else {
+                $service->getTimeTrackingEntries($parameters);
+            }
+            $this->fail('Expected a time tracking error');
+        } catch (ApiException $e) {
+            $this->assertSame($status, $e->getCode());
+            $this->assertSame($body, $e->getResponseData());
+            $this->assertStringContainsString($body['errors'][0]['message'], $e->getMessage());
+        }
+    }
+
+    public static function timeTrackingErrors(): array
+    {
+        return [
+            'unauthorized assignee' => [403, 'update', ['assignee' => '67890'], [
+                'errors' => [[
+                    'message' => 'You can only set assignee to yourself or to a user whose time you review.',
+                ]],
+            ]],
+            'conflicting filters' => [400, 'list', ['assignee' => '67890', 'user' => '98765'], [
+                'errors' => [[
+                    'message' => 'assignee: cannot be combined with a different value for the deprecated '
+                        . 'user parameter',
+                ]],
+            ]],
+        ];
+    }
+
+    public function testJsonErrorWithoutMessagePreservesResponseData(): void
+    {
+        $body = ['status' => '400', 'scimType' => 'invalidCursor'];
+        $rawBody = json_encode($body);
+        $mockHttpClient = $this->injectMockHttpClient();
+        $response = new Response(400, [], $rawBody);
+        $request = new Request('GET', 'https://app.asana.com/api/1.0/scim/Users');
+        $mockHttpClient->expects($this->once())
+            ->method('request')
+            ->willThrowException(new ClientException('Client error', $request, $response));
+
+        try {
+            $this->apiClient->request('GET', 'scim/Users');
+            $this->fail('Expected a SCIM error');
+        } catch (ApiException $e) {
+            $this->assertSame($body, $e->getResponseData());
+            $this->assertSame($rawBody, $e->getMessage());
+        }
     }
 
     /**
