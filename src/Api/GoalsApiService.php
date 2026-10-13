@@ -13,6 +13,11 @@ class GoalsApiService extends BaseApiService
      * Get a goal
      * GET /goals/{goal_gid}
      * Returns the full record for a single goal.
+     * Rich text in text custom fields is opt-in through opt_fields=custom_fields.html_text_value.
+     * html_text_value is read-only and nullable; text_value and display_value remain plain text.
+     * The current OpenAPI spec instead lists custom_field_settings.custom_field.html_text_value
+     * for custom field settings. Query options are forwarded unchanged; see the README for this
+     * difference between the specification and the rich-text announcement.
      * API Documentation: https://developers.asana.com/reference/getgoal
      *
      * @param string $goalGid The unique global ID of the goal to retrieve.
@@ -90,6 +95,11 @@ class GoalsApiService extends BaseApiService
      * - default_access_level (string): Default role granted to new goal members.
      *   Allowed values: "admin", "editor", "commenter", "viewer"
      *   Example: ["name" => "Updated Goal Name", "status" => "on_track"]
+     * - custom_fields (array): Custom field GIDs mapped to values; text values are treated as plain text.
+     * - html_custom_fields (array<string, string>): Text custom field GIDs mapped to rich text HTML.
+     *   Values must be valid XML wrapped in <body></body> tags. Asana synchronizes the HTML and
+     *   plain-text values; display_value remains plain text. Unsupported field types or invalid
+     *   rich text are rejected by Asana with HTTP 400 (ApiException).
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      * - opt_pretty (bool): Returns formatted JSON if true

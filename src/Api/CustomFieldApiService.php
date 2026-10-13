@@ -8,6 +8,14 @@ use BrightleafDigital\Exceptions\RateLimitException;
 use BrightleafDigital\Utils\ValidationTrait;
 use BrightleafDigital\Exceptions\ValidationException;
 
+/**
+ * Custom field definitions and settings.
+ *
+ * Text custom field responses can include read-only html_text_value (string|null), the HTML
+ * representation of text_value. display_value remains plain text. Values are written on the
+ * owning task, project, portfolio or goal through html_custom_fields, rather than by updating
+ * the custom field definition. See https://developers.asana.com/docs/rich-text.
+ */
 class CustomFieldApiService extends BaseApiService
 {
     /**

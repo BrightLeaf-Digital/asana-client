@@ -15,6 +15,8 @@ class TaskApiService extends BaseApiService
      * GET /tasks
      * Returns a list of tasks filtered by the specified criteria. This endpoint provides a way to get
      * multiple tasks in a single request according to your search parameters.
+     * Rich text in text custom fields is opt-in through opt_fields=custom_fields.html_text_value.
+     * html_text_value is read-only and nullable; text_value and display_value remain plain text.
      * API Documentation: https://developers.asana.com/reference/gettasks
      * @param array $options Query parameters to filter and format results:
      *
@@ -120,6 +122,11 @@ class TaskApiService extends BaseApiService
      *                                         Section_gid is optional - if omitted task will be added to project root
      *                    Example: ["name" => "New task", "workspace" => "12345",
      *                             "memberships" => [["project" => "789", "section" => "101112"]]]
+     * - custom_fields (array): Custom field GIDs mapped to values; text values are treated as plain text.
+     * - html_custom_fields (array<string, string>): Text custom field GIDs mapped to rich text HTML.
+     *   Values must be valid XML wrapped in <body></body> tags. Asana synchronizes the HTML and
+     *   plain-text values; display_value remains plain text. Unsupported field types or invalid
+     *   rich text are rejected by Asana with HTTP 400 (ApiException).
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      *   (e.g., "name,assignee.status,custom_fields.name")
@@ -185,6 +192,8 @@ class TaskApiService extends BaseApiService
      * Returns the complete task record for a single task. The task record includes
      * basic metadata (name, notes, completion status, etc.) along with any custom
      * fields, followers, assignee and more (or less) as requested via opt_fields.
+     * Text custom fields include read-only html_text_value (string|null) by default.
+     * text_value and display_value remain plain text.
      * API Documentation: https://developers.asana.com/reference/gettask
      * @param string $taskGid The unique global ID of the task to retrieve. This identifier
      *                        can be found in the task URL or returned from task-related API endpoints.
@@ -280,6 +289,11 @@ class TaskApiService extends BaseApiService
      *                      ]
      *                    Example: ["name" => "Update Task", "completed" => true,
      *                             "memberships" => [["project" => "123", "section" => "456"]]]
+     * - custom_fields (array): Custom field GIDs mapped to values; text values are treated as plain text.
+     * - html_custom_fields (array<string, string>): Text custom field GIDs mapped to rich text HTML.
+     *   Values must be valid XML wrapped in <body></body> tags. Asana synchronizes the HTML and
+     *   plain-text values; display_value remains plain text. Unsupported field types or invalid
+     *   rich text are rejected by Asana with HTTP 400 (ApiException).
      * @param array $options Optional parameters for the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      *   (e.g., "name,assignee.status,custom_fields.name")
@@ -512,6 +526,8 @@ class TaskApiService extends BaseApiService
      * Returns compact task records that are contained within the specified project. Tasks can exist
      * in multiple projects at once. By default, tasks included are not sorted and basic task fields
      * are returned. Tasks may be filtered by specifying the query options.
+     * Rich text in text custom fields is opt-in through opt_fields=custom_fields.html_text_value.
+     * html_text_value is read-only and nullable; text_value and display_value remain plain text.
      * API Documentation: https://developers.asana.com/reference/gettasksforproject
      *
      * @param string $projectGid The unique global ID of the project to get tasks from.
@@ -585,6 +601,8 @@ class TaskApiService extends BaseApiService
      * GET /sections/{section_gid}/tasks
      * Returns a list of tasks in a section. Tasks can be placed into a section within a project.
      * This endpoint allows retrieving all tasks that are currently in a specific section.
+     * Rich text in text custom fields is opt-in through opt_fields=custom_fields.html_text_value.
+     * html_text_value is read-only and nullable; text_value and display_value remain plain text.
      * API Documentation: https://developers.asana.com/reference/gettasksforsection
      *
      * @param string $sectionGid The unique global ID of the section to query tasks from.
@@ -658,6 +676,8 @@ class TaskApiService extends BaseApiService
      * GET /tags/{tag_gid}/tasks
      * Returns a list of all tasks with the specified tag. Tasks can have multiple tags
      * and this endpoint allows retrieving all tasks associated with a particular tag.
+     * Rich text in text custom fields is opt-in through opt_fields=custom_fields.html_text_value.
+     * html_text_value is read-only and nullable; text_value and display_value remain plain text.
      * API Documentation: https://developers.asana.com/reference/gettasksfortag
      *
      * @param string $tagGid The global identifier for the tag to query tasks from.
@@ -733,6 +753,8 @@ class TaskApiService extends BaseApiService
      * Retrieves the compact list of tasks in a user's My Tasks list. The My Tasks list
      * represents the tasks assigned to a user that also appear in their My Tasks list.
      * Users can reorder their My Tasks list and specify custom sections to group tasks.
+     * Rich text in text custom fields is opt-in through opt_fields=custom_fields.html_text_value.
+     * html_text_value is read-only and nullable; text_value and display_value remain plain text.
      * API Documentation: https://developers.asana.com/reference/gettasksforusertasklist
      *
      * @param string $userTaskListGid The globally unique identifier for the user task list.
@@ -805,6 +827,8 @@ class TaskApiService extends BaseApiService
      * GET /tasks/{task_gid}/subtasks
      * Retrieves a compact list of all subtasks associated with the given task. A subtask is a task that
      * represents a breakdown of a larger task and maintains a parent-child relationship with its parent task.
+     * Rich text in text custom fields is opt-in through opt_fields=custom_fields.html_text_value.
+     * html_text_value is read-only and nullable; text_value and display_value remain plain text.
      * API Documentation: https://developers.asana.com/reference/getsubtasksfortask
      *
      * Subtasks inherit the projects of their ancestor tasks. The projects and memberships fields
@@ -894,6 +918,11 @@ class TaskApiService extends BaseApiService
      * - completed (boolean): Boolean for completion status.
      *   Example: false
      *                    Example: ["name" => "My Subtask", "assignee" => "67890", "due_on" => "2024-12-31"]
+     * - custom_fields (array): Custom field GIDs mapped to values; text values are treated as plain text.
+     * - html_custom_fields (array<string, string>): Text custom field GIDs mapped to rich text HTML.
+     *   Values must be valid XML wrapped in <body></body> tags. Asana synchronizes the HTML and
+     *   plain-text values; display_value remains plain text. Unsupported field types or invalid
+     *   rich text are rejected by Asana with HTTP 400 (ApiException).
      * @param array $options Optional parameters to include with the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      *   (e.g., "name,assignee.name,completed,due_on,parent")
@@ -1744,6 +1773,8 @@ class TaskApiService extends BaseApiService
      * Fetches a task from a specific workspace using its custom task ID.
      * The `custom_task_id` must be unique within the workspace. If no task matches
      * the provided custom ID, an error will be returned.
+     * Text custom fields include read-only html_text_value (string|null) by default.
+     * text_value and display_value remain plain text.
      * API Documentation: https://developers.asana.com/reference/gettaskforcustomid
      *
      * @param string $workspaceGid The unique global ID of the workspace where the task is searched.
@@ -1808,6 +1839,8 @@ class TaskApiService extends BaseApiService
      * the Asana API. This method allows filtering tasks based on a variety of
      * search options, such as assignee, completion status, and due dates.
      * For details about available filters, refer to the Asana API documentation.
+     * Rich text in text custom fields is opt-in through opt_fields=custom_fields.html_text_value.
+     * html_text_value is read-only and nullable; text_value and display_value remain plain text.
      * API Documentation: https://developers.asana.com/reference/searchtasksforworkspace
      *
      * @param string $workspaceGid The unique global ID of the workspace where the tasks should be searched.

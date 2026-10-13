@@ -159,6 +159,11 @@ class PortfoliosApiService extends BaseApiService
      * Get a portfolio
      * GET /portfolios/{portfolio_gid}
      * Returns the full record for a single portfolio.
+     * Rich text in text custom fields is opt-in through opt_fields=custom_fields.html_text_value.
+     * html_text_value is read-only and nullable; text_value and display_value remain plain text.
+     * The current OpenAPI spec instead lists custom_field_settings.custom_field.html_text_value
+     * for custom field settings. Query options are forwarded unchanged; see the README for this
+     * difference between the specification and the rich-text announcement.
      * API Documentation: https://developers.asana.com/reference/getportfolio
      *
      * @param string $portfolioGid The unique global ID of the portfolio to retrieve.
@@ -241,6 +246,11 @@ class PortfoliosApiService extends BaseApiService
      *   resource_subtype is "custom". The type must be valid for portfolios, and Asana-created
      *   types cannot be assigned through the API
      *   Example: ["name" => "Updated Name", "color" => "light-green"]
+     * - custom_fields (array): Custom field GIDs mapped to values; text values are treated as plain text.
+     * - html_custom_fields (array<string, string>): Text custom field GIDs mapped to rich text HTML.
+     *   Values must be valid XML wrapped in <body></body> tags. Asana synchronizes the HTML and
+     *   plain-text values; display_value remains plain text. Unsupported field types or invalid
+     *   rich text are rejected by Asana with HTTP 400 (ApiException).
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      *   `resource_subtype` and `custom_type` are opt-in fields; `custom_type` additionally

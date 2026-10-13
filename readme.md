@@ -82,6 +82,22 @@ This library provides comprehensive coverage of the Asana API, including:
 - **Sections** - Organize tasks within projects using sections
 - **Memberships** - Manage project and workspace memberships
 
+### Rich text custom fields
+
+Text custom field values support rich text through `html_custom_fields`, a map of custom field GIDs to HTML strings.
+This parameter is supported when creating or updating tasks and projects, creating subtasks or projects in a team or
+workspace, and updating portfolios or goals. HTML must be valid XML wrapped in `<body></body>` tags; Asana rejects
+invalid markup and non-text custom fields with HTTP 400, surfaced as `ApiException` with the API error details.
+Asana synchronizes HTML and plain-text values. Existing `custom_fields` writes remain plain text, and `display_value`
+is always plain text.
+
+Read-only `html_text_value` is nullable and returned by default for task reads by GID or custom ID. Other reads require
+opting in through `opt_fields`. The [announcement](https://forum.asana.com/t/new-rich-text-support-for-text-custom-fields/1158354/1)
+specifies `custom_fields.html_text_value`; the current OpenAPI spec lists
+`custom_field_settings.custom_field.html_text_value` for project, goal and portfolio reads instead. These paths refer
+to different response locations; the client forwards the requested fields unchanged, without rewriting one to the other.
+See the [rich text documentation](https://developers.asana.com/docs/rich-text) for formatting requirements.
+
 ### Advanced Features
 - **Webhooks** - Set up real-time notifications for resource changes
 - **Events** - Poll for events and track changes to resources

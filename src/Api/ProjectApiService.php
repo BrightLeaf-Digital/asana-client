@@ -140,6 +140,11 @@ class ProjectApiService extends BaseApiService
      *   resource_subtype is "custom". The type must be valid for projects, and Asana-created
      *   types cannot be assigned through the API
      *                    Example: ["name" => "New Project", "workspace" => "12345", "notes" => "Project details"]
+     * - custom_fields (array): Custom field GIDs mapped to values; text values are treated as plain text.
+     * - html_custom_fields (array<string, string>): Text custom field GIDs mapped to rich text HTML.
+     *   Values must be valid XML wrapped in <body></body> tags. Asana synchronizes the HTML and
+     *   plain-text values; display_value remains plain text. Unsupported field types or invalid
+     *   rich text are rejected by Asana with HTTP 400 (ApiException).
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      *   (e.g., "name,owner.name,custom_field_settings,due_date,current_status")
@@ -203,6 +208,11 @@ class ProjectApiService extends BaseApiService
      * Returns the complete project record for a single project. The project record includes
      * basic metadata (name, notes, status, etc.) along with any custom fields and more
      * as requested via opt_fields.
+     * Rich text in text custom fields is opt-in through opt_fields=custom_fields.html_text_value.
+     * html_text_value is read-only and nullable; text_value and display_value remain plain text.
+     * The current OpenAPI spec instead lists custom_field_settings.custom_field.html_text_value
+     * for custom field settings. Query options are forwarded unchanged; see the README for this
+     * difference between the specification and the rich-text announcement.
      * API Documentation: https://developers.asana.com/reference/getproject
      * @param string $projectGid The unique global ID of the project to retrieve. This identifier
      *                           can be found in the project URL or returned from project-related API endpoints.
@@ -302,6 +312,11 @@ class ProjectApiService extends BaseApiService
      *   resource_subtype is "custom". The type must be valid for projects, and Asana-created
      *   types cannot be assigned through the API
      *                    Example: ["name" => "Updated Project", "notes" => "New description"]
+     * - custom_fields (array): Custom field GIDs mapped to values; text values are treated as plain text.
+     * - html_custom_fields (array<string, string>): Text custom field GIDs mapped to rich text HTML.
+     *   Values must be valid XML wrapped in <body></body> tags. Asana synchronizes the HTML and
+     *   plain-text values; display_value remains plain text. Unsupported field types or invalid
+     *   rich text are rejected by Asana with HTTP 400 (ApiException).
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      *   (e.g., "name,owner.name,custom_field_settings,due_date,current_status")
@@ -701,6 +716,11 @@ class ProjectApiService extends BaseApiService
      *   resource_subtype is "custom". The type must be valid for projects, and Asana-created
      *   types cannot be assigned through the API
      *                    Example: ["name" => "New Team Project", "notes" => "Project details"]
+     * - custom_fields (array): Custom field GIDs mapped to values; text values are treated as plain text.
+     * - html_custom_fields (array<string, string>): Text custom field GIDs mapped to rich text HTML.
+     *   Values must be valid XML wrapped in <body></body> tags. Asana synchronizes the HTML and
+     *   plain-text values; display_value remains plain text. Unsupported field types or invalid
+     *   rich text are rejected by Asana with HTTP 400 (ApiException).
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      *   (e.g., "name,owner.name,custom_field_settings,due_date,current_status")
@@ -860,6 +880,11 @@ class ProjectApiService extends BaseApiService
      *   resource_subtype is "custom". The type must be valid for projects, and Asana-created
      *   types cannot be assigned through the API
      *                    Example: ["name" => "New Workspace Project", "notes" => "Project details"]
+     * - custom_fields (array): Custom field GIDs mapped to values; text values are treated as plain text.
+     * - html_custom_fields (array<string, string>): Text custom field GIDs mapped to rich text HTML.
+     *   Values must be valid XML wrapped in <body></body> tags. Asana synchronizes the HTML and
+     *   plain-text values; display_value remains plain text. Unsupported field types or invalid
+     *   rich text are rejected by Asana with HTTP 400 (ApiException).
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): A comma-separated list of fields to include in the response
      *   (e.g., "name,owner.name,custom_field_settings,due_date,current_status")
