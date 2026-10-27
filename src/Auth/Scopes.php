@@ -169,6 +169,25 @@ class Scopes
      */
     public const PROJECTS_WRITE = 'projects:write';
 
+    // 🔹 Records
+    /**
+     * DELETE /records/{record_gid}
+     */
+    public const RECORDS_DELETE = 'records:delete';
+
+    /**
+     * - GET /records/{record_gid}
+     * - GET /tables/{table_gid}/records
+     * - GET /workspaces/{workspace_gid}/records/search
+     */
+    public const RECORDS_READ = 'records:read';
+
+    /**
+     * - POST /records
+     * - PUT /records/{record_gid}
+     */
+    public const RECORDS_WRITE = 'records:write';
+
     // 🔹 Roles
     /**
      * - GET /roles
@@ -196,14 +215,37 @@ class Scopes
     /**
      * - GET /stories/{story_gid}
      * - GET /tasks/{task_gid}/stories
+     * - GET /records/{record_gid}/stories
      */
     public const STORIES_READ = 'stories:read';
 
     /**
      * - PUT /stories/{story_gid}
      * - POST /tasks/{task_gid}/stories
+     * - POST /records/{record_gid}/stories
      */
     public const STORIES_WRITE = 'stories:write';
+
+    // 🔹 Tables
+    /**
+     * DELETE /tables/{table_gid}
+     */
+    public const TABLES_DELETE = 'tables:delete';
+
+    /**
+     * - GET /tables/{table_gid}
+     * - GET /tables/{table_gid}/custom_field_settings
+     * - GET /workspaces/{workspace_gid}/tables
+     */
+    public const TABLES_READ = 'tables:read';
+
+    /**
+     * - POST /tables
+     * - PUT /tables/{table_gid}
+     * - POST /tables/{table_gid}/addCustomFieldSetting
+     * - POST /tables/{table_gid}/removeCustomFieldSetting
+     */
+    public const TABLES_WRITE = 'tables:write';
 
     // 🔹 Tags
     /**

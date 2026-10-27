@@ -88,6 +88,26 @@ class ScopesTest extends TestCase
     }
 
     /**
+     * Test tables scope constants.
+     */
+    public function testTablesScopes(): void
+    {
+        $this->assertSame('tables:delete', Scopes::TABLES_DELETE);
+        $this->assertSame('tables:read', Scopes::TABLES_READ);
+        $this->assertSame('tables:write', Scopes::TABLES_WRITE);
+    }
+
+    /**
+     * Test records scope constants.
+     */
+    public function testRecordsScopes(): void
+    {
+        $this->assertSame('records:delete', Scopes::RECORDS_DELETE);
+        $this->assertSame('records:read', Scopes::RECORDS_READ);
+        $this->assertSame('records:write', Scopes::RECORDS_WRITE);
+    }
+
+    /**
      * Test tags scope constants.
      */
     public function testTagsScopes(): void
