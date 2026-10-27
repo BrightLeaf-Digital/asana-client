@@ -160,4 +160,68 @@ class StoriesApiService extends BaseApiService
 
         return $this->createResource("tasks/$taskGid/stories", $data, $options, $responseType);
     }
+
+    /**
+     * Get stories from a record
+     * GET /records/{record_gid}/stories
+     * Returns the compact records for all stories on the record.
+     * Requires the `stories:read` OAuth scope.
+     * API Documentation: https://developers.asana.com/reference/getstoriesforrecord
+     *
+     * @param string $recordGid The record to operate on.
+     * @param array $options Optional parameters to customize the request:
+     * - limit (int): Results per page.
+     * - offset (string): Offset token for pagination.
+     * - created_after (string): Only return stories created after this ISO 8601 date-time.
+     * - resource_subtype (string): Only "comment_added" is supported, which returns comments only.
+     * - sort_ascending (bool): true (default) for oldest first, false for newest first.
+     * - opt_fields (string): A comma-separated list of fields to include in the response.
+     *
+     * @param int $responseType The type of response to return.
+     * @return array The response data based on the specified response type.
+     * @throws ApiException
+     * @throws RateLimitException
+     * @throws ValidationException
+     */
+    public function getStoriesForRecord(
+        string $recordGid,
+        array $options = [],
+        int $responseType = HttpClientInterface::RESPONSE_DATA
+    ): array {
+        $this->validateGid($recordGid, 'Record GID');
+
+        return $this->getResources("records/$recordGid/stories", $options, $responseType);
+    }
+
+    /**
+     * Create a story on a record
+     * POST /records/{record_gid}/stories
+     * Adds a story to a record. This endpoint currently only allows for comment stories to be created.
+     * Requires the `stories:write` OAuth scope.
+     * API Documentation: https://developers.asana.com/reference/createstoryforrecord
+     *
+     * @param string $recordGid The record to operate on.
+     * @param array $data The properties of the story to create. Can include:
+     * - text (string): The plain text of the comment to add.
+     * - html_text (string): The rich text of the comment to add.
+     * - is_pinned (bool): Whether the story should be pinned to the top of the record.
+     *
+     * @param array $options Optional parameters to customize the request.
+     * @param int $responseType The type of response to return.
+     * @return array The response data based on the specified response type.
+     * @throws ApiException
+     * @throws RateLimitException
+     * @throws ValidationException
+     */
+    public function createStoryForRecord(
+        string $recordGid,
+        array $data,
+        array $options = [],
+        int $responseType = HttpClientInterface::RESPONSE_DATA
+    ): array {
+        $this->validateGid($recordGid, 'Record GID');
+        $this->validateAtLeastOneField($data, ['text', 'html_text'], 'Create Story');
+
+        return $this->createResource("records/$recordGid/stories", $data, $options, $responseType);
+    }
 }

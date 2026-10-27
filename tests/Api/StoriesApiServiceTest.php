@@ -3,6 +3,7 @@
 namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\StoriesApiService;
+use BrightleafDigital\Exceptions\ValidationException;
 use BrightleafDigital\Http\HttpClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -101,6 +102,62 @@ class StoriesApiServiceTest extends TestCase
             ->willReturn([]);
 
         $this->service->createStoryForTask('67890', $data);
+    }
+
+    /**
+     * Test getStoriesForRecord calls client with correct parameters.
+     */
+    public function testGetStoriesForRecord(): void
+    {
+        $options = ['resource_subtype' => 'comment_added', 'sort_ascending' => false];
+
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with('GET', 'records/67890/stories', ['query' => $options], HttpClientInterface::RESPONSE_DATA)
+            ->willReturn([]);
+
+        $this->service->getStoriesForRecord('67890', $options);
+    }
+
+    /**
+     * Test createStoryForRecord calls client with correct parameters.
+     */
+    public function testCreateStoryForRecord(): void
+    {
+        $data = ['text' => 'New comment'];
+
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'records/67890/stories',
+                ['json' => ['data' => $data], 'query' => []],
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $this->service->createStoryForRecord('67890', $data);
+    }
+
+    /**
+     * Test getStoriesForRecord rejects a non-numeric GID.
+     */
+    public function testGetStoriesForRecordThrowsExceptionForNonNumericGid(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Record GID must be a numeric string.');
+
+        $this->service->getStoriesForRecord('abc');
+    }
+
+    /**
+     * Test createStoryForRecord requires text or html_text.
+     */
+    public function testCreateStoryForRecordRequiresText(): void
+    {
+        $this->expectException(ValidationException::class);
+
+        $this->service->createStoryForRecord('67890', ['is_pinned' => true]);
     }
 
     /**

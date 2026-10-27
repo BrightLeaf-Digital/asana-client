@@ -75,4 +75,18 @@ class CustomFieldSettingsApiServiceTest extends TestCase
         $actual = $this->service->getCustomFieldSettingsForTeam($gid);
         $this->assertSame($expected, $actual);
     }
+
+    public function testGetCustomFieldSettingsForTable(): void
+    {
+        $gid = '12345';
+        $expected = ['data' => []];
+
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->with('GET', "tables/$gid/custom_field_settings", ['query' => []], HttpClientInterface::RESPONSE_DATA)
+            ->willReturn($expected);
+
+        $actual = $this->service->getCustomFieldSettingsForTable($gid);
+        $this->assertSame($expected, $actual);
+    }
 }

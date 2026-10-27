@@ -143,4 +143,38 @@ class CustomFieldSettingsApiService extends BaseApiService
             $responseType
         );
     }
+
+    /**
+     * Get a table's custom fields
+     * GET /tables/{table_gid}/custom_field_settings
+     * Returns a paginated list of the custom field settings for the given table.
+     * Requires the `tables:read` OAuth scope.
+     * API Documentation: https://developers.asana.com/reference/getcustomfieldsettingsfortable
+     *
+     * @param string $tableGid Globally unique identifier for the table.
+     * @param array $options Optional parameters:
+     * - limit (int): Results per page.
+     * - offset (string): Offset token.
+     * - opt_fields (string): Comma-separated list of fields.
+     * - opt_pretty (bool): Pretty JSON.
+     * @param int $responseType The type of response to return.
+     *
+     * @return array The response data.
+     * @throws ApiException
+     * @throws RateLimitException
+     * @throws ValidationException If table GID is empty.
+     */
+    public function getCustomFieldSettingsForTable(
+        string $tableGid,
+        array $options = [],
+        int $responseType = HttpClientInterface::RESPONSE_DATA
+    ): array {
+        $this->validateGid($tableGid, 'Table GID');
+        return $this->client->request(
+            'GET',
+            "tables/$tableGid/custom_field_settings",
+            ['query' => $options],
+            $responseType
+        );
+    }
 }
