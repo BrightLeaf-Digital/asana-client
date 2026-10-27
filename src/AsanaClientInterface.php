@@ -48,6 +48,8 @@ use BrightleafDigital\Api\TypeaheadApiService;
 use BrightleafDigital\Api\CustomFieldSettingsApiService;
 use BrightleafDigital\Api\OooEntriesApiService;
 use BrightleafDigital\Api\ProjectPortfolioSettingsApiService;
+use BrightleafDigital\Api\TablesApiService;
+use BrightleafDigital\Api\RecordsApiService;
 use BrightleafDigital\Api\RolesApiService;
 use BrightleafDigital\Api\TimesheetApprovalStatusesApiService;
 use BrightleafDigital\Api\TimeTrackingCategoriesApiService;
@@ -503,4 +505,18 @@ interface AsanaClientInterface
      * @throws NotFoundExceptionInterface
      */
     public function projectPortfolioSettings(): ProjectPortfolioSettingsApiService;
+
+    /**
+     * @return TablesApiService
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function tables(): TablesApiService;
+
+    /**
+     * @return RecordsApiService
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function records(): RecordsApiService;
 }

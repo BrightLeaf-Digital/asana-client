@@ -51,6 +51,8 @@ use BrightleafDigital\Api\ProjectPortfolioSettingsApiService;
 use BrightleafDigital\Api\RolesApiService;
 use BrightleafDigital\Api\TimesheetApprovalStatusesApiService;
 use BrightleafDigital\Api\TimeTrackingCategoriesApiService;
+use BrightleafDigital\Api\TablesApiService;
+use BrightleafDigital\Api\RecordsApiService;
 use BrightleafDigital\Auth\AsanaOAuthHandler;
 use BrightleafDigital\Auth\AuthHandlerInterface;
 use BrightleafDigital\Exceptions\AuthException;
@@ -263,6 +265,8 @@ class AsanaClient implements AsanaClientInterface
             TimeTrackingCategoriesApiService::class,
             OooEntriesApiService::class,
             ProjectPortfolioSettingsApiService::class,
+            TablesApiService::class,
+            RecordsApiService::class,
         ];
 
         foreach ($services as $service) {
@@ -721,6 +725,24 @@ class AsanaClient implements AsanaClientInterface
     public function projectPortfolioSettings(): ProjectPortfolioSettingsApiService
     {
         return $this->container->get(ProjectPortfolioSettingsApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function tables(): TablesApiService
+    {
+        return $this->container->get(TablesApiService::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function records(): RecordsApiService
+    {
+        return $this->container->get(RecordsApiService::class);
     }
 
     // --- Feature Flags ---
