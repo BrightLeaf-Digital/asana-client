@@ -96,7 +96,8 @@ class WebhooksApiService extends BaseApiService
      * API Documentation: https://developers.asana.com/reference/createwebhook
      * @param array $data Data for creating the webhook. Supported fields include:
      *                    Required:
-     * - resource (string): GID of the resource to watch for changes.
+     * - resource (string): GID of the resource to watch for changes. Tables and records
+     *   can be watched as well as tasks, projects and other resources.
      *   Example: "12345"
      * - target (string): The URL to receive the HTTP POST.
      *   Must be a valid HTTPS URL.

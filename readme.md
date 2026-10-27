@@ -110,6 +110,7 @@ See the [rich text documentation](https://developers.asana.com/docs/rich-text) f
 - **Batch API** - Execute multiple API requests in a single call
 - **Status Updates** - Post and retrieve project status updates
 - **User Task Lists** - Access "My Tasks" and personal task lists
+- **Tables and Records** - Manage structured tables, their records, and comments on records
 
 ### Quick Examples
 
@@ -216,6 +217,33 @@ parameters return `scimType: invalidValue`. Inspect these fields with
 `$exception->getResponseData()` on `ApiException`. `RESPONSE_FULL` additionally exposes HTTP metadata;
 `RESPONSE_DATA` also preserves the entire SCIM envelope because SCIM has no `data` wrapper.
 See the [SCIM reference](https://developers.asana.com/docs/scim).
+
+### Tables and records
+
+A table holds records (rows) whose columns are the table's custom field settings. Only custom fields
+that are global (published) to the workspace can be added to a table; others return HTTP 403. A table
+holds at most 150 custom fields, and every record belongs to exactly one table.
+
+```php
+$table = $client->tables()->createTable(['workspace' => $workspaceGid, 'name' => 'Customers']);
+$client->tables()->addCustomFieldSettingForTable($table['gid'], ['custom_field' => $fieldGid]);
+
+$record = $client->records()->createRecord([
+    'table' => $table['gid'],
+    'name' => 'Acme Corp',
+    'custom_fields' => [$fieldGid => 'Enterprise'],
+    'unique_fingerprint' => 'crm-account-0061',
+]);
+$records = $client->records()->getRecordsForTable($table['gid'], ['sort_by' => 'created_at']);
+$matches = $client->records()->searchRecords($workspaceGid, ['text' => 'Acme', 'tables.any' => $table['gid']]);
+$client->stories()->createStoryForRecord($record['gid'], ['text' => 'Renewal due next month']);
+```
+
+A repeated `unique_fingerprint` within a table returns HTTP 409 instead of creating a duplicate.
+Record search requires a premium plan; other users receive HTTP 402. Both surface as `ApiException`.
+Tables and records can be watched through `webhooks()->createWebhook()`. The API does not yet expose
+record permissions. Scopes: `tables:read|write|delete`, `records:read|write|delete`; comments use
+`stories:read|write`. See the [announcement](https://forum.asana.com/t/new-tables-and-records-api/1159790).
 
 ## Design Decisions
 
