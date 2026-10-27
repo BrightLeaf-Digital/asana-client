@@ -81,13 +81,15 @@ class RecordsApiService extends BaseApiService
      *
      * @param array $data Data for creating the record. Supported fields include:
      *                    Required:
+     * - name (string): Name of the record.
+     *   Example: "Acme Corp"
      * - table (string): GID of the table to create the record in.
      *   Example: "12345"
      *                    Optional:
-     * - name (string): Name of the record.
-     *   Example: "Acme Corp"
      * - custom_fields (array): Map of custom field GID to value. The value is an enum option
-     *   GID, string, number or object depending on the custom field type.
+     *   GID, string, number or object depending on the custom field type. Only fields already
+     *   on the table can be written; unlike tasks, records cannot force-write a field that
+     *   is not yet on the table.
      *   Example: ["67890" => "Enterprise"]
      * - unique_fingerprint (string): Client-provided identifier used to deduplicate record
      *   creation within a table. A duplicate fingerprint fails with a 409 Conflict instead of
@@ -122,14 +124,14 @@ class RecordsApiService extends BaseApiService
      *
      * @throws ApiException
      * @throws RateLimitException
-     * @throws ValidationException If the table field is missing
+     * @throws ValidationException If name or table is missing
      */
     public function createRecord(
         array $data,
         array $options = [],
         int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
-        $this->validateRequiredFields($data, ['table'], 'record creation');
+        $this->validateRequiredFields($data, ['name', 'table'], 'record creation');
 
         return $this->createResource('records', $data, $options, $responseType);
     }
@@ -181,7 +183,8 @@ class RecordsApiService extends BaseApiService
      *                          Example: "12345"
      * @param array $data Properties to update. Can include:
      * - name (string): New name of the record.
-     * - custom_fields (array): Map of custom field GID to new value.
+     * - custom_fields (array): Map of custom field GID to new value. Only fields already on
+     *   the table can be written.
      *   Example: ["name" => "Acme Inc", "custom_fields" => ["67890" => "Mid-market"]]
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): Comma-separated fields to include in the response

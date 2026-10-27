@@ -99,6 +99,17 @@ class RecordsApiServiceTest extends TestCase
         $this->service->createRecord(['name' => 'Acme Corp']);
     }
 
+    /**
+     * Test createRecord throws exception when name is missing.
+     */
+    public function testCreateRecordThrowsExceptionForMissingName(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Missing required field(s) for record creation: name');
+
+        $this->service->createRecord(['table' => '12345']);
+    }
+
     // ── getRecord ─────────────────────────────────────────────────────────
 
     /**

@@ -222,7 +222,8 @@ See the [SCIM reference](https://developers.asana.com/docs/scim).
 
 A table holds records (rows) whose columns are the table's custom field settings. Only custom fields
 that are global (published) to the workspace can be added to a table; others return HTTP 403. A table
-holds at most 150 custom fields, and every record belongs to exactly one table.
+holds at most 150 custom fields, and every record belongs to exactly one table. Record `custom_fields`
+writes only accept fields already on the table.
 
 ```php
 $table = $client->tables()->createTable(['workspace' => $workspaceGid, 'name' => 'Customers']);

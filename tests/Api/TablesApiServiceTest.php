@@ -98,6 +98,17 @@ class TablesApiServiceTest extends TestCase
         $this->service->createTable(['name' => 'Customers']);
     }
 
+    /**
+     * Test createTable throws exception when name is missing.
+     */
+    public function testCreateTableThrowsExceptionForMissingName(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Missing required field(s) for table creation: name');
+
+        $this->service->createTable(['workspace' => '12345']);
+    }
+
     // ── getTable ──────────────────────────────────────────────────────────
 
     /**

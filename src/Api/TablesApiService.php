@@ -72,16 +72,14 @@ class TablesApiService extends BaseApiService
      *
      * @param array $data Data for creating the table. Supported fields include:
      *                    Required:
+     * - name (string): Name of the table.
+     *   Example: "Customers"
      * - workspace (string): GID of the workspace or organization to create the table in.
      *   Tables cannot be moved to a different workspace once created.
      *   Example: "12345"
-     *                    Optional:
-     * - name (string): Name of the table.
-     *   Example: "Customers"
-     * - custom_field_settings (array): Custom fields to enable on the table, as existing
-     *   global custom field GIDs or inline custom field definitions. Fields must be global
-     *   to the workspace or the request fails with a 403.
-     *   Example: ["workspace" => "12345", "name" => "Customers"]
+     *   Example: ["name" => "Customers", "workspace" => "12345"]
+     *
+     * Add columns after creation with addCustomFieldSettingForTable().
      * @param array $options Optional parameters to customize the request:
      * - opt_fields (string): Comma-separated fields to include in the response
      * - opt_pretty (bool): Returns formatted JSON if true
@@ -105,14 +103,14 @@ class TablesApiService extends BaseApiService
      *
      * @throws ApiException
      * @throws RateLimitException
-     * @throws ValidationException If the workspace field is missing
+     * @throws ValidationException If name or workspace is missing
      */
     public function createTable(
         array $data,
         array $options = [],
         int $responseType = HttpClientInterface::RESPONSE_DATA
     ): array {
-        $this->validateRequiredFields($data, ['workspace'], 'table creation');
+        $this->validateRequiredFields($data, ['name', 'workspace'], 'table creation');
 
         return $this->createResource('tables', $data, $options, $responseType);
     }
