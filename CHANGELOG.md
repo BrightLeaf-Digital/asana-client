@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## v0.2.8 - 2026-10-27
+
+### Added
+- document and test rich text custom field support (a90327a)
+- add tables and records OAuth scopes (fc2cb84)
+- add Tables and Records API services (89656a0)
+- add record stories and table custom field settings endpoints (b04b1de)
+
+### Documentation
+- document tables and records support (4293ba0)
+
+### Fixed
+- align table and record creation with the OpenAPI spec (74e642e)
+
+
 ## v0.2.7 - 2026-10-11
 
 ### Added
