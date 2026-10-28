@@ -50,6 +50,7 @@ use BrightleafDigital\Api\OooEntriesApiService;
 use BrightleafDigital\Api\ProjectPortfolioSettingsApiService;
 use BrightleafDigital\Api\TablesApiService;
 use BrightleafDigital\Api\RecordsApiService;
+use BrightleafDigital\Api\NotificationsApiService;
 use BrightleafDigital\Api\RolesApiService;
 use BrightleafDigital\Api\TimesheetApprovalStatusesApiService;
 use BrightleafDigital\Api\TimeTrackingCategoriesApiService;
@@ -519,4 +520,11 @@ interface AsanaClientInterface
      * @throws NotFoundExceptionInterface
      */
     public function records(): RecordsApiService;
+
+    /**
+     * @return NotificationsApiService
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function notifications(): NotificationsApiService;
 }
