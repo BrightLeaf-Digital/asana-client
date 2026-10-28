@@ -75,6 +75,18 @@ class Scopes
      */
     public const JOBS_READ = 'jobs:read';
 
+    // 🔹 Notifications
+    /**
+     * GET /users/{user_gid}/notifications
+     */
+    public const NOTIFICATIONS_READ = 'notifications:read';
+
+    /**
+     * - POST /users/{user_gid}/notifications/markRead
+     * - POST /users/{user_gid}/notifications/markUnread
+     */
+    public const NOTIFICATIONS_WRITE = 'notifications:write';
+
     // 🔹 Ooo entries
     /**
      * DELETE /ooo_entries/{ooo_entry_gid}

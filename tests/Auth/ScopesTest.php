@@ -108,6 +108,15 @@ class ScopesTest extends TestCase
     }
 
     /**
+     * Test notifications scope constants.
+     */
+    public function testNotificationsScopes(): void
+    {
+        $this->assertSame('notifications:read', Scopes::NOTIFICATIONS_READ);
+        $this->assertSame('notifications:write', Scopes::NOTIFICATIONS_WRITE);
+    }
+
+    /**
      * Test tags scope constants.
      */
     public function testTagsScopes(): void
