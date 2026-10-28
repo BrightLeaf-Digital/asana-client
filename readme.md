@@ -75,6 +75,7 @@ This library provides comprehensive coverage of the Asana API, including:
 - **Tasks** - Create, read, update, delete tasks and manage task relationships
 - **Projects** - Manage projects, sections, and project memberships
 - **Users** - Get user information and manage user settings
+- **Notifications** - Read the authenticated user's Inbox and mark notifications read or unread
 - **Workspaces** - Access workspace information and settings
 - **Tags** - Create and manage tags for organizing tasks
 - **Attachments** - Upload and manage file attachments
@@ -245,6 +246,27 @@ Record search requires a premium plan; other users receive HTTP 402. Both surfac
 Tables and records can be watched through `webhooks()->createWebhook()`. The API does not yet expose
 record permissions. Scopes: `tables:read|write|delete`, `records:read|write|delete`; comments use
 `stories:read|write`. See the [announcement](https://forum.asana.com/t/new-tables-and-records-api/1159790).
+
+### Notifications (Inbox)
+
+Read the authenticated user's Asana Inbox and update read state. Only the user's own Inbox is
+accessible (`me` or their own GID; anything else returns HTTP 403, service accounts included).
+Read state is shared with Asana, so marking a notification read also marks it read in the Inbox.
+
+```php
+$notifications = $client->notifications()->getNotifications($workspaceGid, 'me', [
+    'opt_fields' => 'story_resource_subtype,work_objects.name,story.text,is_read',
+]);
+$unread = array_column(array_filter($notifications, fn ($n) => !$n['is_read']), 'gid');
+$result = $client->notifications()->markNotificationsRead($workspaceGid, array_slice($unread, 0, 50));
+// $result['failed_gids'] lists GIDs that could not be updated
+```
+
+`markNotificationsRead()` / `markNotificationsUnread()` accept 1–50 GIDs per call. `priority_classification`
+currently always returns `unclassified`; treat it as an open set. `story` is `null` for system-generated
+notifications such as overdue reminders. Notifications are polling only (no webhooks or events), are not
+grouped into threads, and only read state can be changed. Scopes: `notifications:read|write`. See the
+[announcement](https://forum.asana.com/t/new-notifications-api/1159934).
 
 ## Design Decisions
 
