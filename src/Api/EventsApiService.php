@@ -62,9 +62,10 @@ class EventsApiService extends BaseApiService
      * - Just the data array containing the list of events with fields including:
      * - user: The user who triggered the event
      * - resource: The resource that was affected
-     * - type: The type of event (e.g., "task", "project", "story")
+     * - type: The type of event (e.g., "task", "project", "story", "custom_field")
      * - action: The action that occurred (e.g., "changed", "added", "removed")
-     * - parent: The parent resource if applicable
+     * - parent: The parent resource if applicable. For "custom_field" added/removed events this is
+     *   the project, portfolio or table the field was connected to or removed from
      * - created_at: Timestamp when the event occurred
      * - change: Object describing what changed (field, action, new_value, etc.)
      *                 Additional fields as specified in opt_fields
@@ -153,9 +154,10 @@ class EventsApiService extends BaseApiService
      * - Just the data array containing the list of events with fields including:
      * - user: The user who triggered the event
      * - resource: The resource that was affected
-     * - type: The type of event (e.g., "task", "project", "story")
+     * - type: The type of event (e.g., "task", "project", "story", "custom_field")
      * - action: The action that occurred (e.g., "changed", "added", "removed", "deleted", "undeleted")
-     * - parent: The parent resource if applicable
+     * - parent: The parent resource if applicable. For "custom_field" added/removed events this is
+     *   the project, portfolio or table the field was connected to or removed from
      * - created_at: Timestamp when the event occurred
      * - change: Object describing what changed (field, action, new_value, added_value, removed_value)
      *                 Additional fields as specified in opt_fields

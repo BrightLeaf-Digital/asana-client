@@ -105,7 +105,10 @@ class WebhooksApiService extends BaseApiService
      *                    Optional:
      * - filters (array): An array of filter objects for this webhook.
      *   Each filter has:
-     * - resource_type (string): The type of resource to filter on (e.g., "task")
+     * - resource_type (string): The type of resource to filter on (e.g., "task"). Use
+     *   "custom_field" with action "added" or "removed" to observe fields being added to or
+     *   removed from a watched project, portfolio or table. Deliveries carry only the compact
+     *   field (gid, resource_type); fetch it with CustomFieldApiService::getCustomField()
      * - resource_subtype (string): The subtype of resource (optional)
      * - action (string): The action to filter on (e.g., "changed", "added", "removed")
      * - fields (array): Array of field names to filter on (e.g., ["due_at", "due_on"])
@@ -239,7 +242,10 @@ class WebhooksApiService extends BaseApiService
      * @param array $data The properties of the webhook to update. Can include:
      * - filters (array): An array of filter objects for this webhook.
      *   Each filter has:
-     * - resource_type (string): The type of resource to filter on (e.g., "task")
+     * - resource_type (string): The type of resource to filter on (e.g., "task"). Use
+     *   "custom_field" with action "added" or "removed" to observe fields being added to or
+     *   removed from a watched project, portfolio or table. Deliveries carry only the compact
+     *   field (gid, resource_type); fetch it with CustomFieldApiService::getCustomField()
      * - resource_subtype (string): The subtype of resource (optional)
      * - action (string): The action to filter on (e.g., "changed", "added", "removed")
      * - fields (array): Array of field names to filter on (e.g., ["due_at", "due_on"])

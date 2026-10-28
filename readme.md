@@ -268,6 +268,14 @@ notifications such as overdue reminders. Notifications are polling only (no webh
 grouped into threads, and only read state can be changed. Scopes: `notifications:read|write`. See the
 [announcement](https://forum.asana.com/t/new-notifications-api/1159934).
 
+### Custom field webhook events
+
+Project, portfolio and table webhooks and event streams emit `custom_field` events with action `added` or
+`removed` when a field is connected to or removed from the container; the event's `parent` is the container.
+Filter on them with `['resource_type' => 'custom_field', 'action' => 'added']`. Webhook deliveries carry the
+compact field only, so call `customFields()->getCustomField()` for the full record. Value edits on tasks still
+arrive as task `changed` events. See the [announcement](https://forum.asana.com/t/new-webhook-event-types/1159912).
+
 ## Design Decisions
 
 - When a field is required by an Asana API endpoint (such as a workspace GID), it's typically required as a method argument
