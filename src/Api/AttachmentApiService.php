@@ -287,14 +287,10 @@ class AttachmentApiService extends BaseApiService
         if ($stream === false) {
             throw new RuntimeException('Failed to create temporary stream');
         }
-        // Write the file contents to the stream
-        // Check if the stream is writable
-        if (stream_get_meta_data($stream)['mode'] !== 'r+') {
-            fclose($stream);
-            throw new RuntimeException('Stream is not writable');
-        }
-        // Write the file contents to the stream and check if fwrite was successful
-        if (fwrite($stream, $fileContents) === false) {
+        // Write the file contents to the stream and check that all of it was written. Do not
+        // check stream_get_meta_data()'s mode: PHP reports a php://temp stream as 'w+b'
+        // whatever mode it was opened with.
+        if (fwrite($stream, $fileContents) !== strlen($fileContents)) {
             fclose($stream);
             throw new RuntimeException('Failed to write to temporary stream');
         }

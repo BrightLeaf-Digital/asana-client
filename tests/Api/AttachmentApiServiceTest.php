@@ -4,7 +4,6 @@ namespace BrightleafDigital\Tests\Api;
 
 use BrightleafDigital\Api\AttachmentApiService;
 use BrightleafDigital\Http\HttpClientInterface;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -195,29 +194,68 @@ class AttachmentApiServiceTest extends TestCase
     }
 
     /**
-     * Test uploadAttachmentFromContents calls client with correct parameters.
-     *
-     * Note: This test verifies the method signature and mock expectations.
-     * The actual stream handling is tested via integration tests since
-     * stream_get_meta_data behavior varies by environment.
+     * Test uploadAttachmentFromContents sends the contents as a readable, rewound stream.
      */
-    #[Group('integration')]
     public function testUploadAttachmentFromContents(): void
     {
-        $this->markTestSkipped(
-            'This test requires integration testing due to stream handling in the implementation.'
-        );
+        $sent = null;
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'attachments',
+                $this->callback(function ($options) use (&$sent) {
+                    $sent = $options;
+                    return true;
+                }),
+                HttpClientInterface::RESPONSE_DATA
+            )
+            ->willReturn([]);
+
+        $this->service->uploadAttachmentFromContents('12345', "line one\nline two\n", 'notes.diff');
+
+        $this->assertCount(2, $sent['multipart']);
+        $this->assertArrayNotHasKey('query', $sent);
+        $file = $sent['multipart'][0];
+        $this->assertSame('file', $file['name']);
+        $this->assertSame('notes.diff', $file['filename']);
+        $this->assertIsResource($file['contents']);
+        $this->assertSame("line one\nline two\n", stream_get_contents($file['contents']));
+        fclose($file['contents']);
+        $this->assertSame(['name' => 'parent', 'contents' => '12345'], $sent['multipart'][1]);
     }
 
     /**
-     * Test uploadAttachmentFromContents with options.
+     * Test uploadAttachmentFromContents with empty contents and options.
      */
-    #[Group('integration')]
     public function testUploadAttachmentFromContentsWithOptions(): void
     {
-        $this->markTestSkipped(
-            'This test requires integration testing due to stream handling in the implementation.'
+        $sent = null;
+        $this->mockClient()->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'attachments',
+                $this->callback(function ($options) use (&$sent) {
+                    $sent = $options;
+                    return true;
+                }),
+                HttpClientInterface::RESPONSE_FULL
+            )
+            ->willReturn([]);
+
+        $options = ['opt_fields' => 'name,download_url'];
+        $this->service->uploadAttachmentFromContents(
+            '12345',
+            '',
+            'empty.txt',
+            $options,
+            HttpClientInterface::RESPONSE_FULL
         );
+
+        $this->assertSame($options, $sent['query']);
+        $this->assertSame('', stream_get_contents($sent['multipart'][0]['contents']));
+        fclose($sent['multipart'][0]['contents']);
     }
 
     /**
