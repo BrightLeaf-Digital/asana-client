@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## v0.2.9 - 2026-11-12
+
+### Added
+- add notifications OAuth scopes (7675344)
+- add Notifications API service (c94dfe0)
+
+### Documentation
+- document notifications API (a4f8d2b)
+- document custom field added/removed webhook events (d0195ec)
+
+### Fixed
+- let uploadAttachmentFromContents upload (dd48125)
+
+
 ## v0.2.8 - 2026-10-27
 
 ### Added
